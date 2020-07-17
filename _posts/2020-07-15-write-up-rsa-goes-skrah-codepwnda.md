@@ -3,8 +3,7 @@ layout: post
 title: "Codepwnda - RSA Goes Skrah Write-Up"
 date: 2020-07-15 06:25:05 +0530
 categories:
-  - Write Up
-  - CTF
+  - WriteUp
   - Crypto
 ---
 
