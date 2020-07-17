@@ -110,8 +110,8 @@ p, q = Int('p'), Int('q')
 persamaan_1 = (p*q) == n
 persamaan_2 = (p+q) == ((h - n) - 0xdeadbeef**2)/0xdeadbeef
 
-s.add(persamaan1)
-s.add(persamaan2)
+s.add(persamaan_1)
+s.add(persamaan_2)
 
 if s.check() == sat:
     print s.model()
@@ -152,4 +152,4 @@ abdullahnz ~/Codepwnda/RSA python solver.py
 codepwnda{64d6585a10d63c8ad74e9e2cf57773dee67a5d81}~~~~~~~~~~~~~
 ```
 ### Flag 
-`codepwnda{64d6585a10d63c8ad74e9e2cf57773dee67a5d81}`
+codepwnda{64d6585a10d63c8ad74e9e2cf57773dee67a5d81}
