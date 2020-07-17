@@ -76,20 +76,20 @@ Hint: 32562261483871436207482160160917673015442002221518714172850628049975159904
 Pada file `enc` terdapat `hint` yang dimana `hint` tersebut dikalkulasi oleh script pada line ke-31, berikut potongan script line 31.
 
 ```py
-  h = (p+0xdeadbeef) * (q+0xdeadbeef)
+h = (p+0xdeadbeef) * (q+0xdeadbeef)
 ```
 
 Dimana dari `hint` tersebut akan menjadi persamaan yang digunakan untuk mencari faktor prima `p` dan `q`. Persamaan dicari dengan cara menyederhanakan atau memindah ruas-ruas bilangan, seperti dalam matematika pada umumnya.
 
 ```py
-  h = (p+0xdeadbeef) * (q+0xdeadbeef)
-  h = pq + p*0xdeadbeef + q*0xdeadbeef + 0xdeadbeef**2
+h = (p+0xdeadbeef) * (q+0xdeadbeef)
+h = pq + p*0xdeadbeef + q*0xdeadbeef + 0xdeadbeef**2
 ```
 Karena `pq = n`, maka pq bisa kita tulis dengan `n`.
 ```py
-  h               = n + 0xdeadbeef(p+q) + 0xdeadbeef**2
-  h - n           = 0xdeadbeef(p+q) + 0xdeadbeef**2
-  0xdeadbeef(p+q) = (h - n) - 0xdeadbeef**2
+h               = n + 0xdeadbeef(p+q) + 0xdeadbeef**2
+h - n           = 0xdeadbeef(p+q) + 0xdeadbeef**2
+0xdeadbeef(p+q) = (h - n) - 0xdeadbeef**2
 ```
 Pindah ruas `0xdeadbeef` kiri ke ruas kanan, maka persamaan `p+q` ditemukan, yaitu sebagai berikut.
 ```py
