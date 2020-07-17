@@ -286,10 +286,10 @@ End of assembler dump.
 Sama dengan soal ```buffer1```, binary ini menggunakan ```gets``` untuk mengambil inputan yang diberi ukuran sebesar ```0x90```.
 
 ```py
-   0x08048555 <+57>: cmp    DWORD PTR [ebp-0xc],0x13377331
-   0x0804855c <+64>: jne    0x8048576 <main+90>
-   0x0804855e <+66>: cmp    DWORD PTR [ebp-0x10],0x0
-   0x08048562 <+70>: jne    0x8048576 <main+90>
+ 0x08048555 <+57>: cmp    DWORD PTR [ebp-0xc],0x13377331
+ 0x0804855c <+64>: jne    0x8048576 <main+90>
+ 0x0804855e <+66>: cmp    DWORD PTR [ebp-0x10],0x0
+ 0x08048562 <+70>: jne    0x8048576 <main+90>
 ```
 
 Tetapi, dalam binary ini, ada 2 validasi yang harus dilalui.
@@ -444,7 +444,7 @@ gdb-peda$ pattern offset 0x41474141
 1095188801 found at offset: 52
 ```
 
-Terlihat pada offset 52 ```eip``` ter-overwrite dan bisa merubah *return address* fungsi `flag` yang ada pada alamat `0x080491c2`.
+Terlihat pada offset 52 ```eip``` ter-overwrite dan bisa merubah *return address* mengarah ke fungsi `flag` yang ada pada alamat `0x080491c2`.
 
 ```sh
 $ objdump -D ./buffow | grep flag
