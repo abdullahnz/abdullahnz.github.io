@@ -53,3 +53,10 @@ theme: plainwhite
 plugins:
   - jekyll-seo-tag
 #  - jekyll-feed
+navigation:
+#   - title: Homepage
+#     url: "/"
+  - title: Categories
+    url: "/categories"
+#   - title: About Me
+#     url: "/about"
