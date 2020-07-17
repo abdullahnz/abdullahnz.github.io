@@ -3,8 +3,7 @@ layout: post
 title: "AsgamaCTF Binary Exploit Write-Up"
 date: 2020-07-15 06:25:05 +0530
 categories:
-  - Write Up
-  - CTF
+  - WriteUp
   - PWN
 ---
 
