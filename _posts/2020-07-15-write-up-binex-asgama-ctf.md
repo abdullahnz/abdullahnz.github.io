@@ -493,5 +493,5 @@ GamaCTF{Ini_Bukan_Flagnya}
 Sebagian solver diatas dibuat dengan bantuan dari pwntools yang bisa didownload [disini](https://github.com/Gallopsled/pwntools).
 
 ## Referensi
-1. *https://www.tutorialspoint.com/assembly_programming/assembly_conditions.htm [(klik)](https://www.tutorialspoint.com/assembly_programming/assembly_conditions.htm)*
+1. *https://www.tutorialspoint.com/assembl.. [(klik)](https://www.tutorialspoint.com/assembly_programming/assembly_conditions.htm)*
 2. *https://en.wikipedia.org/wiki/Endianness [(klik)](https://en.wikipedia.org/wiki/Endianness)*
