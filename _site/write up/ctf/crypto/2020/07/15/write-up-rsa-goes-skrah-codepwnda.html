@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head><meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="X-UA-Compatible" content="ie=edge">
+<link href="https://fonts.googleapis.com/css?family=Merriweather:300|Raleway:400,700" rel="stylesheet">
+<link rel="stylesheet" href="/assets/css/style.css">
+<title>Codepwnda - RSA Goes Skrah Write-Up</title>
+<!-- Begin Jekyll SEO tag v2.6.1 -->
+<title>Codepwnda - RSA Goes Skrah Write-Up | Abdullahnz’s Notes</title>
+<meta name="generator" content="Jekyll v4.1.1" />
+<meta property="og:title" content="Codepwnda - RSA Goes Skrah Write-Up" />
+<meta name="author" content="abdullahnz" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="Diberikan 2 buah file, yaitu: rsa-goes-skrrrahh.py yang digunakan untuk meng-encrypt flag, dan enc adalah hasil atau output dari peng-encrypt-an flag." />
+<meta property="og:description" content="Diberikan 2 buah file, yaitu: rsa-goes-skrrrahh.py yang digunakan untuk meng-encrypt flag, dan enc adalah hasil atau output dari peng-encrypt-an flag." />
+<link rel="canonical" href="http://localhost:4000/write%20up/ctf/crypto/2020/07/15/write-up-rsa-goes-skrah-codepwnda.html" />
+<meta property="og:url" content="http://localhost:4000/write%20up/ctf/crypto/2020/07/15/write-up-rsa-goes-skrah-codepwnda.html" />
+<meta property="og:site_name" content="Abdullahnz’s Notes" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2020-07-15T07:55:05+07:00" />
+<script type="application/ld+json">
+{"description":"Diberikan 2 buah file, yaitu: rsa-goes-skrrrahh.py yang digunakan untuk meng-encrypt flag, dan enc adalah hasil atau output dari peng-encrypt-an flag.","mainEntityOfPage":{"@type":"WebPage","@id":"http://localhost:4000/write%20up/ctf/crypto/2020/07/15/write-up-rsa-goes-skrah-codepwnda.html"},"url":"http://localhost:4000/write%20up/ctf/crypto/2020/07/15/write-up-rsa-goes-skrah-codepwnda.html","author":{"@type":"Person","name":"abdullahnz"},"@type":"BlogPosting","headline":"Codepwnda - RSA Goes Skrah Write-Up","dateModified":"2020-07-15T07:55:05+07:00","datePublished":"2020-07-15T07:55:05+07:00","@context":"https://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+
+<style>
+table {
+    margin: auto !important;
+    min-width: 500px !important;
+}
+</style></head>
+
+<body>
+  <main class="container">
+    <section class="about">
+      <a href="/"><img class="profile_image" style="border-radius: 50%;" src="/assets/portfolio.png" alt="Nizam Abdullah"></a>
+      <h2 id="title" >
+        <a href="/">Nizam Abdullah</a>
+      </h2>
+      <p class="tagline">Student.</p>
+      <ul class="social"><a href="https://github.com/abdullahnz" target="_blank">
+          <li>
+            <i class="icon-github-circled"></i>
+          </li>
+        </a><a href="https://instagram.com/abdullahnz_" target="_blank">
+          <li>
+            <i class="icon-instagram"></i>
+          </li>
+        </a><a href="https://facebook.com/profile.php?id=100006254298767" target="_blank">
+          <li>
+            <i class="icon-facebook-squared"></i>
+          </li>
+        </a><a href=" https://t.me/abdullahnzz" target="_blank">
+          <li>
+            <i class="icon-telegram"></i>
+          </li>
+        </a></ul><p>&copy;
+        2020</p><div>
+        <p>Dark Mode
+          <i class="icon-moon"></i>
+          <label class="switch">
+            <input type="checkbox" id="dark-mode-toggle">
+            <span class="slider round" onclick="toggleDarkMode()"></span>
+          </label>
+        </p>
+      </div>
+      <script type="text/javascript" src="/assets/js/darkmode.js"></script></section>
+    <section class="content">
+      <div class="post-container">
+  <a class="post-link" href="/write%20up/ctf/crypto/2020/07/15/write-up-rsa-goes-skrah-codepwnda.html">
+    <h2 class="post-title">Codepwnda - RSA Goes Skrah Write-Up</h2>
+  </a>
+  <div class="post-meta">
+    <div class="post-date"><i class="icon-calendar"></i>Jul 15, 2020</div><ul class="post-categories"><li>Write Up</li><li>CTF</li><li>Crypto</li></ul></div>
+  <div class="post">
+    <p>Diberikan 2 buah file, yaitu:</p>
+<ul>
+  <li><code class="language-plaintext highlighter-rouge">rsa-goes-skrrrahh.py</code> yang digunakan untuk meng-encrypt flag, dan</li>
+  <li><code class="language-plaintext highlighter-rouge">enc</code> adalah hasil atau output dari peng-encrypt-an flag.</li>
+</ul>
+
+<p><strong><code class="language-plaintext highlighter-rouge">rsa-goes-skrrrahh.py</code></strong></p>
+<div class="language-py highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">from</span> <span class="nn">gmpy2</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">import</span> <span class="nn">os</span><span class="p">,</span> <span class="n">struct</span><span class="p">,</span> <span class="n">time</span>
+
+<span class="k">def</span> <span class="nf">egcd</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">a</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">return</span> <span class="p">(</span><span class="n">b</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="n">g</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">x</span> <span class="o">=</span> <span class="n">egcd</span><span class="p">(</span><span class="n">b</span><span class="o">%</span><span class="n">a</span><span class="p">,</span><span class="n">a</span><span class="p">)</span>
+    <span class="k">return</span> <span class="p">(</span><span class="n">g</span><span class="p">,</span> <span class="n">x</span> <span class="o">-</span> <span class="p">(</span><span class="n">b</span><span class="o">//</span><span class="n">a</span><span class="p">)</span> <span class="o">*</span> <span class="n">y</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">modinv</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">m</span><span class="p">):</span>
+    <span class="n">g</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="n">egcd</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">m</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">g</span> <span class="o">!=</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="nb">Exception</span><span class="p">(</span><span class="s">"No modular inverse"</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">x</span><span class="o">%</span><span class="n">m</span>
+
+<span class="k">def</span> <span class="nf">generateN</span><span class="p">(</span><span class="n">randomST</span><span class="p">):</span>
+    <span class="n">k1</span> <span class="o">=</span> <span class="n">mpz_urandomb</span><span class="p">(</span><span class="n">randomST</span><span class="p">,</span> <span class="mi">1024</span><span class="p">)</span>
+    <span class="n">k2</span> <span class="o">=</span> <span class="n">mpz_urandomb</span><span class="p">(</span><span class="n">randomST</span><span class="p">,</span> <span class="mi">1024</span><span class="p">)</span>
+
+    <span class="n">p</span> <span class="o">=</span> <span class="n">next_prime</span><span class="p">(</span><span class="n">k1</span><span class="p">)</span>
+    <span class="n">q</span> <span class="o">=</span> <span class="n">next_prime</span><span class="p">(</span><span class="n">k2</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">is_prime</span><span class="p">(</span><span class="n">p</span><span class="p">,</span> <span class="mi">50</span><span class="p">)</span> <span class="ow">and</span> <span class="n">is_prime</span><span class="p">(</span><span class="n">q</span><span class="p">,</span> <span class="mi">50</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">[</span><span class="n">p</span><span class="p">,</span> <span class="n">q</span><span class="p">]</span>
+
+<span class="k">def</span> <span class="nf">generateKeys</span><span class="p">(</span><span class="n">p</span><span class="p">,</span> <span class="n">q</span><span class="p">):</span>
+    <span class="n">e</span> <span class="o">=</span> <span class="mh">0x10001</span>
+    <span class="n">n</span> <span class="o">=</span> <span class="n">p</span> <span class="o">*</span> <span class="n">q</span>
+    <span class="n">phi</span> <span class="o">=</span> <span class="p">(</span><span class="n">p</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">q</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">d</span> <span class="o">=</span> <span class="n">modinv</span><span class="p">(</span><span class="n">e</span><span class="p">,</span> <span class="n">phi</span><span class="p">)</span>
+    <span class="n">h</span> <span class="o">=</span> <span class="p">(</span><span class="n">p</span><span class="o">+</span><span class="mh">0xdeadbeef</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">q</span><span class="o">+</span><span class="mh">0xdeadbeef</span><span class="p">)</span>
+    <span class="k">return</span> <span class="p">[</span><span class="n">e</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="n">h</span><span class="p">]</span>
+
+<span class="k">def</span> <span class="nf">encryptMsg</span><span class="p">():</span>
+    <span class="n">seed</span> <span class="o">=</span> <span class="n">os</span><span class="p">.</span><span class="n">urandom</span><span class="p">(</span><span class="mi">8</span><span class="p">)</span>
+    <span class="n">randomST</span> <span class="o">=</span> <span class="n">random_state</span><span class="p">(</span><span class="n">struct</span><span class="p">.</span><span class="n">unpack</span><span class="p">(</span><span class="s">"&gt;Q"</span><span class="p">,</span> <span class="n">seed</span><span class="p">)[</span><span class="mi">0</span><span class="p">])</span>
+
+    <span class="n">p</span><span class="p">,</span> <span class="n">q</span> <span class="o">=</span> <span class="n">generateN</span><span class="p">(</span><span class="n">randomST</span><span class="p">)</span>
+    <span class="n">e</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="n">h</span> <span class="o">=</span> <span class="n">generateKeys</span><span class="p">(</span><span class="n">p</span><span class="p">,</span> <span class="n">q</span><span class="p">)</span>
+
+    <span class="n">flag</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="s">"flag"</span><span class="p">).</span><span class="n">read</span><span class="p">()</span>
+    <span class="n">flag</span> <span class="o">=</span> <span class="n">flag</span><span class="p">.</span><span class="n">ljust</span><span class="p">(</span><span class="mi">64</span><span class="p">,</span> <span class="s">"</span><span class="se">\x7e</span><span class="s">"</span><span class="p">)</span>
+    <span class="n">flag</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">flag</span><span class="p">.</span><span class="n">encode</span><span class="p">(</span><span class="s">"hex"</span><span class="p">),</span> <span class="mi">16</span><span class="p">)</span>
+    <span class="n">encrypted</span> <span class="o">=</span> <span class="nb">pow</span><span class="p">(</span><span class="n">flag</span><span class="p">,</span> <span class="n">e</span><span class="p">,</span> <span class="n">n</span><span class="p">)</span>
+
+    <span class="k">print</span> <span class="s">"Cipher: {}"</span><span class="p">.</span><span class="nb">format</span><span class="p">(</span><span class="n">encrypted</span><span class="p">)</span>
+    <span class="k">print</span> <span class="s">"N: {}"</span><span class="p">.</span><span class="nb">format</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>
+    <span class="k">print</span> <span class="s">"Hint: {}"</span><span class="p">.</span><span class="nb">format</span><span class="p">(</span><span class="n">h</span><span class="p">)</span>
+
+<span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s">"__main__"</span><span class="p">:</span>
+    <span class="n">encryptMsg</span><span class="p">()</span> 
+</code></pre></div></div>
+
+<p>dan file <strong><code class="language-plaintext highlighter-rouge">enc</code></strong>.</p>
+<div class="language-py highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">Cipher</span><span class="p">:</span> <span class="mi">2783681285224397954445633434092010094202154026351075327595262315611963060834268330495003476443468455933771589021321167423952974433206799778170982398059065283311583221733327500582515864630039335118928192904883592951078506863443594128693054651308173150413944814782446460604924080949887844708703732095645295622958880669878572827156610531298376783363421384785801753032417536662122015382380889140323708534641203346350589292490826472394653845250793749628707526760481205875798918611767693363345218050757536598073662452358873149264179421540412287270509518114963322448415748603820569049446868237998366567665317608731109181957</span>
+<span class="n">N</span><span class="p">:</span> <span class="mi">3256226148387143620748216016091767301544200222151871417285062804997515990445839897273196564112977469632288904415895789208702219044672267615643272782757966270464651099334396871080478335191111952511052661254669563908518252375444233155972983832416735017880201519006877751058589417284970582039965771233221016711318442645350110925698099770289295910882000031766951653491463807803675140995396224307604132474154433821872956743871932987528829067022435457739031806017588448296251954640125851949901704392123345256602246275586222273803279362438459210330281277165384961780739344041626232385517019828333155917126810961344433991861</span>
+<span class="n">Hint</span><span class="p">:</span> <span class="mi">3256226148387143620748216016091767301544200222151871417285062804997515990445839897273196564112977469632288904415895789208702219044672267615643272782757966270464651099334396871080478335191111952511052661254669563908518252375444233155972983832416735017880201519006877751058589417284970582039965771233710124804125920978011223686997676454388103351196049357554477226209883509290629285087983204033202815451494581559629751828525162951060214854199388888638763294932811862670747777685064339406502372910861397837574615036661035963635147450924617475484126226676255415016995059650725575250856895523892418566200500427209543093484</span>
+</code></pre></div></div>
+
+<p>Pada file <code class="language-plaintext highlighter-rouge">enc</code> terdapat <code class="language-plaintext highlighter-rouge">hint</code> yang dimana <code class="language-plaintext highlighter-rouge">hint</code> tersebut dikalkulasi oleh script pada line ke-31, berikut potongan script line 31.</p>
+
+<div class="language-py highlighter-rouge"><div class="highlight"><pre class="highlight"><code>  <span class="n">h</span> <span class="o">=</span> <span class="p">(</span><span class="n">p</span><span class="o">+</span><span class="mh">0xdeadbeef</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">q</span><span class="o">+</span><span class="mh">0xdeadbeef</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p>Dimana dari <code class="language-plaintext highlighter-rouge">hint</code> tersebut akan menjadi persamaan yang digunakan untuk mencari faktor prima <code class="language-plaintext highlighter-rouge">p</code> dan <code class="language-plaintext highlighter-rouge">q</code>. Persamaan dicari dengan cara menyederhanakan atau memindah ruas-ruas bilangan, seperti dalam matematika pada umumnya.</p>
+
+<div class="language-py highlighter-rouge"><div class="highlight"><pre class="highlight"><code>  <span class="n">h</span> <span class="o">=</span> <span class="p">(</span><span class="n">p</span><span class="o">+</span><span class="mh">0xdeadbeef</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">q</span><span class="o">+</span><span class="mh">0xdeadbeef</span><span class="p">)</span>
+  <span class="n">h</span> <span class="o">=</span> <span class="n">pq</span> <span class="o">+</span> <span class="n">p</span><span class="o">*</span><span class="mh">0xdeadbeef</span> <span class="o">+</span> <span class="n">q</span><span class="o">*</span><span class="mh">0xdeadbeef</span> <span class="o">+</span> <span class="mh">0xdeadbeef</span><span class="o">**</span><span class="mi">2</span>
+</code></pre></div></div>
+<p>Karena <code class="language-plaintext highlighter-rouge">pq = n</code>, maka pq bisa kita tulis dengan <code class="language-plaintext highlighter-rouge">n</code>.</p>
+<div class="language-py highlighter-rouge"><div class="highlight"><pre class="highlight"><code>  <span class="n">h</span>               <span class="o">=</span> <span class="n">n</span> <span class="o">+</span> <span class="mh">0xdeadbeef</span><span class="p">(</span><span class="n">p</span><span class="o">+</span><span class="n">q</span><span class="p">)</span> <span class="o">+</span> <span class="mh">0xdeadbeef</span><span class="o">**</span><span class="mi">2</span>
+  <span class="n">h</span> <span class="o">-</span> <span class="n">n</span>           <span class="o">=</span> <span class="mh">0xdeadbeef</span><span class="p">(</span><span class="n">p</span><span class="o">+</span><span class="n">q</span><span class="p">)</span> <span class="o">+</span> <span class="mh">0xdeadbeef</span><span class="o">**</span><span class="mi">2</span>
+  <span class="mh">0xdeadbeef</span><span class="p">(</span><span class="n">p</span><span class="o">+</span><span class="n">q</span><span class="p">)</span> <span class="o">=</span> <span class="p">(</span><span class="n">h</span> <span class="o">-</span> <span class="n">n</span><span class="p">)</span> <span class="o">-</span> <span class="mh">0xdeadbeef</span><span class="o">**</span><span class="mi">2</span>
+</code></pre></div></div>
+<p>Pindah ruas <code class="language-plaintext highlighter-rouge">0xdeadbeef</code> kiri ke ruas kanan, maka persamaan <code class="language-plaintext highlighter-rouge">p+q</code> ditemukan, yaitu sebagai berikut.</p>
+<div class="language-py highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">p</span><span class="o">+</span><span class="n">q</span> <span class="o">=</span> <span class="p">((</span><span class="n">h</span> <span class="o">-</span> <span class="n">n</span><span class="p">)</span> <span class="o">-</span> <span class="mh">0xdeadbeef</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span><span class="o">/</span><span class="mh">0xdeadbeef</span>
+</code></pre></div></div>
+<p>Sehingga, telah didapat 2 persamaan untuk mencari faktor prima <code class="language-plaintext highlighter-rouge">p</code> dan <code class="language-plaintext highlighter-rouge">q</code>. Selanjutnya dilakukan scripting menggunakan <code class="language-plaintext highlighter-rouge">z3 solver</code> untuk mendapatkan faktor prima <code class="language-plaintext highlighter-rouge">p</code> dan <code class="language-plaintext highlighter-rouge">q</code>.</p>
+<div class="language-py highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">from</span> <span class="nn">z3</span> <span class="kn">import</span> <span class="o">*</span>
+
+<span class="n">h</span> <span class="o">=</span> <span class="mi">3256226148387143620748216016091767301544200222151871417285062804997515990445839897273196564112977469632288904415895789208702219044672267615643272782757966270464651099334396871080478335191111952511052661254669563908518252375444233155972983832416735017880201519006877751058589417284970582039965771233710124804125920978011223686997676454388103351196049357554477226209883509290629285087983204033202815451494581559629751828525162951060214854199388888638763294932811862670747777685064339406502372910861397837574615036661035963635147450924617475484126226676255415016995059650725575250856895523892418566200500427209543093484</span>
+<span class="n">n</span> <span class="o">=</span> <span class="mi">3256226148387143620748216016091767301544200222151871417285062804997515990445839897273196564112977469632288904415895789208702219044672267615643272782757966270464651099334396871080478335191111952511052661254669563908518252375444233155972983832416735017880201519006877751058589417284970582039965771233221016711318442645350110925698099770289295910882000031766951653491463807803675140995396224307604132474154433821872956743871932987528829067022435457739031806017588448296251954640125851949901704392123345256602246275586222273803279362438459210330281277165384961780739344041626232385517019828333155917126810961344433991861</span>
+<span class="n">c</span> <span class="o">=</span> <span class="mi">2783681285224397954445633434092010094202154026351075327595262315611963060834268330495003476443468455933771589021321167423952974433206799778170982398059065283311583221733327500582515864630039335118928192904883592951078506863443594128693054651308173150413944814782446460604924080949887844708703732095645295622958880669878572827156610531298376783363421384785801753032417536662122015382380889140323708534641203346350589292490826472394653845250793749628707526760481205875798918611767693363345218050757536598073662452358873149264179421540412287270509518114963322448415748603820569049446868237998366567665317608731109181957</span>
+<span class="n">e</span> <span class="o">=</span> <span class="mh">0x10001</span>
+
+<span class="n">s</span> <span class="o">=</span> <span class="n">Solver</span><span class="p">()</span>
+<span class="n">p</span><span class="p">,</span> <span class="n">q</span> <span class="o">=</span> <span class="n">Int</span><span class="p">(</span><span class="s">'p'</span><span class="p">),</span> <span class="n">Int</span><span class="p">(</span><span class="s">'q'</span><span class="p">)</span>
+
+<span class="n">persamaan_1</span> <span class="o">=</span> <span class="p">(</span><span class="n">p</span><span class="o">*</span><span class="n">q</span><span class="p">)</span> <span class="o">==</span> <span class="n">n</span>
+<span class="n">persamaan_2</span> <span class="o">=</span> <span class="p">(</span><span class="n">p</span><span class="o">+</span><span class="n">q</span><span class="p">)</span> <span class="o">==</span> <span class="p">((</span><span class="n">h</span> <span class="o">-</span> <span class="n">n</span><span class="p">)</span> <span class="o">-</span> <span class="mh">0xdeadbeef</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span><span class="o">/</span><span class="mh">0xdeadbeef</span>
+
+<span class="n">s</span><span class="p">.</span><span class="n">add</span><span class="p">(</span><span class="n">persamaan1</span><span class="p">)</span>
+<span class="n">s</span><span class="p">.</span><span class="n">add</span><span class="p">(</span><span class="n">persamaan2</span><span class="p">)</span>
+
+<span class="k">if</span> <span class="n">s</span><span class="p">.</span><span class="n">check</span><span class="p">()</span> <span class="o">==</span> <span class="n">sat</span><span class="p">:</span>
+    <span class="k">print</span> <span class="n">s</span><span class="p">.</span><span class="n">model</span><span class="p">()</span>
+
+</code></pre></div></div>
+<p>Jalankan dan didapatkan faktor prima <code class="language-plaintext highlighter-rouge">p</code> dan <code class="language-plaintext highlighter-rouge">q</code>.</p>
+<div class="language-py highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">abdullahnz</span> <span class="o">~/</span><span class="n">Codepwnda</span><span class="o">/</span><span class="n">RSA</span> <span class="n">python</span> <span class="n">find_pq</span><span class="p">.</span><span class="n">py</span> 
+<span class="p">[</span><span class="n">q</span> <span class="o">=</span> <span class="mi">33385269079622478453325236063515181611256944674152365317809634437376517505269553741918964843293370582240570866273474090994802059110818210207117696390200786638375836678726128866471294378187564067762338160655251424635959985578842645031115006915051226005183322067178585233262798833434196450875360258410597163199</span><span class="p">,</span>
+ <span class="n">p</span> <span class="o">=</span> <span class="mi">97534818144528943726242400925545530269129802387851430827994976147635395054419771969458210269759609769822994313308107700342988338805456769390786716026517348178404907434666812233647447870116940654095233254690533500229037597430845760652918381249597815805059295379044297855091071068642770887503355952222308652939</span><span class="p">]</span>
+
+</code></pre></div></div>
+<h3 id="decrypting-the-message">Decrypting the Message</h3>
+<p>Setelah <code class="language-plaintext highlighter-rouge">p</code> dan <code class="language-plaintext highlighter-rouge">q</code> didapat, kita bisa mendekripsi <code class="language-plaintext highlighter-rouge">flag</code> secara biasa. Berikut script solver yang saya buat.</p>
+<div class="language-py highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">from</span> <span class="nn">Crypto.Util.number</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">import</span> <span class="nn">gmpy2</span>
+
+<span class="n">h</span> <span class="o">=</span> <span class="mi">3256226148387143620748216016091767301544200222151871417285062804997515990445839897273196564112977469632288904415895789208702219044672267615643272782757966270464651099334396871080478335191111952511052661254669563908518252375444233155972983832416735017880201519006877751058589417284970582039965771233710124804125920978011223686997676454388103351196049357554477226209883509290629285087983204033202815451494581559629751828525162951060214854199388888638763294932811862670747777685064339406502372910861397837574615036661035963635147450924617475484126226676255415016995059650725575250856895523892418566200500427209543093484</span>
+<span class="n">n</span> <span class="o">=</span> <span class="mi">3256226148387143620748216016091767301544200222151871417285062804997515990445839897273196564112977469632288904415895789208702219044672267615643272782757966270464651099334396871080478335191111952511052661254669563908518252375444233155972983832416735017880201519006877751058589417284970582039965771233221016711318442645350110925698099770289295910882000031766951653491463807803675140995396224307604132474154433821872956743871932987528829067022435457739031806017588448296251954640125851949901704392123345256602246275586222273803279362438459210330281277165384961780739344041626232385517019828333155917126810961344433991861</span>
+<span class="n">c</span> <span class="o">=</span> <span class="mi">2783681285224397954445633434092010094202154026351075327595262315611963060834268330495003476443468455933771589021321167423952974433206799778170982398059065283311583221733327500582515864630039335118928192904883592951078506863443594128693054651308173150413944814782446460604924080949887844708703732095645295622958880669878572827156610531298376783363421384785801753032417536662122015382380889140323708534641203346350589292490826472394653845250793749628707526760481205875798918611767693363345218050757536598073662452358873149264179421540412287270509518114963322448415748603820569049446868237998366567665317608731109181957</span>
+<span class="n">e</span> <span class="o">=</span> <span class="mh">0x10001</span>
+<span class="n">q</span> <span class="o">=</span> <span class="mi">33385269079622478453325236063515181611256944674152365317809634437376517505269553741918964843293370582240570866273474090994802059110818210207117696390200786638375836678726128866471294378187564067762338160655251424635959985578842645031115006915051226005183322067178585233262798833434196450875360258410597163199</span>
+<span class="n">p</span> <span class="o">=</span> <span class="mi">97534818144528943726242400925545530269129802387851430827994976147635395054419771969458210269759609769822994313308107700342988338805456769390786716026517348178404907434666812233647447870116940654095233254690533500229037597430845760652918381249597815805059295379044297855091071068642770887503355952222308652939</span>
+
+<span class="n">phi</span> <span class="o">=</span> <span class="p">(</span><span class="n">p</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">q</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">d</span> <span class="o">=</span> <span class="n">gmpy2</span><span class="p">.</span><span class="n">invert</span><span class="p">(</span><span class="n">e</span><span class="p">,</span> <span class="n">phi</span><span class="p">)</span>
+<span class="n">m</span> <span class="o">=</span> <span class="nb">pow</span><span class="p">(</span><span class="n">c</span><span class="p">,</span> <span class="n">d</span><span class="p">,</span> <span class="n">n</span><span class="p">)</span>
+
+<span class="k">print</span> <span class="n">long_to_bytes</span><span class="p">(</span><span class="n">m</span><span class="p">)</span>
+
+</code></pre></div></div>
+
+<p>Jalankan dan <code class="language-plaintext highlighter-rouge">flag</code> didapat.</p>
+
+<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code>abdullahnz ~/Codepwnda/RSA python solver.py 
+codepwnda<span class="o">{</span>64d6585a10d63c8ad74e9e2cf57773dee67a5d81<span class="o">}</span>~~~~~~~~~~~~~
+</code></pre></div></div>
+<h3 id="flag">Flag</h3>
+<p><code class="language-plaintext highlighter-rouge">codepwnda{64d6585a10d63c8ad74e9e2cf57773dee67a5d81}</code></p>
+
+  </div><div id="disqus_thread" style="margin-top:25px"></div>
+  <script>
+    var disqus_config = function () {
+      this.page.url = 'http://localhost:4000/write%20up/ctf/crypto/2020/07/15/write-up-rsa-goes-skrah-codepwnda.html';
+      this.page.identifier = 'http://localhost:4000/write%20up/ctf/crypto/2020/07/15/write-up-rsa-goes-skrah-codepwnda.html';
+    };
+    (function () {
+      var d = document, s = d.createElement('script');
+      s.src = 'https://abdullahnz.disqus.com/embed.js';
+      s.setAttribute('data-timestamp', +new Date());
+      (d.head || d.body).appendChild(s);
+    })();
+  </script>
+  <noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript" rel="nofollow">comments
+      powered by Disqus.</a></noscript></div>
+
+    </section>
+  </main>
+  <script src="/assets/js/simple-jekyll-search.min.js"></script>
+  <script src="/assets/js/search.js"></script>
+  
+</body>
+
+</html>

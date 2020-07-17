@@ -1,0 +1,27 @@
+[
+  
+    {
+      "title"    : "Codepwnda - RSA Goes Skrah Write-Up",
+      "title-lower"    : "codepwnda - rsa goes skrah write-up",
+      "sub-titile" : "",
+      "sub-titile-lower" : "",
+      "categories" : "Write UpCTFCrypto",
+      "tags"     : "",
+      "url"      : "/write%20up/ctf/crypto/2020/07/15/write-up-rsa-goes-skrah-codepwnda.html",
+      "date"     : "2020-07-15 07:55:05 +0700",
+      "content"     : "Diberikan 2 buah file, yaitu:  rsa-goes-skrrrahh.py yang digunakan untuk meng-encrypt flag, dan  enc adalah hasil atau output dari peng-encrypt-an flag.rsa-goes-skrrrahh.pyfrom gmpy2 import *import..."
+    } ,
+  
+    {
+      "title"    : "AsgamaCTF Binary Exploit Write-Up",
+      "title-lower"    : "asgamactf binary exploit write-up",
+      "sub-titile" : "",
+      "sub-titile-lower" : "",
+      "categories" : "Write UpCTFPWN",
+      "tags"     : "",
+      "url"      : "/write%20up/ctf/pwn/2020/07/15/write-up-binex-asgama-ctf.html",
+      "date"     : "2020-07-15 07:55:05 +0700",
+      "content"     : "AsgamaCTF adalah platform yang disediakan oleh Universitas Gajah Maja untuk bahan pembelajaran yang ditargetkan untuk umum. Adapun berikut jenis-jenis soal yang disediakan, sebagai berikut:  Web Ex..."
+    } 
+  
+]
