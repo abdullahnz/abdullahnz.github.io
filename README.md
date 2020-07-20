@@ -1,1 +1,1 @@
-Hanya beberapa **tulisan tangan** kok. Hmm.
+Hanya beberapa **tulisan tangan** kok. Hmm :))
