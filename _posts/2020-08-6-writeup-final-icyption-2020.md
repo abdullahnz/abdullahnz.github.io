@@ -222,7 +222,7 @@ Jalankan dan didapatkan flag.
 
 `icyption{m3m4ng_r4d4_r4d4_sus4h_jug4}`
 
-## Canary Birds
+## Canary Birds [250pts]
 
 Awalnya hanya diberikan service nc saja tidak ada file binary-nya sampai ada yang tanya jurinya.
 
