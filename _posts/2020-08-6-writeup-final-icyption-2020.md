@@ -21,20 +21,25 @@ Diberikan sebuah audio file yang bernama `love on the weekend.mp3`. Cek detail i
 
 ### Flag 
 
-`icyption{Do_y0u_l1k3_J0hn_May3r}`
+`icyption{Do_y0u_l1k3_J0hn_May3r}`\
+<br />
 
 ## Bitcoin Make You Rich [75pts]
 
-Diberikan teks yang telah diencode, yaitu `J8pRND46rbHKmPuz4zWBNaWYzuo8uP6Kit4eFCnCgjGP7JWe8e9CVaK2LitS7CmeQdcCueM`. Sempat stuck beberapa jam, karena saya kira base85. Decode dengan base58 2 kali dan didapatkan flag.
+Diberikan teks yang telah diencode yaitu sebagai berikut.
+```sh
+J8pRND46rbHKmPuz4zWBNaWYzuo8uP6Kit4eFCnCgjGP7JWe8e9CVaK2LitS7CmeQdcCueM
+```
+Sempat stuck beberapa jam, karena saya kira base85 yang ternyata base58. Decode dengan base58 2 kali dan didapatkan flag.
 
 ![FLAG](https://abdullahnz.github.io/assets/images/2.png)
 
 ### Flag
 
-`icyption{satoshi_nakamoto_create_this}`
+`icyption{satoshi_nakamoto_create_this}`\
+<br />
 
-
-## Something Wromng With This Drive [150pts]
+## Something Wrong With This Drive [150pts]
 
 Diberikan sebuah file `data.img` dimana command `file` pada linux tidak dapat mengetahui informasi file `data.img` yang menandakan file tersebut corrupt.
 
@@ -48,7 +53,8 @@ Mount file dengan command `sudo mount data.img [dir]`, didapatkan file gambar ya
 
 ### Flag
 
-`icyption{f1n4lly_y0u_f1nd_m3}`
+`icyption{f1n4lly_y0u_f1nd_m3}`\
+<br />
 
 ## Wonderful Painting [80pts]
 
@@ -58,7 +64,8 @@ Diberikan file gambar bernama `blahblah.jpg`. Cek stereogram dengan stegsolve di
 
 ### Flag
 
-`icyption{S3m0g4_K4mi_M3n4ng}`
+`icyption{S3m0g4_K4mi_M3n4ng}`\
+<br />
 
 ## Sniff Sniff [175pts]
 
@@ -124,6 +131,7 @@ for data in usb_data:
             extracted_data += KEYBOARD_CODES[key][0]
 
 print(extracted_data)
+
 ```
 
 ![FLAG](https://abdullahnz.github.io/assets/images/6.png)
@@ -132,7 +140,8 @@ Ternyata flag tidak benar. Hilangkan huruf `w` menjadi `W1r3sh4rk` dan perbaiki 
 
 ### Flag 
 
-`icyption{W1r3sh4rk_n0t_only_f0r_n3tw0rks}`
+`icyption{W1r3sh4rk_n0t_only_f0r_n3tw0rks}`\
+<br />
 
 ## Any Information On This Website [100pts]
 
@@ -168,7 +177,7 @@ Akses folder git pada `http://180.250.135.6:8080/.git/` dan menampilkan `403 For
 Dump git dengan [GitTools](https://github.com/internetwache/GitTools). 
 
 ```sh
-./gitdummper.sh http://180.250.135.6:8080/.git/ out
+$ ./gitdummper.sh http://180.250.135.6:8080/.git/ out
 ```
 
 Didapatkan flag pada file config.
@@ -177,7 +186,8 @@ Didapatkan flag pada file config.
 
 ### Flag 
 
-`icyption{1N1_kaN_Y4Ng_kaMu_Cari_h3he}`
+`icyption{1N1_kaN_Y4Ng_kaMu_Cari_h3he}`\
+<br />
 
 ## Hannah Needs Your Help [200pts]
 
@@ -220,7 +230,8 @@ Jalankan dan didapatkan flag.
 
 ### Flag
 
-`icyption{m3m4ng_r4d4_r4d4_sus4h_jug4}`
+`icyption{m3m4ng_r4d4_r4d4_sus4h_jug4}`\
+<br />
 
 ## Canary Birds [250pts]
 
@@ -279,7 +290,8 @@ if __name__ == '__main__':
 
 ### Flag
 
-`icyption{m4u_d4p3t_b34s1sw4}`
+`icyption{m4u_d4p3t_b34s1sw4}`\
+<br />
 
 Berikut hasil decompile binary menggunakan IDA. 
 
@@ -319,6 +331,7 @@ int __cdecl main(int argc, const char **argv, const char **envp)
 Admin Mistake. Harusnya menggunakan fungsi `fopen()` dalam C untuk mendapatkan value flag. Karena kalau seperti ini malah lebih ke-reversing kata salah satu peserta.
 
 ![DISCORD](https://abdullahnz.github.io/assets/images/12.png)
+<br />
 
 ## Penutup
 
