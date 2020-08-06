@@ -649,6 +649,7 @@ Run exploit dan didapatkan shell.
 
 ![Shell](https://raw.githubusercontent.com/abdullahnz/abdullahnz.github.io/master/_posts/images/asgama_5s.png)
 
+Solver bisa dilihat [disini](https://github.com/abdullahnz/abdullahnz.github.io/blob/master/_posts/solver/solver_soal.py).
 
 ## Notes
 Sebagian solver diatas dibuat dengan bantuan dari pwntools yang bisa didownload [disini](https://github.com/Gallopsled/pwntools).
