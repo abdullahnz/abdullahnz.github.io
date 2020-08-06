@@ -1,10 +1,8 @@
 title: Abdullahnz's Notes
-author: abdullahnz
+author: Nizam Abdullah
 email: edfallennzm@gmail.com
 description: > # this means to ignore newlines until "show_exerpts:"
-  Write an awesome description for your new site here. You can edit this
-  line in _config.yml. It will appear in your document head meta (for
-  Google search results) and in your feed.xml site description.
+  Personal blog of Nizam Abdullah.
 show_excerpts: true # set to true to show excerpts on the homepage
 profile_image: "assets/portfolio.png"
 # Minima date format
@@ -20,29 +18,17 @@ plainwhite:
   dark_mode: true # set to true to add dark mode toggle
   html_lang: "en" # set the lang attribute of the <html> tag for the pages. See here for a list of codes: https://www.w3schools.com/tags/ref_country_codes.asp
   disqus_shortname: abdullahnz
- 
+  navigation:
+    - title: Categories
+      url: "/categories"
   # generate social links in footer
-  social_links:
-    # twitter: thelehhman
-    github:  abdullahnz
-    # linkedIn: in/thelehhman
-    rss: rss
-    # dribbble: jekyll
-    # flickr:   jekyll
-    instagram: abdullahnz_
-    # pinterest: jekyll
-    # youtube: jekyll
-    facebook: profile.php?id=100006254298767
-    # soundcloud: jekyll
+  social_links: 
+    github:  abdullahnz 
+    rss: rss 
+    instagram: abdullahnz_  
+    facebook: profile.php?id=100006254298767 
     telegram: abdullahnzz
-    # gitlab: jekyll
-
-    # Mastodon instances
-    # mastodon:
-    # - username: jekyll
-    #   instance: example.com
-    # - username: jekyll2
-    #   instance: example.com
+  
 
 # If you want to link only specific pages in your header, uncomment
 # this and add the path to the pages in order as they should show up
