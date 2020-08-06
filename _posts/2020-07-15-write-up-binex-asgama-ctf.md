@@ -487,9 +487,11 @@ GamaCTF{Ini_Bukan_Flagnya}
 ```
 
 ### Flag
-```GamaCTF{Ini_Bukan_Flagnya}```   
+```GamaCTF{Ini_Bukan_Flagnya}```
+
 
 ## Bebas
+
 Diberikan file `bebas.zip` yang didalamnya terdapat file binary elf 32bit yang executable.
 ```sh
 $ file soal 
@@ -631,7 +633,7 @@ $1 = 0x64
 
 Alamat yang bocor pada offset 2 adalah `0xffffcd1a`, sementara alamat stack adalah `0xffffccb6`. Selisih/jarak alamat pada offset 2 dan alamat stack adalah `0x64`. Maka untuk mendapatkan alamat stack, leak pada offset 2 lalu kurangi `0x64`.
 
-![Output](images/asgama_5.png)
+![Output](https://github.com/abdullahnz/abdullahnz.github.io/_posts/images/asgama_5.png)
 
 Selanjutnya dilakukan pembuatan payload. Flow paylaod: `padding + canary + return address ke alamat stack 2 kali + shellcode`.
 
@@ -647,7 +649,7 @@ Selanjutnya dilakukan pembuatan payload. Flow paylaod: `padding + canary + retur
 
 Run exploit dan didapatkan shell.
 
-![Shell](images/asgama_5s.png)
+![Shell](https://github.com/abdullahnz/abdullahnz.github.io/_posts/images/asgama_5s.png)
 
 
 ## Notes
