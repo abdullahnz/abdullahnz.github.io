@@ -1,10 +1,21 @@
+---
+layout: post
+title: "Final Icyption 2020 Write-Up"
+date: 2020-08-6 12:25:05 +0530
+categories:
+  - WriteUp
+  - Final
+---
+
 # WRITE UP ICYPTION 2020.
+
+Berikut write-up dari tim kami Semoga Menang. Semoga bisa mudah dipahami.
 
 ## Love On The Weekend [50pts]
 
 Diberikan sebuah audio file yang bernama `love on the weekend.mp3`. Cek detail informasi file dengan `exiftool` didapat flag pada metadata `Lyrics`.
 
-![FLAG](images/1.png)
+![FLAG](https://abdullahnz.github.io/assets/images/1.png)
 
 ### Flag 
 
@@ -14,7 +25,7 @@ Diberikan sebuah audio file yang bernama `love on the weekend.mp3`. Cek detail i
 
 Diberikan teks yang telah diencode, yaitu `J8pRND46rbHKmPuz4zWBNaWYzuo8uP6Kit4eFCnCgjGP7JWe8e9CVaK2LitS7CmeQdcCueM`. Sempat stuck beberapa jam, karena saya kira base85. Decode dengan base58 2 kali dan didapatkan flag.
 
-![FLAG](images/2.png)
+![FLAG](https://abdullahnz.github.io/assets/images/2.png)
 
 ### Flag
 
@@ -27,11 +38,11 @@ Diberikan sebuah file `data.img` dimana command `file` pada linux tidak dapat me
 
 Fix file tersebut dengan `e2fsck` dan file berhasil diperbaiki.
 
-![FIX](images/3.png)
+![FIX](https://abdullahnz.github.io/assets/images/3.png)
 
 Mount file dengan command `sudo mount data.img [dir]`, didapatkan file gambar yang memuat flag.
 
-![FLAG](images/4.jpg)
+![FLAG](https://abdullahnz.github.io/assets/images/4.jpg)
 
 ### Flag
 
@@ -41,7 +52,7 @@ Mount file dengan command `sudo mount data.img [dir]`, didapatkan file gambar ya
 
 Diberikan file gambar bernama `blahblah.jpg`. Cek stereogram dengan stegsolve didapatkan flag tetapi sulit untuk dibaca. Cari tools online, didapatkan pada `https://magiceye.ecksdee.co.uk/`. Upload gambar dan geser-geser didapatkan flag seperti nama tim saya :)
 
-![FLAG](images/5.png)
+![FLAG](https://abdullahnz.github.io/assets/images/5.png)
 
 ### Flag
 
@@ -113,7 +124,7 @@ for data in usb_data:
 print(extracted_data)
 ```
 
-![FLAG](images/6.png)
+![FLAG](https://abdullahnz.github.io/assets/images/6.png)
 
 Ternyata flag tidak benar. Hilangkan huruf `w` menjadi `W1r3sh4rk` dan perbaiki format flag, didapatkan flag yang benar.
 
@@ -133,7 +144,9 @@ Try guest/guest
 
 Login dengan credential yang didapat, lalu didapati clue selanjutnya pada konten halaman.
 
-`it's cool that you logged in, but unfortunately we can only give the next clue to 'administrator'. :(`
+```
+it's cool that you logged in, but unfortunately we can only give the next clue to 'administrator'. :(
+```
 
 Cek cookie pada website, ditemukan cookie `auth` yang terdapat `username=guest` dimana merupakan credential untuk login tadi.
 
@@ -158,7 +171,7 @@ Dump git dengan [GitTools](https://github.com/internetwache/GitTools).
 
 Didapatkan flag pada file config.
 
-![FLAG](images/7.png)
+![FLAG](https://abdullahnz.github.io/assets/images/7.png)
 
 ### Flag 
 
@@ -211,14 +224,14 @@ Jalankan dan didapatkan flag.
 
 Awalnya hanya diberikan service nc saja tidak ada file binary-nya sampai ada yang tanya jurinya.
 
-![DISCORD](images/9.png)
+![DISCORD](https://abdullahnz.github.io/assets/images/9.png)
 **maaf nama tidak disensor.*
 
 Akhirnya file binary-nya dibagi, dan didalamnya terdapat flag XD.
 
 Tapi disini penulis mengerjakan seperti apa yang dikatakan juri.
 
-![DISCORD](images/10.png)
+![DISCORD](https://abdullahnz.github.io/assets/images/10.png)
 
 ```sh
 $ python -c 'print "A"*17' | ./source 
@@ -233,7 +246,7 @@ saya akan mengulang perkataan ada. masukkan karakter! ERROR! karaktermu kepanjan
 
 Ditemukan pada saat input 20 karakter, program menampikan error. Selanjutnya dilakukan bruteforce karakter (yang dimaksud seperti canary) dan didapatkan flag ketika karakter ke-21 adalah `%`.
 
-![FLAG](images/11.png)
+![FLAG](https://abdullahnz.github.io/assets/images/11.png)
 
 Berikut solvernya.
 
@@ -303,13 +316,13 @@ int __cdecl main(int argc, const char **argv, const char **envp)
 
 Admin Mistake. Harusnya menggunakan fungsi `fopen()` dalam C untuk mendapatkan value flag. Karena kalau seperti ini malah lebih ke-reversing kata salah satu peserta.
 
-![DISCORD](images/12.png)
+![DISCORD](https://abdullahnz.github.io/assets/images/12.png)
 
 ## Penutup
 
 Masukkan untuk juri, kalau tidak ada pembahasan soal katakan saja tidak ada. Ini sudah tanggal berapa :v
 
-![DISCORD](images/13.png)
+![DISCORD](https://abdullahnz.github.io/assets/images/13.png)
 
 Jika ada yang keberatan karena saya tidak sensor nama, bisa hubungi saya dan saya akan edit postingan ini, terimakasih panitia.
 
