@@ -212,7 +212,7 @@ for e in range(0x10001):
 
 Jalankan dan didapatkan flag.
 
-![FLAG](images/8.png)
+![FLAG](https://abdullahnz.github.io/assets/images/8.png)
 
 ### Flag
 
