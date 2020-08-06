@@ -7,7 +7,10 @@ categories:
   - Final
 ---
 
-Berikut write-up dari tim kami Semoga Menang. Semoga bisa mudah dipahami.
+Berikut write-up dari tim kami Semoga Menang, yang beranggota:
+    1. Bagas Mukti W (@bl33dz)
+    2. Athaya Ramadhan (@athayarama)
+    3. Nizam Abdullah (@abdullahnz_)
 
 ## Love On The Weekend [50pts]
 
