@@ -7,8 +7,6 @@ categories:
   - Final
 ---
 
-# WRITE UP ICYPTION 2020.
-
 Berikut write-up dari tim kami Semoga Menang. Semoga bisa mudah dipahami.
 
 ## Love On The Weekend [50pts]
