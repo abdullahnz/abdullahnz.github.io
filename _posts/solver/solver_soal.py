@@ -1,5 +1,6 @@
+#!/usr/bin/python
+
 from pwn import *
-from sys import argv
 
 def exploit(p):
     # leaked stack and canary
