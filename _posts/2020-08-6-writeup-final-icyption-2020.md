@@ -7,7 +7,8 @@ categories:
   - Final
 ---
 
-Berikut write-up dari tim kami Semoga Menang, yang beranggota:
+Berikut write-up dari tim kami Semoga Menang, yang beranggota.
+
     1. Bagas Mukti W (@bl33dz)
     2. Athaya Ramadhan (@athayarama)
     3. Nizam Abdullah (@abdullahnz_)
