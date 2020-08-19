@@ -277,7 +277,7 @@ Hello, 0x7fffffffdbfc.0x7fffffffdbfc.(nil)!
 Ternyata alamat target terletak pada offset pertama. Overwrite target dengan nilai 1337 dan didapatkan flag.
 
 ```sh
-abdullahnz@zeroday:~/CTF/COMPFEST/hc/pwn/Format_String_EZ ./fmt1 
+$ ./fmt1 
 What's your name?
 %1337x%n
 Hello,
