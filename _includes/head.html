@@ -2,28 +2,55 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta http-equiv="X-UA-Compatible" content="ie=edge">
 <link href="https://fonts.googleapis.com/css?family=Merriweather:300|Raleway:400,700" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Lato&family=Roboto+Mono&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="{{ "/assets/css/style.css" | relative_url }}">
 <title>{{ page.title | default: site.title }}</title>
 {% seo %}
 <style>
 table {
     margin: auto !important;
-    min-width: 500px;
-}
-ul.posts li .post p {
-    padding-bottom: 32px !important;        
+    min-width: 500px !important;
 }
 
-@media only screen and (max-width: 600px) {
-  table {
-    max-width: 500px !important;
-    min-width: 300px !important;
-  }
-  body {
-    overflow-x: hidden !important;
-  }
-  .highlight {
-    font-size: 14px !important;
-  }
+ul.posts li .post p {
+    padding-bottom: 32px !important;       
 }
+
+* {
+    font-family: 'Lato', sans-serif;
+}
+
+code.language-plaintext.highlighter-rouge {
+    font-family: 'Roboto Mono', monospace !important;
+    font-size: 14px;
+    color: rgb(236, 6, 95);
+    border-radius: 4px;
+    padding: 3px 1px !important;
+}
+
+.highlighter-rouge .highlight {
+    background-color: rgb(250, 250, 250);
+}
+
+.dark .highlight {
+    background-color: black;
+}
+
+.dark .highlight *{
+    background-color: black;
+}
+
+.highlighter-rouge .highlight pre {
+    font-size: 13px;
+}
+
+h3 {
+    margin-bottom: -6px !important;
+}
+
+code span {
+    font-family: 'Roboto Mono', monospace !important;
+}
+
+
 </style>
