@@ -7,6 +7,9 @@ categories:
   - Crypto
 ---
 
+Berikut WriteUp Salah Satu Challenge Pada Kategori Kriptografi Yang Ada Dalam CTF Codepwnda Yang Diadakan Oleh IPB.\
+<br/>
+
 Diberikan 2 buah file, yaitu:
 - `rsa-goes-skrrrahh.py` yang digunakan untuk meng-encrypt flag, dan
 - `enc` adalah hasil atau output dari peng-encrypt-an flag.
