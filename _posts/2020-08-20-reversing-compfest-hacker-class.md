@@ -458,7 +458,7 @@ else:
 
 ```
 
-Didapatkan flag tetapi dengan tertukar-tukar antara index ganjil dengan index setelahnya.
+Didapatkan flag tetapi dengan tertukar-tukar antara index genap dengan index setelahnya.
 
 ```sh
 $ python solver.py 
