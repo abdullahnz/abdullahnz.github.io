@@ -429,7 +429,7 @@ else:
 
 ```
 
-Didapatkan flag tetapi dengan tertukar-tukar antara index ganjil dengan index setelahnya.
+Didapatkan flag tetapi dengan tertukar-tukar antara index genap dengan index setelahnya.
 
 ![FLAG](https://abdullahnz.github.io/assets/images/FLAG-5.png)
 
