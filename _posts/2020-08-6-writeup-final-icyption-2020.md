@@ -7,7 +7,7 @@ categories:
   - Final
 ---
 
-Berikut write-up dari tim kami Semoga Menang, yang beranggota.
+Berikut write-up dari tim kami Semoga Menang (SMK N 2 Surakarta), yang beranggota.
 
     1. Bagas Mukti W (@bl33dz)
     2. Athaya Ramadhan (@athayarama)
