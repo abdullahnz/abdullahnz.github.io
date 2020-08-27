@@ -1,6 +1,6 @@
 ---
 layout: post
-title: "Compfest 20 - Hacker Class WriteUp"
+title: "Compfest 12 - Hacker Class WriteUp"
 date: 2020-08-18 12:17:56 +0530
 categories:
   - WriteUp
