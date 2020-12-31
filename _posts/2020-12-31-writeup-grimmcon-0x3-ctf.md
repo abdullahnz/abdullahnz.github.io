@@ -330,7 +330,7 @@ int __cdecl main(int argc, const char **argv, const char **envp)
 }
 ```
 
-Oke, karena input pakai read. Read itu tidak mengakhiri buffer dengan *nullbyte*. Nah, jika buffer sampai saved_canary tidak mengandung *nullbyte*, maka, saved_canary akan ikut ter-*puts* bersamaan dengan input buffer kita.
+Oke, karena input pakai read. Read itu tidak mengakhiri buffer dengan *nullbyte*. Nah, jika input buffer sampai v5 / canary tidak mengandung *nullbyte*, maka, v5 akan ikut ter-*puts* bersamaan dengan input buffer kita.
 
 Karena *puts* itu terminate dengan *nullbyte*.
 
@@ -344,7 +344,7 @@ $ python -c 'print "a"*0x27' | ./weird_cookie
 [snip]
 ```
 
-Seperti yang saya katakan diatas. Libc leak dapat didapatkan dengan xor saved_canary dengan 0x123456789ABCDEF1.
+Seperti yang saya katakan diatas. Libc leak dapat didapatkan dengan xor v5 dengan 0x123456789ABCDEF1.
 
 Karena overflow hanya 24 byte, dan 16 byte untuk canary dan padding. Jadi untuk rop sendiri itu hanya 8 byte. Jadi, ret-to-libc dengan system disini tidak bisa dilakukan. Karena harus set parameter dulu yang butuh minimal 24 bytes.
 
