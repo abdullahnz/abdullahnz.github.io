@@ -802,7 +802,7 @@ if __name__ == '__main__':
     exploit(r)
 ```
 
-This chall, only 1 team solve this lol. Yeah its me lol.
+First blood :v
 
 ```py
 [+] Opening connection to challenge.ctf.games on port 31213: Done
