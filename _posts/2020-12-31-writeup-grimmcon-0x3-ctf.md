@@ -9,7 +9,7 @@ categories:
 
 Tulisan ini akan menjadi sebuah *remainder* perjalanan saya *mungkin* selama setengah tahun lebih saya mulai masuk ke-dunia CTF, hingga men-*juara*-i event - event CTF di tingkat Pelajar. Mengingat tahun depan sudah mulai masuk universitas, *nugad*, *nugad*, dan *nugad*. ~
 
-![Banner Intro](https://raw.githubusercontent.com/abdullahnz/abdullahnz.github.io/master/_posts/images/grimmcon/intro.png)
+<!-- ![Banner Intro](https://raw.githubusercontent.com/abdullahnz/abdullahnz.github.io/master/_posts/images/grimmcon/intro.png) -->
 
 ## Stacked [489 pts]
 
