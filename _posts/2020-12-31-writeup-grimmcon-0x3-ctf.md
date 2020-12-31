@@ -7,7 +7,7 @@ categories:
   - PWN
 ---
 
-![Banner Intro](images/grimmcon/intro.png)
+![Banner Intro](https://raw.githubusercontent.com/abdullahnz/abdullahnz.github.io/master/_posts/images/grimmcon/intro.png)
 
 ## Stacked [489 pts]
 
@@ -108,7 +108,7 @@ Terdapat fungsi yang menarik disini, yaitu pada fungsi *useful*. Seperti namanya
 
 Karena stack executable, bisa return ke shellcode kita dengan gadget diatas.
 
-Oiya, karena interaksi dilakukan tidak langsung pada binarynya *child atau apalah ngga tau istilahnya*, jika inject shellcode *execve*, maka stdin akan masuk *parent*-nya.
+Oiya, karena interaksi dilakukan tidak langsung pada binarynya *child atau apalah ngga tau istilahnya*, jika inject shellcode *execve* secara langsung, maka stdin, stdout akan masuk *parent*-nya.
 
 Solusi? *socketcall* syscall. Full solver.
 
