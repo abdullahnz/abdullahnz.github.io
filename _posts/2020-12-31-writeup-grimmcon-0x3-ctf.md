@@ -262,7 +262,7 @@ if __name__ == '__main__':
     exploit(r)
 ```
 
-ret-to-libc for profil.
+ret-to-libc for profit.
 
 ```py
 $ python solver.py 31322
