@@ -1,6 +1,6 @@
 ---
 layout: post
-title: "GRIMMCon 0x3 CTF - Binary Exploit"
+title: "GRIMMCON 0x3 CTF - Binary Exploit"
 date: 2020-12-31 12:45:45 +0530
 categories:
   - WriteUp
