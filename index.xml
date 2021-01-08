@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Abdullah</title>
+    <link>http://abdullahnz.github.io/</link>
+    <description>Recent content on Abdullah</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <lastBuildDate>Thu, 31 Dec 2020 12:45:45 +0530</lastBuildDate><atom:link href="http://abdullahnz.github.io/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title></title>
+      <link>http://abdullahnz.github.io/about/</link>
+      <pubDate>Fri, 01 Jan 2021 22:38:36 +0700</pubDate>
+      
+      <guid>http://abdullahnz.github.io/about/</guid>
+      <description>Short for introduce myself.  Capturing flag since July 2020 with Semoga Menang team in Icyption 2020. Interested in binary exploitation, reverse enginerring and some algos (programming). Student of 2 Vocational High School, Surakarta. Now, with Super H!ker team maybe until graduation from student. My english is bad, btw. If u inviting me to join on your team, maybe I can learn from our discussion. SOC ID  </description>
+    </item>
+    
+    <item>
+      <title>Grimmcon 0x3 Write Up - PWN</title>
+      <link>http://abdullahnz.github.io/posts/grimmcon/pwn/</link>
+      <pubDate>Thu, 31 Dec 2020 12:45:45 +0530</pubDate>
+      
+      <guid>http://abdullahnz.github.io/posts/grimmcon/pwn/</guid>
+      <description>Tulisan ini akan menjadi sebuah &lt;em&gt;remainder&lt;/em&gt; perjalanan saya yang &lt;em&gt;mungkin&lt;/em&gt; sudah setengah tahun lebih saya mulai masuk ke-dunia CTF, hingga &lt;code&gt;alhamdullillah&lt;/code&gt; menjadi juara dari beberapa ajang kompetisi CTF ditingkat pelajar. &lt;em&gt;Yaa,&lt;/em&gt; masih ditingkat pelajar. Mengingat tahun depan sudah harus &lt;em&gt;&lt;del&gt;kuliah-kerja-nyata&lt;/del&gt;&lt;/em&gt; masuk universitas, dan mungkin saja akan &lt;em&gt;nugad&lt;/em&gt;, &lt;em&gt;nugad&lt;/em&gt;, dan &lt;em&gt;nugad&lt;/em&gt; (sesuai rumor ditelinga saya).</description>
+    </item>
+    
+    <item>
+      <title>Final Icyption 2020 Write Up</title>
+      <link>http://abdullahnz.github.io/posts/icyption/final/</link>
+      <pubDate>Fri, 07 Aug 2020 12:25:05 +0530</pubDate>
+      
+      <guid>http://abdullahnz.github.io/posts/icyption/final/</guid>
+      <description>Ini merupakan kompetisi CTF pertama yang saya ikuti, dan ini merupakan sebuah &lt;em&gt;kickstart&lt;/em&gt; dan &lt;em&gt;abuse&lt;/em&gt; untuk saya bahwa saya dapat berkontribusi di bidang ini. Special thanks to &lt;em&gt;bl33dz&lt;/em&gt; yang telah mengundang saya untuk join ke tim nya (yang sebelumnya tim ini memiliki 3 anggota, karena sudah lulus satu diganti saya wkwk).</description>
+    </item>
+    
+  </channel>
+</rss>
