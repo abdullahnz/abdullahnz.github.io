@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>PWN on Abdullah</title>
+    <link>http://abdullahnz.github.io/categories/pwn/</link>
+    <description>Recent content in PWN on Abdullah</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <lastBuildDate>Thu, 31 Dec 2020 12:45:45 +0530</lastBuildDate><atom:link href="http://abdullahnz.github.io/categories/pwn/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Grimmcon 0x3 Write Up - PWN</title>
+      <link>http://abdullahnz.github.io/posts/grimmcon/pwn/</link>
+      <pubDate>Thu, 31 Dec 2020 12:45:45 +0530</pubDate>
+      
+      <guid>http://abdullahnz.github.io/posts/grimmcon/pwn/</guid>
+      <description>Tulisan ini akan menjadi sebuah &lt;em&gt;remainder&lt;/em&gt; perjalanan saya yang &lt;em&gt;mungkin&lt;/em&gt; sudah setengah tahun lebih saya mulai masuk ke-dunia CTF, hingga &lt;code&gt;alhamdullillah&lt;/code&gt; menjadi juara dari beberapa ajang kompetisi CTF ditingkat pelajar. &lt;em&gt;Yaa,&lt;/em&gt; masih ditingkat pelajar. Mengingat tahun depan sudah harus &lt;em&gt;&lt;del&gt;kuliah-kerja-nyata&lt;/del&gt;&lt;/em&gt; masuk universitas, dan mungkin saja akan &lt;em&gt;nugad&lt;/em&gt;, &lt;em&gt;nugad&lt;/em&gt;, dan &lt;em&gt;nugad&lt;/em&gt; (sesuai rumor ditelinga saya).</description>
+    </item>
+    
+  </channel>
+</rss>
