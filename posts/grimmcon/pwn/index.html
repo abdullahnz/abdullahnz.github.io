@@ -668,7 +668,7 @@ ID: 4215472    &lt;- LEAK
 Setting:     &lt;- LEAK
 Is active: 0
 </code></pre><h2 id="information-leak-1">Information Leak.</h2>
-<p>Leak bisa didapatkan dengan memenuhi <em>tcache-bin</em>. Yaitu dengan alloc 7 chunks, lalu free semuanya. Nah chunk terakhir ini akan berisi sisa-sisa pointer <em>unsorted-bin</em> yang berisi alamat <em>main_arena</em>. Nah karena <em>main_arena</em> itu letaknya di-libc, maka dengan <em>use-after-free</em> yaitu dengan print index ini akan mendapatkan libc leak!</p>
+<p>Leak bisa didapatkan dengan memenuhi <em>tcache-bin</em>. Yaitu dengan alloc 8 chunks, lalu free semuanya. 7 chunks akan memenuhi tcache-bins dan chunk terakhir akan berisi sisa-sisa pointer <em>unsorted-bin</em> yang berisi alamat <em>main_arena</em>. Nah karena <em>main_arena</em> itu letaknya di-libc, maka dengan <em>use-after-free</em> yaitu dengan print index ini akan mendapatkan libc leak!</p>
 <p>Setelah itu, tinggal <em>tcache poisoning</em>. Overwrite <code>__free_hook</code> dengan <code>system</code>. Free chunk yang menyimpan string &ldquo;/bin/sh&rdquo; untuk mendapatkan RCE.</p>
 <p>Full solver,</p>
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#75715e">#!/usr/bin/python</span>
