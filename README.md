@@ -1,3 +1,3 @@
-# abdullahnz.github.io
+# Minimalis :)
 
 hugo, hugo, hug! need hug! :p
