@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Categories on Abdullah</title>
+    <link>http://abdullahnz.github.io/categories/</link>
+    <description>Recent content in Categories on Abdullah</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <lastBuildDate>Thu, 31 Dec 2020 12:45:45 +0530</lastBuildDate><atom:link href="http://abdullahnz.github.io/categories/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Binary Exploit</title>
+      <link>http://abdullahnz.github.io/categories/binary-exploit/</link>
+      <pubDate>Thu, 31 Dec 2020 12:45:45 +0530</pubDate>
+      
+      <guid>http://abdullahnz.github.io/categories/binary-exploit/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>WriteUp</title>
+      <link>http://abdullahnz.github.io/categories/writeup/</link>
+      <pubDate>Thu, 31 Dec 2020 12:45:45 +0530</pubDate>
+      
+      <guid>http://abdullahnz.github.io/categories/writeup/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Final</title>
+      <link>http://abdullahnz.github.io/categories/final/</link>
+      <pubDate>Fri, 07 Aug 2020 12:25:05 +0530</pubDate>
+      
+      <guid>http://abdullahnz.github.io/categories/final/</guid>
+      <description></description>
+    </item>
+    
+  </channel>
+</rss>

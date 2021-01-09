@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Final on Abdullah</title>
+    <link>http://abdullahnz.github.io/categories/final/</link>
+    <description>Recent content in Final on Abdullah</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <lastBuildDate>Fri, 07 Aug 2020 12:25:05 +0530</lastBuildDate><atom:link href="http://abdullahnz.github.io/categories/final/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Final Icyption 2020 Writeup</title>
+      <link>http://abdullahnz.github.io/posts/icyption/final/</link>
+      <pubDate>Fri, 07 Aug 2020 12:25:05 +0530</pubDate>
+      
+      <guid>http://abdullahnz.github.io/posts/icyption/final/</guid>
+      <description>Ini merupakan kompetisi CTF pertama yang saya ikuti, dan ini merupakan sebuah &lt;em&gt;kickstart&lt;/em&gt; dan &lt;em&gt;abuse&lt;/em&gt; untuk saya bahwa saya dapat berkontribusi di bidang ini. Special thanks to &lt;em&gt;bl33dz&lt;/em&gt; yang telah mengundang saya untuk join ke tim nya &amp;hellip;</description>
+    </item>
+    
+  </channel>
+</rss>

