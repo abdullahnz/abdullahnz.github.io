@@ -6,7 +6,16 @@
     <description>Recent content in Posts on Abdullah</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Thu, 31 Dec 2020 12:45:45 +0530</lastBuildDate><atom:link href="http://abdullahnz.github.io/posts/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Wed, 27 Jan 2021 06:31:03 +0700</lastBuildDate><atom:link href="http://abdullahnz.github.io/posts/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Setengah Tahun &#34;loncat&#34; ke Dunia CTF</title>
+      <link>http://abdullahnz.github.io/posts/halfyear/</link>
+      <pubDate>Wed, 27 Jan 2021 06:31:03 +0700</pubDate>
+      
+      <guid>http://abdullahnz.github.io/posts/halfyear/</guid>
+      <description>Ini akan jadi seri cerita aku, tentang pengalamanku &amp;ldquo;loncat&amp;rdquo; ke dunia per-CTF-an. Loncat ya, bukan terjung atau yang sebagainya. Mau gimana lagi, &lt;em&gt;looping&lt;/em&gt; aja dulu nggak tau gan, hehe. &amp;hellip; Lanjut. Mulai dari &lt;em&gt;nderedeg&lt;/em&gt; liat scoreboard, sampai &lt;em&gt;alhamdullillah&lt;/em&gt; menjadi juara di beberapa kompetisi lokal. Aku juga akan sedikit cerita fakta tentang diriku, dan mungkin juga tentang perjalanannya.</description>
+    </item>
+    
     <item>
       <title>Grimmcon 0x3 Writeup - Binary Exploit</title>
       <link>http://abdullahnz.github.io/posts/grimmcon/pwn/</link>

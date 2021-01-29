@@ -142,9 +142,11 @@
 </code></pre></div><p>Bug-nya terlihat jelas pada <em>handle_client</em> dimana user diberikan input sebesar 0x800 yang ditampung di variable buf, tetapi variable buf hanya berukuran 0x400.</p>
 <h2 id="exploit">Exploit</h2>
 <p>Terdapat fungsi yang menarik disini, yaitu pada fungsi <em>useful</em>.</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-c" data-lang="c">.text:<span style="color:#ae81ff">0000000000401557</span> useful       proc near
-.text:<span style="color:#ae81ff">0000000000401557</span>              jmp     rsp
-.text:<span style="color:#ae81ff">0000000000401557</span> useful       endp
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-py" data-lang="py">Dump of assembler code <span style="color:#66d9ef">for</span> function useful:
+   <span style="color:#ae81ff">0x0000000000401557</span> <span style="color:#f92672">&lt;+</span><span style="color:#ae81ff">0</span><span style="color:#f92672">&gt;</span>:	jmp    rsp
+   <span style="color:#ae81ff">0x0000000000401559</span> <span style="color:#f92672">&lt;+</span><span style="color:#ae81ff">2</span><span style="color:#f92672">&gt;</span>:	nop
+   <span style="color:#ae81ff">0x000000000040155a</span> <span style="color:#f92672">&lt;+</span><span style="color:#ae81ff">3</span><span style="color:#f92672">&gt;</span>:	ud2    
+End of assembler dump<span style="color:#f92672">.</span>
 </code></pre></div><p>Karena kondisi stack executable, bisa jump ke shellcode kita dengan gadget diatas.</p>
 <p>Oiya, karena interaksi dilakukan tidak langsung pada binarynya <em>child atau apalah belum terlalu paham istilahnya</em>, jika inject shellcode <em>execve</em> secara langsung, maka stdin, stdout akan masuk ke <em>parent</em>. Sementara kita berada diposisi yang berinteraksi dengan parent.</p>
 <p>Solusinya adalah menggunakan <em>socketcall</em> syscall <a href="https://medium.com/@chaudharyaditya/slae-0x2-linux-x86-reverse-shellcode-d7126d638aff">[1]</a><a href="https://barriersec.com/2018/11/linux-x86-reverse-shell-shellcode/">[2]</a>, yaitu dengan menduplikasi stdin, stdout, dan stderr ke socket.</p>
@@ -215,7 +217,7 @@ flag<span style="color:#f92672">{</span>e4fd4c9fcad9ba84666e5c7a4a9ab1f0<span st
 <blockquote>
 <p>ssize_t write(int fd, const void *buf, size_t count);</p>
 </blockquote>
-<p>Ada suatu teknik yang bernama <code>ret-to-csu</code><a href="https://bananamafia.dev/post/x64-rop-redpwn/">[1]</a> yang dipresentasikan di Black Hat Asia 2018. Teknik ini didasari dari gadget yang ada didalam fungsi <code>__libc_csu_init()</code>. Saya tidak akan membahas ret-to-csu disini. Karena teknik ini tidak terlalu rumit juga, <em>plus</em> sudah banyak yang tau juga.</p>
+<p>Ada suatu teknik yang bernama <code>ret-to-csu</code><a href="https://bananamafia.dev/post/x64-rop-redpwn/">[1]</a> yang dipresentasikan di Black Hat Asia 2018. Teknik ini didasari dari gadget yang ada didalam fungsi <code>__libc_csu_init</code>. Saya tidak akan membahas ret-to-csu disini. Karena teknik ini tidak terlalu rumit juga, <em>plus</em> sudah banyak yang tau juga.</p>
 <p>Full solver,</p>
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#75715e">#!/usr/bin/python</span>
 
@@ -431,15 +433,15 @@ flag<span style="color:#f92672">{</span>e87923d7cd36a8580d0cf78656d457c6<span st
     <span style="color:#ae81ff">0015</span>: <span style="color:#ae81ff">0x06</span> <span style="color:#ae81ff">0x00</span> <span style="color:#ae81ff">0x00</span> <span style="color:#ae81ff">0x00000000</span>  <span style="color:#66d9ef">return</span> KILL
     <span style="color:#ae81ff">0016</span>: <span style="color:#ae81ff">0x06</span> <span style="color:#ae81ff">0x00</span> <span style="color:#ae81ff">0x00</span> <span style="color:#ae81ff">0x7fff0000</span>  <span style="color:#66d9ef">return</span> ALLOW
 
-</code></pre></div><p>Summary</p>
+</code></pre></div><h2 id="summary">Summary</h2>
 <ul>
 <li>sys_number &gt; 0x3fffffff, ini membuat syscall ABI tidak bisa digunakan.</li>
 <li>fungsi penting yaitu open, openat, execve, execveat, read, terblacklist. Jadi open/read/write dan rce tidak bisa dilakukan.</li>
 <li>selainnya, belum baca-baca lagi gan :v</li>
 </ul>
-<p>Cara-cara seperti menggunakan syscall ABI, syscall orw tidak bisa dilakukan.</p>
-<p>Ada instruksi yang bernama <code>far return</code> atau biasa dikenal dengan <code>retf</code>. Intruksi ini akan pop 2 value, yaitu di <em>cs</em> dan <em>ip</em>. Jika value <em>cs</em> ini 0x23, maka program akan return ke &ldquo;32 bit mode&rdquo;. Kalau cs init 0x33, program return ke &ldquo;64 bit mode&rdquo;. Dengan mengubah cs menjadi 0x23, maka kita bisa menjalankan syscall 32 bit diproses 64 bit.</p>
-<p>Nah ini cukup mem-<em>bypass</em> filter-filter diatas. Karena <em>syscall_number</em> di 32 bit itu beda sama 64 bit. Syscall number dari execve pada 32 bit itu adalah 11. Dan itu terblacklist juga di binary sandbox. Solusinya adalah open/read/write file flag. Letak flag bisa didapatkan dalam Dockerfile.</p>
+<h2 id="exploit-1">Exploit</h2>
+<p>Didalam assembly, ada instruksi yang bernama <code>far return</code> atau biasa dikenal dengan <code>retf</code>. Intruksi ini akan pop 2 value, yaitu di <em>cs</em> dan <em>ip</em>. Jika value <em>cs</em> ini 0x23, maka program akan return ke &ldquo;32 bit mode&rdquo;. Kalau cs ini 0x33, program return ke &ldquo;64 bit mode&rdquo;. Dengan mengubah cs menjadi 0x23, maka kita bisa menjalankan syscall 32 bit diproses 64 bit. Hal ini cukup mem-<em>bypass</em> filter-filter diatas. Karena <em>syscall_number</em> di 32 bit berbeda dengan 64 bit.</p>
+<p>Sekarang, apa yang dilakukan? RCE dengan execve yang memiliki syscall number 11? difilter. Solusinya adalah open-read-write file flag dengan letak flag yang diketahui melalui dockerfile.</p>
 <p>Full solver,</p>
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#75715e">#!/usr/bin/python</span>
 
@@ -803,7 +805,7 @@ flag<span style="color:#f92672">{</span>dc75c408f5ba2fbc72b307987dddc775<span st
             </figure>
 			
 			<span>
-			&copy; <time datetime="2021-01-13 10:28:06.3254333 &#43;0700 WIB m=&#43;0.222813690">2021</time> . Made with <a href='https://gohugo.io'>Hugo</a> using the <a href='https://github.com/EmielH/tale-hugo/'>Tale</a> theme.
+			&copy; <time datetime="2021-01-29 11:05:05.737783315 &#43;0700 WIB m=&#43;1.143984674">2021</time> . Made with <a href='https://gohugo.io'>Hugo</a> using the <a href='https://github.com/EmielH/tale-hugo/'>Tale</a> theme.
 			</span>
 		</footer>
 
