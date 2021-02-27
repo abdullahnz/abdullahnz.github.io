@@ -39,3 +39,11 @@
     url('../fonts/libre-baskerville-v7-latin-italic.ttf') format('truetype'), /* Safari, Android, iOS */
     url('../fonts/libre-baskerville-v7-latin-italic.svg#LibreBaskerville') format('svg'); /* Legacy iOS */
 }
+
+@font-face {
+    font-family: 'Iosevka Pragmata';
+    font-style: normal;
+    font-weight: 400;
+    src: url('../fonts/iosevka-prag.ttf') format('truetype'); /* Safari, Android, iOS */
+}
+
