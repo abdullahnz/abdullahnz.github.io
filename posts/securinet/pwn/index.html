@@ -352,7 +352,7 @@ r<span style="color:#f92672">.</span>sendlineafter(<span style="color:#e6db74">&
 <h1 id="membership-management">Membership Management</h1>
 <p>Heap exploitation challange GLIBC 2.31. Dengan fitur create, delete, edit dan tanpa view. Yaa, inti tantangan problem ini adalah tidak ada fungsi view.</p>
 <h2 id="analysist-2">Analysist</h2>
-<p>Subscribe, akan melakukan malloc sebesar 0x50. Pointer heap dari malloc ini ditampung di variable global array yang memiliki size 52. D an melakukan inisiasi <code>is_active</code> pada index array yang dipakai menjadi <code>1</code>. Ini menandakan chunk dalam kondisi terpakai.</p>
+<p>Subscribe, akan melakukan malloc sebesar 0x50. Pointer heap dari malloc ini ditampung di variable global array yang memiliki size 52. Dan melakukan inisiasi <code>is_active</code> pada index array yang dipakai menjadi <code>1</code>. Ini menandakan chunk dalam kondisi terpakai.</p>
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-c" data-lang="c"><span style="color:#66d9ef">int</span> __usercall <span style="color:#a6e22e">subscribe</span>()
 {
   <span style="color:#66d9ef">int</span> result; <span style="color:#75715e">// eax@3
