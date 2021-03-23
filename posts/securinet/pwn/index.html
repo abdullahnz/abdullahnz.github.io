@@ -61,6 +61,7 @@
 
 
 		<p>First note, aku mengerjakan ini semalam setelah kompetisi selesai. Iseng-iseng buka ctftime, di running event ada ini. Tapi, ternyata waktu -1 jam selesai event ini :'(.</p>
+<p>Untuk solver dan source challanges bisa didownload <a href="../source/source.zip">disini</a>.</p>
 <h1 id="kill-shot">Kill Shot</h1>
 <p>Simplenya, kita diberi <code>printf</code> yang parameternya kita kontrol untuk mendapakan leak, dan fungsi <code>kill</code> untuk <code>write-what-where</code>. Setelahnya, diberi <code>add</code> dan <code>delete</code> yang secara berurutan fungsi tersebut menggunakan <code>malloc</code> dan <code>free</code> seperti heap exploitation pada umumnya. Sejauh yang aku baca, tidak ada bug pada 2 fungsi tersebut.</p>
 <h2 id="analysist">Analysist</h2>
@@ -352,7 +353,7 @@ r<span style="color:#f92672">.</span>sendlineafter(<span style="color:#e6db74">&
 <h1 id="membership-management">Membership Management</h1>
 <p>Heap exploitation challange GLIBC 2.31. Dengan fitur create, delete, edit dan tanpa view. Yaa, inti tantangan problem ini adalah tidak ada fungsi view.</p>
 <h2 id="analysist-2">Analysist</h2>
-<p>Subscribe, akan melakukan malloc sebesar 0x50. Pointer heap dari malloc ini ditampung di variable global array yang memiliki size 52. D an melakukan inisiasi <code>is_active</code> pada index array yang dipakai menjadi <code>1</code>. Ini menandakan chunk dalam kondisi terpakai.</p>
+<p>Subscribe, akan melakukan malloc sebesar 0x50. Pointer heap dari malloc ini ditampung di variable global array yang memiliki size 52. Dan melakukan inisiasi <code>is_active</code> pada index array yang dipakai menjadi <code>1</code>. Ini menandakan chunk dalam kondisi terpakai.</p>
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-c" data-lang="c"><span style="color:#66d9ef">int</span> __usercall <span style="color:#a6e22e">subscribe</span>()
 {
   <span style="color:#66d9ef">int</span> result; <span style="color:#75715e">// eax@3
@@ -556,12 +557,11 @@ modify(<span style="color:#ae81ff">12</span>, p64(libc<span style="color:#f92672
 
 modify(<span style="color:#ae81ff">13</span>, <span style="color:#e6db74">&#39;/bin/sh</span><span style="color:#ae81ff">\0</span><span style="color:#e6db74">&#39;</span>)
 unsubscribe(<span style="color:#ae81ff">13</span>)
-</code></pre></div><p>Tambahkan <code>try except</code> untuk automasi bruteforce.</p>
+</code></pre></div><p>Tambahkan <code>try except</code> untuk otomasi bruteforce.</p>
 <p><img src="../images/success.png" alt="leak"></p>
 <h2 id="flag-3">Flag</h2>
 <p><code>flag{welcome_you_are_now_one_of_us_4d2d08c6994188b642a854194916fbbc}</code></p>
-<h1 id="footnote-1">Footnote</h1>
-<p>Nice challanges, untuk solver dan source soal <a href="../source/source.zip">disini</a>.</p>
+<p>Nice challanges!</p>
 <h1 id="reference">Reference</h1>
 <ul>
 <li><a href="http://blog.rh0gue.com/2017-12-31-34c3ctf-300/">http://blog.rh0gue.com/2017-12-31-34c3ctf-300/</a></li>
@@ -605,7 +605,7 @@ unsubscribe(<span style="color:#ae81ff">13</span>)
             </figure>
 			
 			<span>
-			&copy; <time datetime="2021-03-23 08:55:09.564685611 &#43;0700 WIB m=&#43;1.320311124">2021</time> . Made with <a href='https://gohugo.io'>Hugo</a> using the <a href='https://github.com/EmielH/tale-hugo/'>Tale</a> theme.
+			&copy; <time datetime="2021-03-23 21:10:07.901089771 &#43;0700 WIB m=&#43;1.276419489">2021</time> . Made with <a href='https://gohugo.io'>Hugo</a> using the <a href='https://github.com/EmielH/tale-hugo/'>Tale</a> theme.
 			</span>
 		</footer>
 
