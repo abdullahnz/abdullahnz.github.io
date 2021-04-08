@@ -47,3 +47,9 @@
     src: url('../fonts/iosevka-prag.ttf') format('truetype'); /* Safari, Android, iOS */
 }
 
+@font-face {
+    font-family: 'Roboto';
+    font-style: normal;
+    font-weight: 400;
+    src: url('../fonts/Roboto-Regular.ttf') format('truetype'); /* Safari, Android, iOS */
+}

@@ -204,8 +204,8 @@ total <span style="color:#ae81ff">24</span>
 cat flag.txt
 flag<span style="color:#f92672">{</span>e4fd4c9fcad9ba84666e5c7a4a9ab1f0<span style="color:#f92672">}</span>
 </code></pre></div><h2 id="flag">Flag</h2>
-<p><code>flag{e4fd4c9fcad9ba84666e5c7a4a9ab1f0}</code></p>
-<!-- raw HTML omitted -->
+<pre><code>flag{e4fd4c9fcad9ba84666e5c7a4a9ab1f0}
+</code></pre><!-- raw HTML omitted -->
 <h1 id="patches-revenge-500pts">Patches Revenge [500pts]</h1>
 <p>Libc diberikan, berarti perlu <em>leak-meleak</em> disini. dan <em>mungkin</em> saja ret-to-libc (?)</p>
 <h2 id="main-function">Main Function</h2>
@@ -312,8 +312,8 @@ flag<span style="color:#f92672">{</span>499c6288c77f297f4fd87db8e442e3f0<span st
 <span style="color:#f92672">[</span>*<span style="color:#f92672">]</span> Interrupted
 <span style="color:#f92672">[</span>*<span style="color:#f92672">]</span> Closed connection to challenge.ctf.games port <span style="color:#ae81ff">31322</span>
 </code></pre></div><h2 id="flag-1">Flag</h2>
-<p><code>flag{499c6288c77f297f4fd87db8e442e3f0}</code></p>
-<h1 id="weird-cookie-500-pts">Weird Cookie [500 pts]</h1>
+<pre><code>flag{499c6288c77f297f4fd87db8e442e3f0}
+</code></pre><h1 id="weird-cookie-500-pts">Weird Cookie [500 pts]</h1>
 <h2 id="the-main-function">the main function</h2>
 <p>Intinya soal ini seperti pada judulnya. Dimana terdapat custom canary yang ditempatkan di variable setelah input buffer. Seperti canary pada umumnya, jika berubah, maka <code>__stack_chk_fail</code> akan dipanggil. Tetapi pada kasus ini, program akan exit.</p>
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-c" data-lang="c"><span style="color:#66d9ef">int</span> <span style="color:#66d9ef">__cdecl</span> <span style="color:#a6e22e">main</span>(<span style="color:#66d9ef">int</span> argc, <span style="color:#66d9ef">const</span> <span style="color:#66d9ef">char</span> <span style="color:#f92672">**</span>argv, <span style="color:#66d9ef">const</span> <span style="color:#66d9ef">char</span> <span style="color:#f92672">**</span>envp)
@@ -412,8 +412,8 @@ drwxr-xr-x <span style="color:#ae81ff">1</span> root <span style="color:#ae81ff"
 $ cat flag.txt
 flag<span style="color:#f92672">{</span>e87923d7cd36a8580d0cf78656d457c6<span style="color:#f92672">}</span>
 </code></pre></div><h2 id="flag-2">Flag</h2>
-<p><code>flag{e87923d7cd36a8580d0cf78656d457c6}</code></p>
-<h1 id="sanded-box-500pts">Sanded Box [500pts]</h1>
+<pre><code>flag{e87923d7cd36a8580d0cf78656d457c6}
+</code></pre><h1 id="sanded-box-500pts">Sanded Box [500pts]</h1>
 <blockquote>
 <p>I set up a secure environment for users to execute shellcode. Now nobody will be able to get the flag!</p>
 </blockquote>
@@ -509,8 +509,8 @@ flag <span style="color:#f92672">=</span> re<span style="color:#f92672">.</span>
 
 <span style="color:#66d9ef">print</span> flag
 </code></pre></div><h2 id="flag-3">Flag</h2>
-<p><code>flag{dc75c408f5ba2fbc72b307987dddc775}</code></p>
-<h1 id="waf-500pts">WAF [500pts]</h1>
+<pre><code>flag{dc75c408f5ba2fbc72b307987dddc775}
+</code></pre><h1 id="waf-500pts">WAF [500pts]</h1>
 <blockquote>
 <p>Not to be confused with Web Application Firewall.</p>
 </blockquote>
@@ -772,8 +772,8 @@ flag<span style="color:#f92672">{</span>dc75c408f5ba2fbc72b307987dddc775<span st
 <span style="color:#f92672">[</span>*<span style="color:#f92672">]</span> Interrupted
 <span style="color:#f92672">[</span>*<span style="color:#f92672">]</span> Closed connection to challenge.ctf.games port <span style="color:#ae81ff">31213</span>
 </code></pre></div><h2 id="flag-4">Flag</h2>
-<p><code>flag{dc75c408f5ba2fbc72b307987dddc775}</code></p>
-<p>Akhir kata, nice challanges <em>buat aku</em>. Source soal dan solver bisa di download <a href="../source/source.zip">disini</a>, thanks.</p>
+<pre><code>flag{dc75c408f5ba2fbc72b307987dddc775}
+</code></pre><p>Akhir kata, nice challanges <em>buat aku</em>. Source soal dan solver bisa di download <a href="../source/source.zip">disini</a>, thanks.</p>
 
 
 		
@@ -810,7 +810,7 @@ flag<span style="color:#f92672">{</span>dc75c408f5ba2fbc72b307987dddc775<span st
             </figure>
 			
 			<span>
-			&copy; <time datetime="2021-03-23 08:32:38.071291389 &#43;0700 WIB m=&#43;0.336710970">2021</time> . Made with <a href='https://gohugo.io'>Hugo</a> using the <a href='https://github.com/EmielH/tale-hugo/'>Tale</a> theme.
+			&copy; <time datetime="2021-04-08 07:09:19.574234202 &#43;0700 WIB m=&#43;0.896168889">2021</time> . Made with <a href='https://gohugo.io'>Hugo</a> using the <a href='https://github.com/EmielH/tale-hugo/'>Tale</a> theme.
 			</span>
 		</footer>
 
