@@ -240,20 +240,20 @@ delete(<span style="color:#ae81ff">0</span>)
 0x30 [  1]: 0x5555557576b0 ◂— 0x0
 0x90 [  7]: 0x555555757620 —▸ 0x555555757590 —▸ 0x555555757500 —▸ 0x555555757470 —▸ 0x5555557573e0 —▸ 0x555555757350 —▸ 0x5555557572c0 ◂— 0x0
 
-pwndbg&gt; vis 2
-0x555555757000	0x0000000000000000	0x0000000000000251	........Q.......
-0x555555757010	0x0700000000000100	0x0000000000000000	................
+
+0x555555757000	0x0000000000000000	0x0000000000000251
+0x555555757010	0x0700000000000100	0x0000000000000000
 ...
-0x555555757050	0x0000000000000000	0x00005555557576b0	.........vuUUU..
+0x555555757050	0x0000000000000000	0x00005555557576b0
 ...
-0x555555757080	0x0000000000000000	0x0000555555757620	........ vuUUU..
+0x555555757080	0x0000000000000000	0x0000555555757620
 ...
-0x555555757250	0x0000000000000000	0x0000000000000061	........a.......
-0x555555757260	0x0000000000000000	0x0000000000000000	................ -&gt; array_data_notes[10]
-0x555555757270	0x0000000000000000	0x0000000000000000	................
-0x555555757280	0x0000000000000000	0x0000000000000000	................
-0x555555757290	0x0000000000000000	0x0000000000000000	................
-0x5555557572a0	0x0000555555757740	0x0000000000000000	@wuUUU..........
+0x555555757250	0x0000000000000000	0x0000000000000061
+0x555555757260	0x0000000000000000	0x0000000000000000 --&gt; array_data_notes[10]
+0x555555757270	0x0000000000000000	0x0000000000000000
+0x555555757280	0x0000000000000000	0x0000000000000000
+0x555555757290	0x0000000000000000	0x0000000000000000
+0x5555557572a0	0x0000555555757740	0x0000000000000000
 0x5555557572b0	0x0000000000000000
 </code></pre><p>Pada alamat <code>0x555555757088</code>, berisi <code>0x555555757620</code>, yang mana ini merupakan salah satu FD pointer dari free`d chunk yang ada di <code>tcachebins list</code> diatas. Karena terdapat index-out-of-bound (negative number) pada fungsi <code>edit</code>, kita bisa melakukan tcache-poisoning dengan mengedit alamat tersebut.</p>
 <p>Selanjutnya hanya mencari index yang akan menunjuk ke alamat target kita diatas. Lalu, edit agar menunjuk ke <code>__free_hook</code>. Yang nantinya akan kita overwrite ke <code>system</code> untuk mendapatkan RCE.</p>
@@ -572,7 +572,7 @@ unsubscribe(<span style="color:#ae81ff">13</span>)
             </figure>
 			
 			<span>
-			&copy; <time datetime="2021-04-08 07:09:19.530346471 &#43;0700 WIB m=&#43;0.852281125">2021</time> . Made with <a href='https://gohugo.io'>Hugo</a> using the <a href='https://github.com/EmielH/tale-hugo/'>Tale</a> theme.
+			&copy; <time datetime="2021-04-08 07:17:21.218798554 &#43;0700 WIB m=&#43;0.225550642">2021</time> . Made with <a href='https://gohugo.io'>Hugo</a> using the <a href='https://github.com/EmielH/tale-hugo/'>Tale</a> theme.
 			</span>
 		</footer>
 
