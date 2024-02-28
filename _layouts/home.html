@@ -8,7 +8,16 @@
         <div class="desc">
           {% for desc in site.description %}
           <p>{{ desc }}</p>
-          {% endfor %}
+          {% endfor %} {% if site.linkedin_url %}
+
+          <a href="{{ site.linkedin_url }}"
+            ><img src="/assets/icons/linkedin.png" alt="Linkedin Icon" width="32"
+          /></a>
+          {% endif %} {% if site.github_url %}
+          <a href="{{ site.github_url }}"
+            ><img src="/assets/icons/github.png" alt="Github Icon" width="32"
+          /></a>
+          {% endif %}
         </div>
       </div>
 

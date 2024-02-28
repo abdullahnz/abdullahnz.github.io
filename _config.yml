@@ -26,8 +26,9 @@ description: # this means to ignore newlines until "baseurl:"
   - I'd like to share my writeup for interested challenges here.
 baseurl: "" # the subpath of your site, e.g. /blog
 url: "" # the base hostname & protocol for your site, e.g. http://example.com
-twitter_username: jekyllrb
-github_username: jekyll
+# twitter_username: jekyllrb
+github_url: https://github.com/abdullahnz
+linkedin_url: https://www.linkedin.com/in/nizam-abdullah-265371231/
 
 # Build settings
 theme: minima
