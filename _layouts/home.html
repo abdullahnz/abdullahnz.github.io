@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+  {% include head-custom.html %}
+  <body>
+    <div class="wrapper">
+      <div class="profile">
+        <h1 class="title">Hello, I'm {{ site.name }}.</h1>
+        <div class="desc">
+          {% for desc in site.description %}
+          <p>{{ desc }}</p>
+          {% endfor %}
+        </div>
+      </div>
+
+      <div class="posts">
+        <div class="header">
+          <span class="title">Posts</span>
+          <span class="count">{{ site.posts.size }}</span>
+        </div>
+
+        {% for post in site.posts %}
+        <div class="post">
+          <a href="{{ post.url }}">{{ post.title }}</a>
+          <p>
+            Published on
+            <span class="underline">{{ post.date | date: "%b %-d, %Y"}}</span>
+          </p>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+    <div class="footer">Made with &hearts; by @abdullahnz</div>
+  </body>
+</html>

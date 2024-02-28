@@ -1,0 +1,178 @@
+@font-face {
+  font-family: "Supreme";
+  src: url("//cdn.fontshare.com/wf/UDGUA26XVGIV6IQWMQNGGAL7FQZFY227/E6HQU6YVWTGYX3KW3DF66KAAJ224ZDU6/5ZZU4JM62PS7KOJ7BOKLPL3AEO2G76TS.woff2")
+      format("woff2"),
+    url("//cdn.fontshare.com/wf/UDGUA26XVGIV6IQWMQNGGAL7FQZFY227/E6HQU6YVWTGYX3KW3DF66KAAJ224ZDU6/5ZZU4JM62PS7KOJ7BOKLPL3AEO2G76TS.woff")
+      format("woff"),
+    url("//cdn.fontshare.com/wf/UDGUA26XVGIV6IQWMQNGGAL7FQZFY227/E6HQU6YVWTGYX3KW3DF66KAAJ224ZDU6/5ZZU4JM62PS7KOJ7BOKLPL3AEO2G76TS.ttf")
+      format("truetype");
+  font-weight: 400;
+  font-display: swap;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "Supreme";
+  src: url("//cdn.fontshare.com/wf/Y4QRUUZINRRA6MAVHWOR3TW2GODCD5RZ/R3R2UQSXQOB32GYUQ6U742TO6KF4EHU6/F6KK3SHJZ5IAQWFJ26LASNWIU5ZCMCOF.woff2")
+      format("woff2"),
+    url("//cdn.fontshare.com/wf/Y4QRUUZINRRA6MAVHWOR3TW2GODCD5RZ/R3R2UQSXQOB32GYUQ6U742TO6KF4EHU6/F6KK3SHJZ5IAQWFJ26LASNWIU5ZCMCOF.woff")
+      format("woff"),
+    url("//cdn.fontshare.com/wf/Y4QRUUZINRRA6MAVHWOR3TW2GODCD5RZ/R3R2UQSXQOB32GYUQ6U742TO6KF4EHU6/F6KK3SHJZ5IAQWFJ26LASNWIU5ZCMCOF.ttf")
+      format("truetype");
+  font-weight: 400;
+  font-display: swap;
+  font-style: italic;
+}
+
+@font-face {
+  font-family: "Supreme";
+  src: url("//cdn.fontshare.com/wf/5T6APCD6XXAHAFTHDATQKT4RFVWRY3KR/VM6PC4PLGZYYJIHGMT63IIGYLTQKGSH6/TN7F4YNDQ3FJ6JRJV2XDS3CGMFKQRLXV.woff2")
+      format("woff2"),
+    url("//cdn.fontshare.com/wf/5T6APCD6XXAHAFTHDATQKT4RFVWRY3KR/VM6PC4PLGZYYJIHGMT63IIGYLTQKGSH6/TN7F4YNDQ3FJ6JRJV2XDS3CGMFKQRLXV.woff")
+      format("woff"),
+    url("//cdn.fontshare.com/wf/5T6APCD6XXAHAFTHDATQKT4RFVWRY3KR/VM6PC4PLGZYYJIHGMT63IIGYLTQKGSH6/TN7F4YNDQ3FJ6JRJV2XDS3CGMFKQRLXV.ttf")
+      format("truetype");
+  font-weight: 700;
+  font-display: swap;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "Supreme";
+  src: url("//cdn.fontshare.com/wf/CMVFVNUF7QWL7YP45D3VMM5S3TR7UETH/FMPD7RZEPLQMABBCRWTSKAVYELCFFGNA/WSOULU7BZA6ZWBLKBF4DDD6R2AYE2F5X.woff2")
+      format("woff2"),
+    url("//cdn.fontshare.com/wf/CMVFVNUF7QWL7YP45D3VMM5S3TR7UETH/FMPD7RZEPLQMABBCRWTSKAVYELCFFGNA/WSOULU7BZA6ZWBLKBF4DDD6R2AYE2F5X.woff")
+      format("woff"),
+    url("//cdn.fontshare.com/wf/CMVFVNUF7QWL7YP45D3VMM5S3TR7UETH/FMPD7RZEPLQMABBCRWTSKAVYELCFFGNA/WSOULU7BZA6ZWBLKBF4DDD6R2AYE2F5X.ttf")
+      format("truetype");
+  font-weight: 700;
+  font-display: swap;
+  font-style: italic;
+}
+
+* {
+  /* margin: 0;
+  padding: 0; */
+  color: rgb(253, 241, 217);
+  font-family: "Supreme", sans-serif;
+}
+
+body {
+  background-color: rgb(38, 38, 38);
+}
+
+.wrapper {
+  margin-top: 120px !important;
+  display: flex;
+  justify-content: space-between;
+  max-width: 55%;
+  max-width: 1150px;
+  margin: auto;
+  position: relative;
+  min-height: 50vh;
+}
+
+.profile {
+  max-width: 35%;
+}
+
+.profile .desc {
+  max-width: 90%;
+}
+
+.profile .title {
+  font-size: 48px;
+  font-family: "Borel", serif;
+  font-weight: bold;
+  line-height: 80px;
+  margin-bottom: -12px;
+}
+
+.profile .desc {
+  font-size: 18px;
+  line-height: 24px;
+  margin-bottom: 24px;
+}
+
+.posts {
+  padding-top: 32px;
+  max-width: 58%;
+}
+
+.posts .title {
+  font-size: 20px;
+  font-weight: bold;
+  text-transform: uppercase;
+}
+
+.posts span.count {
+  font-size: 16px !important;
+  background-color: rgb(106, 85, 60);
+  padding: 4px 8px !important;
+  border-radius: 12px;
+  line-height: 20px;
+  margin-left: 4px;
+}
+
+.header {
+  margin-bottom: 32px;
+}
+
+.post {
+  font-size: 20px;
+  margin-bottom: 32px;
+  /* background-color: aliceblue; */
+}
+
+.post a {
+  text-decoration: 2px underline rgb(68, 68, 68);
+  transition: 0.5s;
+}
+
+.post a:hover {
+  text-decoration-color: rgb(253, 241, 217);
+}
+
+.post p {
+  font-weight: normal;
+  font-size: 16px;
+  margin-top: 12px;
+}
+
+.footer {
+  text-align: center;
+  margin-top: 64px;
+  margin-bottom: 32px;
+}
+
+@media screen and (max-width: 1500px) {
+  .wrapper {
+    max-width: 70%;
+  }
+
+  .profile .desc {
+    max-width: 100%;
+  }
+}
+
+@media screen and (max-width: 1000px) {
+  .wrapper {
+    flex-direction: column;
+  }
+  .profile,
+  .posts {
+    max-width: 100%;
+  }
+}
+
+@media screen and (max-width: 500px) {
+  .wrapper {
+    flex-direction: column;
+    max-width: 90%;
+    margin-top: 64px !important;
+  }
+  .profile,
+  .posts {
+    max-width: 100%;
+  }
+}

