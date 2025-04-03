@@ -231,3 +231,7 @@ url = "posts/"
 # name = "Contato"
 # weight = 5
 # url = "contact/"
+
+[caches]
+  [caches.images]
+    dir = ':cacheDir/images'
