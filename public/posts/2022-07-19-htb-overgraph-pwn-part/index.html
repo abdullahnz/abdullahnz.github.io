@@ -1,0 +1,485 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload" data-no-instant defer></script>
+  <title>
+  HTB: Overgraph - Binary Exploitation Part · abdullahnz
+</title>
+  <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="color-scheme" content="light dark">
+
+
+
+
+<meta name="author" content="Abdullah">
+<meta name="description" content="
+  0x01 Overview
+  
+    
+    Link to heading
+  
+
+Beberapa minggu yang lalu, aku diminta untuk mengerjakan soal pwn pentest dari machine yang terdapat pada HackTheBox oleh temanku. Karena ada waktu buat bantu ngerjain maka aku coba soalnya. Dan karena machine-nya memiliki kategori hard jadi disuruh juga buat writeupnya.
+Binary merupakan ELF 64-bit dan running di mesin ubuntu dengan libc version 2.25 yang digunakan untuk membuat report suatu pesan. Report ini akan menulis pesan ke /opt/crv/&lt;name&gt;.">
+<meta name="keywords" content="blog,developer,personal">
+
+
+
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="HTB: Overgraph - Binary Exploitation Part">
+  <meta name="twitter:description" content="0x01 Overview Link to heading Beberapa minggu yang lalu, aku diminta untuk mengerjakan soal pwn pentest dari machine yang terdapat pada HackTheBox oleh temanku. Karena ada waktu buat bantu ngerjain maka aku coba soalnya. Dan karena machine-nya memiliki kategori hard jadi disuruh juga buat writeupnya.
+Binary merupakan ELF 64-bit dan running di mesin ubuntu dengan libc version 2.25 yang digunakan untuk membuat report suatu pesan. Report ini akan menulis pesan ke /opt/crv/&lt;name&gt;.">
+
+<meta property="og:url" content="http://localhost:1313/posts/2022-07-19-htb-overgraph-pwn-part/">
+  <meta property="og:site_name" content="abdullahnz">
+  <meta property="og:title" content="HTB: Overgraph - Binary Exploitation Part">
+  <meta property="og:description" content="0x01 Overview Link to heading Beberapa minggu yang lalu, aku diminta untuk mengerjakan soal pwn pentest dari machine yang terdapat pada HackTheBox oleh temanku. Karena ada waktu buat bantu ngerjain maka aku coba soalnya. Dan karena machine-nya memiliki kategori hard jadi disuruh juga buat writeupnya.
+Binary merupakan ELF 64-bit dan running di mesin ubuntu dengan libc version 2.25 yang digunakan untuk membuat report suatu pesan. Report ini akan menulis pesan ke /opt/crv/&lt;name&gt;.">
+  <meta property="og:locale" content="en">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="posts">
+    <meta property="article:published_time" content="2022-07-19T15:57:28+07:00">
+    <meta property="article:modified_time" content="2022-07-19T15:57:28+07:00">
+
+
+
+
+<link rel="canonical" href="http://localhost:1313/posts/2022-07-19-htb-overgraph-pwn-part/">
+
+
+<link rel="preload" href="/fonts/fa-brands-400.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/fonts/fa-regular-400.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/fonts/fa-solid-900.woff2" as="font" type="font/woff2" crossorigin>
+
+
+  
+  
+  <link rel="stylesheet" href="/css/coder.css" media="screen">
+
+
+
+
+
+
+  
+    
+    
+    <link rel="stylesheet" href="/css/coder-dark.css" media="screen">
+  
+
+
+
+ 
+
+
+
+
+<link rel="icon" type="image/svg+xml" href="/images/favicon.svg" sizes="any">
+<link rel="icon" type="image/png" href="/images/favicon-32x32.png" sizes="32x32">
+<link rel="icon" type="image/png" href="/images/favicon-16x16.png" sizes="16x16">
+
+<link rel="apple-touch-icon" href="/images/apple-touch-icon.png">
+<link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
+
+<link rel="manifest" href="/site.webmanifest">
+<link rel="mask-icon" href="/images/safari-pinned-tab.svg" color="#5bbad5">
+
+
+
+
+
+
+
+
+
+</head>
+
+
+
+
+
+
+<body class="preload-transitions colorscheme-auto">
+  
+<div class="float-container">
+    <a id="dark-mode-toggle" class="colorscheme-toggle">
+        <i class="fa-solid fa-adjust fa-fw" aria-hidden="true"></i>
+    </a>
+</div>
+
+
+  <main class="wrapper">
+    <nav class="navigation">
+  <section class="container">
+    
+    <a class="navigation-title" href="http://localhost:1313/">
+      abdullahnz
+    </a>
+    
+    
+      <input type="checkbox" id="menu-toggle" />
+      <label class="menu-button float-right" for="menu-toggle">
+        <i class="fa-solid fa-bars fa-fw" aria-hidden="true"></i>
+      </label>
+      <ul class="navigation-list">
+        
+          
+            <li class="navigation-item">
+              <a class="navigation-link " href="/about/">About</a>
+            </li>
+          
+            <li class="navigation-item">
+              <a class="navigation-link " href="/posts/">Blog</a>
+            </li>
+          
+        
+        
+      </ul>
+    
+  </section>
+</nav>
+
+
+    <div class="content">
+      
+  <section class="container post">
+    <article>
+      <header>
+        <div class="post-title">
+          <h1 class="title">
+            <a class="title-link" href="http://localhost:1313/posts/2022-07-19-htb-overgraph-pwn-part/">
+              HTB: Overgraph - Binary Exploitation Part
+            </a>
+          </h1>
+        </div>
+        <div class="post-meta">
+          <div class="date">
+            <span class="posted-on">
+              <i class="fa-solid fa-calendar" aria-hidden="true"></i>
+              <time datetime="2022-07-19T15:57:28&#43;07:00">
+                July 19, 2022
+              </time>
+            </span>
+            <span class="reading-time">
+              <i class="fa-solid fa-clock" aria-hidden="true"></i>
+              4-minute read
+            </span>
+          </div>
+          
+          
+          
+        </div>
+      </header>
+
+      <div class="post-content">
+        
+        <h2 id="0x01-overview">
+  0x01 Overview
+  <a class="heading-link" href="#0x01-overview">
+    <i class="fa-solid fa-link" aria-hidden="true" title="Link to heading"></i>
+    <span class="sr-only">Link to heading</span>
+  </a>
+</h2>
+<p>Beberapa minggu yang lalu, aku diminta untuk mengerjakan soal pwn pentest dari machine yang terdapat pada <a href="http://www.hackthebox.com/"  class="external-link" target="_blank" rel="noopener">HackTheBox</a> oleh temanku. Karena ada waktu buat bantu ngerjain maka aku coba soalnya. Dan karena machine-nya memiliki kategori <code>hard</code> jadi disuruh juga buat writeupnya.</p>
+<p>Binary merupakan ELF 64-bit dan running di mesin <code>ubuntu</code> dengan libc version <code>2.25</code> yang digunakan untuk membuat report suatu pesan. Report ini akan menulis pesan ke <code>/opt/crv/&lt;name&gt;</code>.</p>
+<p>Berikut contoh tampilan program,</p>
+<pre><code>$ ./nreport
+Custom Reporting v1
+
+Enter Your Token: &lt;SOME_VALID_TOKEN&gt;
+Enter Name: &lt;NAME&gt;
+
+Welcome &lt;NAME&gt;
+1.Create New Message
+2.Delete a Message
+3.Edit Messages
+4.Report All Messages
+5.Exit
+&gt;
+</code></pre>
+<h2 id="0x02-reversing-the-binary">
+  0x02 Reversing the Binary
+  <a class="heading-link" href="#0x02-reversing-the-binary">
+    <i class="fa-solid fa-link" aria-hidden="true" title="Link to heading"></i>
+    <span class="sr-only">Link to heading</span>
+  </a>
+</h2>
+<p>Binary tidak memiliki fungsi-fungsi yang rumit, sehingga dapat dengan mudah untuk di-reversing.</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="line"><span class="cl"><span class="kt">int</span> <span class="kr">__cdecl</span> <span class="nf">main</span><span class="p">(</span><span class="kt">int</span> <span class="n">argc</span><span class="p">,</span> <span class="k">const</span> <span class="kt">char</span> <span class="o">**</span><span class="n">argv</span><span class="p">,</span> <span class="k">const</span> <span class="kt">char</span> <span class="o">**</span><span class="n">envp</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="p">...</span>
+</span></span><span class="line"><span class="cl">    <span class="nf">puts</span><span class="p">(</span><span class="s">&#34;Custom Reporting v1</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="nf">auth</span><span class="p">(</span><span class="o">&amp;</span><span class="n">token</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="nf">printf</span><span class="p">(</span><span class="s">&#34;</span><span class="se">\n</span><span class="s">Welcome %s&#34;</span><span class="p">,</span> <span class="n">userinfo1</span><span class="p">,</span> <span class="n">argv</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="k">do</span>
+</span></span><span class="line"><span class="cl">    <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="nf">puts</span><span class="p">(</span><span class="s">&#34;</span><span class="se">\n</span><span class="s">1.Create New Message</span><span class="se">\n</span><span class="s">2.Delete a Message</span><span class="se">\n</span><span class="s">3.Edit Messages</span><span class="se">\n</span><span class="s">4.Report All Messages</span><span class="se">\n</span><span class="s">5.Exit&#34;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">        <span class="nf">printf</span><span class="p">(</span><span class="s">&#34;&gt; &#34;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">        <span class="nf">scanf</span><span class="p">(</span><span class="s">&#34; %1[^</span><span class="se">\n</span><span class="s">]&#34;</span><span class="p">,</span> <span class="n">buf</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">        <span class="n">choice</span> <span class="o">=</span> <span class="nf">atoi</span><span class="p">(</span><span class="n">buf</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">    <span class="k">while</span> <span class="p">(</span> <span class="n">choice</span> <span class="o">&gt;</span> <span class="mi">5</span> <span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="p">...</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></div><h3 id="token-authentication">
+  Token Authentication
+  <a class="heading-link" href="#token-authentication">
+    <i class="fa-solid fa-link" aria-hidden="true" title="Link to heading"></i>
+    <span class="sr-only">Link to heading</span>
+  </a>
+</h3>
+<p>Pengecekan token input dari user terdapat pada fungsi <code>auth</code> yang terdapat pada binary. Berikut hasil dekompilasi fungsi <code>auth</code> yang sudah dirapikan.</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="line"><span class="cl"><span class="p">...</span>
+</span></span><span class="line"><span class="cl"><span class="nf">printf</span><span class="p">(</span><span class="s">&#34;Enter Your Token: &#34;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl"><span class="nf">fgets</span><span class="p">(</span><span class="o">&amp;</span><span class="n">token</span><span class="p">,</span> <span class="mi">19</span><span class="p">,</span> <span class="n">stdin</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="k">if</span> <span class="p">(</span> <span class="nf">strlen</span><span class="p">(</span><span class="o">&amp;</span><span class="n">token</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">15</span> <span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="k">goto</span> <span class="n">INVALID_TOKEN</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">13</span><span class="p">;</span> <span class="n">i</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">;</span> <span class="o">--</span><span class="n">i</span> <span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="n">hash</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">token</span><span class="p">[</span><span class="mi">13</span><span class="p">]</span> <span class="o">^</span> <span class="n">token</span><span class="p">[</span><span class="mi">9</span><span class="p">]</span> <span class="o">^</span> <span class="n">token</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">^</span> <span class="n">token</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">^</span> <span class="n">token</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">^</span> <span class="n">secret</span><span class="p">[</span><span class="n">i</span><span class="p">];</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="k">if</span> <span class="p">(</span><span class="n">hash</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="n">hash</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="n">hash</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">!=</span> <span class="mi">308</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="k">goto</span> <span class="n">INVALID_TOKEN</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="k">if</span> <span class="p">(</span><span class="n">hash</span><span class="p">[</span><span class="mi">7</span><span class="p">]</span> <span class="o">+</span> <span class="n">hash</span><span class="p">[</span><span class="mi">8</span><span class="p">]</span> <span class="o">+</span> <span class="n">hash</span><span class="p">[</span><span class="mi">9</span><span class="p">]</span> <span class="o">!=</span> <span class="mi">325</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="k">goto</span> <span class="n">INVALID_TOKEN</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="k">if</span> <span class="p">(</span><span class="n">hash</span><span class="p">[</span><span class="mi">11</span><span class="p">]</span> <span class="o">+</span> <span class="n">hash</span><span class="p">[</span><span class="mi">12</span><span class="p">]</span> <span class="o">+</span> <span class="n">hash</span><span class="p">[</span><span class="mi">13</span><span class="p">]</span> <span class="o">!=</span> <span class="mi">265</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="k">goto</span> <span class="n">INVALID_TOKEN</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">...</span>
+</span></span><span class="line"><span class="cl"><span class="nf">printf</span><span class="p">(</span><span class="s">&#34;Enter Name: &#34;</span><span class="p">,</span> <span class="mi">19</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl"><span class="nf">scanf</span><span class="p">(</span><span class="s">&#34; %39[^</span><span class="se">\n</span><span class="s">]&#34;</span><span class="p">,</span> <span class="n">userinfo1</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl"><span class="p">...</span>
+</span></span></code></pre></div><p>Seharusnya alur pengecekan token sudah lebih jelas untuk mendapatkan token yang valid,</p>
+<ul>
+<li>Token harus memiliki panjang 15 karakter.</li>
+<li>Nilai <code>hash</code> merupakan hasil xor antara beberapa byte dari token dan <code>secret[i]</code> dengan nilai <code>i</code> yang selaras dengan index dari <code>hash</code>.</li>
+<li>Nilai dari beberapa <code>hash</code> merupakan nilai yang digunakan untuk pengecekan token yang valid.</li>
+<li>Jika pengecekan token lolos, maka akan ada inputan name yang akan disimpan pada <code>userinfo1</code>, dan jika gagal maka program akan exit.</li>
+</ul>
+<p>dah.</p>
+<h3 id="generating-token-authentication">
+  Generating Token Authentication
+  <a class="heading-link" href="#generating-token-authentication">
+    <i class="fa-solid fa-link" aria-hidden="true" title="Link to heading"></i>
+    <span class="sr-only">Link to heading</span>
+  </a>
+</h3>
+<p>Token dapat mudah digenerate dengan <code>z3</code> algebra-solver.</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-py" data-lang="py"><span class="line"><span class="cl"><span class="kn">from</span> <span class="nn">z3</span> <span class="kn">import</span> <span class="o">*</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># secret didapatkan pada binary.</span>
+</span></span><span class="line"><span class="cl"><span class="n">secret</span> <span class="o">=</span> <span class="p">[</span>
+</span></span><span class="line"><span class="cl">    <span class="mh">0x12</span><span class="p">,</span> <span class="mh">0x01</span><span class="p">,</span> <span class="mh">0x12</span><span class="p">,</span> <span class="mh">0x04</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="mh">0x42</span><span class="p">,</span> <span class="mh">0x14</span><span class="p">,</span> <span class="mh">0x06</span><span class="p">,</span> <span class="mh">0x1f</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="mh">0x07</span><span class="p">,</span> <span class="mh">0x16</span><span class="p">,</span> <span class="mh">0x01</span><span class="p">,</span> <span class="mh">0x10</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="mh">0x40</span><span class="p">,</span> <span class="mh">0x00</span><span class="p">,</span> <span class="mh">0x00</span><span class="p">,</span> <span class="mh">0x00</span>
+</span></span><span class="line"><span class="cl"><span class="p">]</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">s</span> <span class="o">=</span> <span class="n">Solver</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl"><span class="n">t</span> <span class="o">=</span> <span class="p">[</span><span class="n">BitVec</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;t!</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">,</span> <span class="mi">32</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">5</span><span class="p">)]</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">t</span><span class="p">)):</span>
+</span></span><span class="line"><span class="cl">    <span class="n">s</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">And</span><span class="p">(</span><span class="n">t</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mh">0x61</span><span class="p">,</span> <span class="n">t</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">&lt;</span> <span class="mh">0x7a</span><span class="p">))</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">xored</span> <span class="o">=</span> <span class="mi">0</span>
+</span></span><span class="line"><span class="cl"><span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">t</span><span class="p">)):</span>
+</span></span><span class="line"><span class="cl">    <span class="n">xored</span> <span class="o">^=</span> <span class="n">t</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">s</span><span class="o">.</span><span class="n">add</span><span class="p">((</span><span class="n">xored</span> <span class="o">^</span> <span class="n">secret</span><span class="p">[</span> <span class="mi">0</span><span class="p">])</span> <span class="o">+</span> <span class="p">(</span><span class="n">xored</span> <span class="o">^</span> <span class="n">secret</span><span class="p">[</span> <span class="mi">1</span><span class="p">])</span> <span class="o">+</span> <span class="p">(</span><span class="n">xored</span> <span class="o">^</span> <span class="n">secret</span><span class="p">[</span> <span class="mi">2</span><span class="p">])</span> <span class="o">==</span> <span class="mi">308</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">s</span><span class="o">.</span><span class="n">add</span><span class="p">((</span><span class="n">xored</span> <span class="o">^</span> <span class="n">secret</span><span class="p">[</span> <span class="mi">7</span><span class="p">])</span> <span class="o">+</span> <span class="p">(</span><span class="n">xored</span> <span class="o">^</span> <span class="n">secret</span><span class="p">[</span> <span class="mi">8</span><span class="p">])</span> <span class="o">+</span> <span class="p">(</span><span class="n">xored</span> <span class="o">^</span> <span class="n">secret</span><span class="p">[</span> <span class="mi">9</span><span class="p">])</span> <span class="o">==</span> <span class="mi">325</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">s</span><span class="o">.</span><span class="n">add</span><span class="p">((</span><span class="n">xored</span> <span class="o">^</span> <span class="n">secret</span><span class="p">[</span><span class="mi">11</span><span class="p">])</span> <span class="o">+</span> <span class="p">(</span><span class="n">xored</span> <span class="o">^</span> <span class="n">secret</span><span class="p">[</span><span class="mi">12</span><span class="p">])</span> <span class="o">+</span> <span class="p">(</span><span class="n">xored</span> <span class="o">^</span> <span class="n">secret</span><span class="p">[</span><span class="mi">13</span><span class="p">])</span> <span class="o">==</span> <span class="mi">265</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="k">while</span> <span class="n">s</span><span class="o">.</span><span class="n">check</span><span class="p">()</span> <span class="o">==</span> <span class="n">sat</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">    <span class="n">m</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">model</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">t</span><span class="p">)):</span>
+</span></span><span class="line"><span class="cl">        <span class="n">s</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">Or</span><span class="p">(</span><span class="n">t</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">!=</span> <span class="n">m</span><span class="p">[</span><span class="n">t</span><span class="p">[</span><span class="n">i</span><span class="p">]]))</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="n">token</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="nb">chr</span><span class="p">(</span><span class="n">m</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">as_long</span><span class="p">())</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">t</span><span class="p">])</span>
+</span></span><span class="line"><span class="cl">    <span class="n">token</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&#34;</span><span class="si">{</span><span class="n">token</span><span class="p">[:</span><span class="mi">3</span><span class="p">]</span><span class="si">}</span><span class="s2">______</span><span class="si">{</span><span class="n">token</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span><span class="si">}</span><span class="s2">___</span><span class="si">{</span><span class="n">token</span><span class="p">[</span><span class="mi">4</span><span class="p">]</span><span class="si">}</span><span class="s2">&#34;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="nb">print</span><span class="p">(</span><span class="n">token</span><span class="p">)</span>
+</span></span></code></pre></div><p>Jalankan dan akan mendapatkan banyak token yang bisa digunakan.</p>
+<h3 id="where-is-the-bug">
+  Where is the bug?
+  <a class="heading-link" href="#where-is-the-bug">
+    <i class="fa-solid fa-link" aria-hidden="true" title="Link to heading"></i>
+    <span class="sr-only">Link to heading</span>
+  </a>
+</h3>
+<p>Bug terdapat pada fungsi <code>edit</code>. Dimana index dari <code>message</code> yang akan di-edit tidak memiliki batas. Hal ini dapat menyebabkan index out-of-bound. Kita bisa mengedit pointer yang ada disebelum maupun sesudah <code>message_array</code>.</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="line"><span class="cl"><span class="k">if</span> <span class="p">(</span> <span class="n">Arryindex</span> <span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="nf">printf</span><span class="p">(</span><span class="s">&#34;Enter number to edit: &#34;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="nf">scanf</span><span class="p">(</span><span class="s">&#34;%d[^</span><span class="se">\n</span><span class="s">]&#34;</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">index</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="nf">printf</span><span class="p">(</span><span class="s">&#34;Message Title: &#34;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="nf">scanf</span><span class="p">(</span><span class="s">&#34; %59[^</span><span class="se">\n</span><span class="s">]&#34;</span><span class="p">,</span> <span class="n">message_array</span><span class="p">[</span><span class="n">index</span><span class="p">]);</span> <span class="c1">// oob jika 0 &lt; index &gt; 10
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="nf">printf</span><span class="p">(</span><span class="s">&#34;Message: &#34;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="n">message_content_ptr</span> <span class="o">=</span> <span class="n">message_array</span><span class="p">[</span><span class="n">index</span><span class="p">]</span> <span class="o">+</span> <span class="mi">60</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="nf">scanf</span><span class="p">(</span><span class="s">&#34;%100[^</span><span class="se">\n</span><span class="s">]&#34;</span><span class="p">,</span> <span class="n">message_content_ptr</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="nf">fflush</span><span class="p">(</span><span class="n">stdin</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="nf">fflush</span><span class="p">(</span><span class="n">stdout</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></div><p>Sebagai gambaran, bersebelahannya variabel <code>message_array</code> dan <code>userinfo1</code>.</p>
+<table>
+  <thead>
+      <tr>
+          <th>Variable</th>
+          <th>Value</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td><strong>message_array[0]</strong></td>
+          <td>0x4072c0</td>
+      </tr>
+      <tr>
+          <td>…</td>
+          <td>…</td>
+      </tr>
+      <tr>
+          <td><strong>message_array[9]</strong></td>
+          <td>0x00000000</td>
+      </tr>
+      <tr>
+          <td>…</td>
+          <td>0x00000000</td>
+      </tr>
+      <tr>
+          <td>…</td>
+          <td>0x00000000</td>
+      </tr>
+      <tr>
+          <td><strong>userinfo1</strong></td>
+          <td>“somename”</td>
+      </tr>
+  </tbody>
+</table>
+<p>Bagaimana jika <code>userinfo1</code> yang menyimpan inputan name kita berisi suatu alamat memori? dan kita mengedit message pada index 12? Maka nilai yang berada pada alamat tersebutlah yang akan diedit.</p>
+<h3 id="got-hijacking">
+  GOT Hijacking
+  <a class="heading-link" href="#got-hijacking">
+    <i class="fa-solid fa-link" aria-hidden="true" title="Link to heading"></i>
+    <span class="sr-only">Link to heading</span>
+  </a>
+</h3>
+<p>Proteksi yang terdapat pada binary.</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-sh" data-lang="sh"><span class="line"><span class="cl">Arch:     amd64-64-little
+</span></span><span class="line"><span class="cl">RELRO:    Partial RELRO
+</span></span><span class="line"><span class="cl">Stack:    Canary found
+</span></span><span class="line"><span class="cl">NX:       NX enabled
+</span></span><span class="line"><span class="cl">PIE:      No PIE <span class="o">(</span>0x3fd000<span class="o">)</span>
+</span></span><span class="line"><span class="cl">RUNPATH:  b<span class="s1">&#39;/usr/local/bin/Nreport/libc/&#39;</span>
+</span></span></code></pre></div><p><code>RELRO</code> ini adalah suatu proteksi yang membuat suatu section pada binary menjadi read-only. Proteksi ini ada 2 mode: full dan partial.</p>
+<ul>
+<li><code>Full</code> berarti GOT section memiliki permission read-only,</li>
+<li><code>Partial</code> berarti GOT section memiliki permission writeable.</li>
+</ul>
+<p>Untuk lainnya, cari sendiri :lol:</p>
+<p>Karena binary memiliki address yang tetap (No PIE), artinya kita bisa mendapatkan alamat suatu simbol dari entry got dengan mudah. Dalam kasus ini, kita akan mengoverwrite <code>free@got</code> ke system. Dan melakukan free atau delete message yang mengandung string <code>&quot;/bin/sh&quot;</code> untuk mendapatkan shell.</p>
+<h3 id="exploit">
+  Exploit
+  <a class="heading-link" href="#exploit">
+    <i class="fa-solid fa-link" aria-hidden="true" title="Link to heading"></i>
+    <span class="sr-only">Link to heading</span>
+  </a>
+</h3>
+<p>Karena buffering enabled, maka disini aku hanya tuliskan alur exploitnya saja. Dan karena binary di-mesin memiliki setuid <code>root</code>, maka kita akan mendapatan <code>root</code>.</p>
+<ol>
+<li>Input valid token yang sudah didapat.</li>
+<li>Input name dengan alamat dari <code>free@got</code> yaitu <code>0x404018</code>.</li>
+<li>Create new message dengan dengan title dan content <code>&quot;/bin/sh&quot;</code>.</li>
+<li>Edit index 12 (OOB) yang akan menunjuk ke buffer name kita yang berisi alamat dari <code>free@got</code>, menjadi <code>system@plt</code> pada <code>0x401080</code>.</li>
+<li>Delete message index 0 tadi yang menyimpan string <code>&quot;/bin/sh&quot;</code> untuk men-trigger <code>free</code>.</li>
+<li>Root shell!</li>
+</ol>
+
+      </div>
+
+
+      <footer>
+        
+
+
+        
+        
+        
+        
+        
+        
+        
+      </footer>
+    </article>
+
+    
+  </section>
+
+    </div>
+
+    <footer class="footer">
+  <section class="container">
+    ©
+    
+      2019 -
+    
+    2025
+     Abdullah 
+    ·
+    
+    Powered by <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a> & <a href="https://github.com/luizdepra/hugo-coder/" target="_blank" rel="noopener">Coder</a>.
+    
+  </section>
+</footer>
+
+  </main>
+
+  
+
+  
+  
+  <script src="/js/coder.js"></script>
+  
+
+  
+
+  
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+</body>
+</html>

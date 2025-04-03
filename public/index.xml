@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Abdullah</title>
+    <link>http://localhost:1313/</link>
+    <description>Recent content on Abdullah</description>
+    <generator>Hugo</generator>
+    <language>en</language>
+    <lastBuildDate>Thu, 05 Jan 2023 01:15:52 +0100</lastBuildDate>
+    <atom:link href="http://localhost:1313/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Autores de Hugo</title>
+      <link>http://localhost:1313/autores/autores-de-hugo/</link>
+      <pubDate>Thu, 05 Jan 2023 01:15:52 +0100</pubDate>
+      <guid>http://localhost:1313/autores/autores-de-hugo/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>temas</title>
+      <link>http://localhost:1313/categoria/temas/</link>
+      <pubDate>Wed, 04 Jan 2023 23:21:18 +0100</pubDate>
+      <guid>http://localhost:1313/categoria/temas/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>sintaxe</title>
+      <link>http://localhost:1313/categoria/sintaxe/</link>
+      <pubDate>Wed, 04 Jan 2023 23:21:06 +0100</pubDate>
+      <guid>http://localhost:1313/categoria/sintaxe/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>Kernel Adventures Part I: SUID binaries are too vulnerable. So I decided to implement su in the Kernel</title>
+      <link>http://localhost:1313/posts/kernel-adventures-part-1/</link>
+      <pubDate>Fri, 26 Aug 2022 15:57:28 +0700</pubDate>
+      <guid>http://localhost:1313/posts/kernel-adventures-part-1/</guid>
+      <description>&lt;p&gt;Kernel Adventures, merupakan kernel exploitation yang terdapat disalah satu challenge &lt;a href=&#34;www.hackthebox.com&#34; &gt;hackthebox&lt;/a&gt;. Ini merupakan challenge kernel pertama yang aku selesaikan. Challenge ini memiliki kesulitan medium jadi mungkin ini masih tergolong mudah.&lt;/p&gt;&#xA;&lt;p&gt;Spoiler alert! karena instance dari challenge ini masih aktif.&lt;/p&gt;&#xA;&lt;h2 id=&#34;0x01-overview&#34;&gt;&#xA;  0x01 Overview&#xA;  &lt;a class=&#34;heading-link&#34; href=&#34;#0x01-overview&#34;&gt;&#xA;    &lt;i class=&#34;fa-solid fa-link&#34; aria-hidden=&#34;true&#34; title=&#34;Link to heading&#34;&gt;&lt;/i&gt;&#xA;    &lt;span class=&#34;sr-only&#34;&gt;Link to heading&lt;/span&gt;&#xA;  &lt;/a&gt;&#xA;&lt;/h2&gt;&#xA;&lt;p&gt;Kernel exploitation adalah challenge kernel yang mana kita sebagai user biasa harus mendapatkan privilege escalation dengan mengeksploitasi bug yang terdapat pada kernel module yang diberikan. Berikut attachment yang diberikan:&lt;/p&gt;</description>
+    </item>
+    <item>
+      <title>HTB: Overgraph - Binary Exploitation Part</title>
+      <link>http://localhost:1313/posts/htb-overgraph-pwn-part/</link>
+      <pubDate>Tue, 19 Jul 2022 15:57:28 +0700</pubDate>
+      <guid>http://localhost:1313/posts/htb-overgraph-pwn-part/</guid>
+      <description>&lt;h2 id=&#34;0x01-overview&#34;&gt;&#xA;  0x01 Overview&#xA;  &lt;a class=&#34;heading-link&#34; href=&#34;#0x01-overview&#34;&gt;&#xA;    &lt;i class=&#34;fa-solid fa-link&#34; aria-hidden=&#34;true&#34; title=&#34;Link to heading&#34;&gt;&lt;/i&gt;&#xA;    &lt;span class=&#34;sr-only&#34;&gt;Link to heading&lt;/span&gt;&#xA;  &lt;/a&gt;&#xA;&lt;/h2&gt;&#xA;&lt;p&gt;Beberapa minggu yang lalu, aku diminta untuk mengerjakan soal pwn pentest dari machine yang terdapat pada &lt;a href=&#34;http://www.hackthebox.com/&#34;  class=&#34;external-link&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;HackTheBox&lt;/a&gt; oleh temanku. Karena ada waktu buat bantu ngerjain maka aku coba soalnya. Dan karena machine-nya memiliki kategori &lt;code&gt;hard&lt;/code&gt; jadi disuruh juga buat writeupnya.&lt;/p&gt;&#xA;&lt;p&gt;Binary merupakan ELF 64-bit dan running di mesin &lt;code&gt;ubuntu&lt;/code&gt; dengan libc version &lt;code&gt;2.25&lt;/code&gt; yang digunakan untuk membuat report suatu pesan. Report ini akan menulis pesan ke &lt;code&gt;/opt/crv/&amp;lt;name&amp;gt;&lt;/code&gt;.&lt;/p&gt;</description>
+    </item>
+    <item>
+      <title>Pwn-ing at Securinets Quals 2021</title>
+      <link>http://localhost:1313/posts/pwning-at-securinets-2021/</link>
+      <pubDate>Mon, 22 Mar 2021 15:57:28 +0700</pubDate>
+      <guid>http://localhost:1313/posts/pwning-at-securinets-2021/</guid>
+      <description>&lt;h2 id=&#34;overview&#34;&gt;&#xA;  Overview&#xA;  &lt;a class=&#34;heading-link&#34; href=&#34;#overview&#34;&gt;&#xA;    &lt;i class=&#34;fa-solid fa-link&#34; aria-hidden=&#34;true&#34; title=&#34;Link to heading&#34;&gt;&lt;/i&gt;&#xA;    &lt;span class=&#34;sr-only&#34;&gt;Link to heading&lt;/span&gt;&#xA;  &lt;/a&gt;&#xA;&lt;/h2&gt;&#xA;&lt;p&gt;Soal-soalnya sangat bagus menurutku (karena solved semua aja sih :evillaught:), tapi aku kerjain ini semalam setelah kompetisi selesai. Karena saat kulihat di runing event ctftime, ternyata waktu &amp;lt;1 jam selesai :’(. Aku hanya kerjain bagian Binary Explotation saja dan dibawah ini writeupnya.&lt;/p&gt;&#xA;&lt;h2 id=&#34;kill-shot-810-pts&#34;&gt;&#xA;  Kill Shot (810 pts)&#xA;  &lt;a class=&#34;heading-link&#34; href=&#34;#kill-shot-810-pts&#34;&gt;&#xA;    &lt;i class=&#34;fa-solid fa-link&#34; aria-hidden=&#34;true&#34; title=&#34;Link to heading&#34;&gt;&lt;/i&gt;&#xA;    &lt;span class=&#34;sr-only&#34;&gt;Link to heading&lt;/span&gt;&#xA;  &lt;/a&gt;&#xA;&lt;/h2&gt;&#xA;&lt;p&gt;Simplenya, binary ini memberikan kita &lt;code&gt;printf&lt;/code&gt; dengan controlled parameter untuk mendapatkan information leaks, dan fungsi kill yang bisa kita gunakan untuk dapatkan arbitrary write.&lt;/p&gt;</description>
+    </item>
+    <item>
+      <title>Final Icyption 2020</title>
+      <link>http://localhost:1313/posts/final-icyption-2020/</link>
+      <pubDate>Fri, 07 Aug 2020 15:57:28 +0700</pubDate>
+      <guid>http://localhost:1313/posts/final-icyption-2020/</guid>
+      <description>&lt;p&gt;Ini merupakan kompetisi CTF pertama yang saya ikuti, dan ini merupakan sebuah kickstart dan abuse untuk saya bahwa saya dapat berkontribusi di bidang ini. Special thanks to bl33dz yang telah mengundang saya untuk join ke tim nya (yang sebelumnya tim ini memiliki 3 anggota, karena sudah lulus satu diganti saya wkwk).&lt;/p&gt;&#xA;&lt;p&gt;&lt;img src=&#34;http://localhost:1313/images/icyp-final/scoreboard.png&#34; alt=&#34;scoreboard&#34;&gt;&lt;/p&gt;&#xA;&lt;p&gt;Yaaps, thats look like it. Kami menjuarai event tersebut, yeay. Tapi sayang, beasiswa hanya 1 untuk ketua tim, sad :’(&lt;/p&gt;</description>
+    </item>
+    <item>
+      <title>About</title>
+      <link>http://localhost:1313/about/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      <guid>http://localhost:1313/about/</guid>
+      <description>&lt;p&gt;Nothing to see here&amp;hellip; Move along!&lt;/p&gt;</description>
+    </item>
+  </channel>
+</rss>

