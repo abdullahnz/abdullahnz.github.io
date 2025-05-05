@@ -192,6 +192,12 @@ name = "Posts"
 weight = 2
 url = "posts/"
 
+
+# [[languages.en.menu.main]]
+# name = "Posts (other)"
+# weight = 2
+# url = "others/"
+
 # [[languages.en.menu.main]]
 # name = "Projects"
 # weight = 3

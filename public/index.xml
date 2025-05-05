@@ -6,28 +6,14 @@
     <description>Recent content on Abdullah</description>
     <generator>Hugo</generator>
     <language>en</language>
-    <lastBuildDate>Thu, 05 Jan 2023 01:15:52 +0100</lastBuildDate>
+    <lastBuildDate>Thu, 03 Apr 2025 16:24:00 +0700</lastBuildDate>
     <atom:link href="http://localhost:1313/index.xml" rel="self" type="application/rss+xml" />
     <item>
-      <title>Autores de Hugo</title>
-      <link>http://localhost:1313/autores/autores-de-hugo/</link>
-      <pubDate>Thu, 05 Jan 2023 01:15:52 +0100</pubDate>
-      <guid>http://localhost:1313/autores/autores-de-hugo/</guid>
-      <description></description>
-    </item>
-    <item>
-      <title>temas</title>
-      <link>http://localhost:1313/categoria/temas/</link>
-      <pubDate>Wed, 04 Jan 2023 23:21:18 +0100</pubDate>
-      <guid>http://localhost:1313/categoria/temas/</guid>
-      <description></description>
-    </item>
-    <item>
-      <title>sintaxe</title>
-      <link>http://localhost:1313/categoria/sintaxe/</link>
-      <pubDate>Wed, 04 Jan 2023 23:21:06 +0100</pubDate>
-      <guid>http://localhost:1313/categoria/sintaxe/</guid>
-      <description></description>
+      <title>Other side: Burnout phase...</title>
+      <link>http://localhost:1313/posts/burnout/</link>
+      <pubDate>Thu, 03 Apr 2025 16:24:00 +0700</pubDate>
+      <guid>http://localhost:1313/posts/burnout/</guid>
+      <description>&lt;p&gt;TBA&amp;hellip;&lt;/p&gt;</description>
     </item>
     <item>
       <title>Kernel Adventures Part I: SUID binaries are too vulnerable. So I decided to implement su in the Kernel</title>

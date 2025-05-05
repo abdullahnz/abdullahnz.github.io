@@ -1,9 +1,22 @@
-<li>
+<li
+  {{
+  if
+  .Params.type
+  }}
+  class="other-side"
+  {{
+  else
+  }}
+  class="normal-side"
+  {{
+  end
+  }}
+>
   <span class="date"
     >{{ .Date | time.Format (.Site.Params.dateFormat | default "January 2, 2006"
-    ) }}</span
-  >
+    ) }}
+  </span>
   <a class="title" href="{{ .Params.externalLink | default .RelPermalink }}"
-    >{{ .Title }}</a
-  >
+    >{{ .Title }}
+  </a>
 </li>

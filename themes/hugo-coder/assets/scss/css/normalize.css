@@ -23,6 +23,7 @@ html {
 body {
   margin: 0;
   font-family: "Supreme", sans-serif !important;
+  transition: all 0.3s ease-in-out;
 }
 
 /**

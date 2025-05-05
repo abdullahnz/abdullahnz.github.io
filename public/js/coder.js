@@ -1,19 +1,24 @@
 const body = document.body;
-const darkModeToggle = document.getElementById('dark-mode-toggle');
-const darkModeMediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+const darkModeToggle = document.getElementById("dark-mode-toggle");
+const darkModeMediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
 
 // Check if user preference is set, if not check value of body class for light or dark else it means that colorscheme = auto
 if (localStorage.getItem("colorscheme")) {
     setTheme(localStorage.getItem("colorscheme"));
-} else if (body.classList.contains('colorscheme-light') || body.classList.contains('colorscheme-dark')) {
+} else if (
+    body.classList.contains("colorscheme-light") ||
+    body.classList.contains("colorscheme-dark")
+) {
     setTheme(body.classList.contains("colorscheme-dark") ? "dark" : "light");
 } else {
     setTheme(darkModeMediaQuery.matches ? "dark" : "light");
 }
 
 if (darkModeToggle) {
-    darkModeToggle.addEventListener('click', () => {
-        let theme = body.classList.contains("colorscheme-dark") ? "light" : "dark";
+    darkModeToggle.addEventListener("click", () => {
+        let theme = body.classList.contains("colorscheme-dark")
+            ? "light"
+            : "dark";
         setTheme(theme);
         rememberTheme(theme);
     });
@@ -24,24 +29,24 @@ darkModeMediaQuery.addListener((event) => {
 });
 
 document.addEventListener("DOMContentLoaded", function () {
-    let node = document.querySelector('.preload-transitions');
-    node.classList.remove('preload-transitions');
+    let node = document.querySelector(".preload-transitions");
+    node.classList.remove("preload-transitions");
 });
 
 function setTheme(theme) {
-    body.classList.remove('colorscheme-auto');
-    let inverse = theme === 'dark' ? 'light' : 'dark';
-    body.classList.remove('colorscheme-' + inverse);
-    body.classList.add('colorscheme-' + theme);
-    document.documentElement.style['color-scheme'] = theme;
+    body.classList.remove("colorscheme-auto");
+    let inverse = theme === "dark" ? "light" : "dark";
+    body.classList.remove("colorscheme-" + inverse);
+    body.classList.add("colorscheme-" + theme);
+    document.documentElement.style["color-scheme"] = theme;
 
     function waitForElm(selector) {
-        return new Promise(resolve => {
+        return new Promise((resolve) => {
             if (document.querySelector(selector)) {
                 return resolve(document.querySelector(selector));
             }
-    
-            const observer = new MutationObserver(mutations => {
+
+            const observer = new MutationObserver((mutations) => {
                 if (document.querySelector(selector)) {
                     resolve(document.querySelector(selector));
                     observer.disconnect();
@@ -50,48 +55,66 @@ function setTheme(theme) {
 
             observer.observe(document.body, {
                 childList: true,
-                subtree: true
+                subtree: true,
             });
         });
     }
 
-    if (theme === 'dark') {
-        const message = {
-            type: 'set-theme',
-            theme: 'github-dark'
-        };
-        waitForElm('.utterances-frame').then((iframe) => {
-            iframe.contentWindow.postMessage(message, 'https://utteranc.es');
-        })
-        
+    if (window.location.pathname === "/posts/") {
+        if (theme === "dark") {
+            document.querySelectorAll(".other-side").forEach((post) => {
+                post.style.display = "none";
+            });
+            document.querySelectorAll(".normal-side").forEach((post) => {
+                post.style.display = "block";
+            });
+        } else {
+            document.querySelectorAll(".other-side").forEach((post) => {
+                post.style.display = "block";
+            });
+            document.querySelectorAll(".normal-side").forEach((post) => {
+                post.style.display = "none";
+            });
+        }
     }
-    else {
+
+    if (theme === "dark") {
         const message = {
-            type: 'set-theme',
-            theme: 'github-light'
+            type: "set-theme",
+            theme: "github-dark",
         };
-        waitForElm('.utterances-frame').then((iframe) => {
-            iframe.contentWindow.postMessage(message, 'https://utteranc.es');
-        })
-        
+        waitForElm(".utterances-frame").then((iframe) => {
+            iframe.contentWindow.postMessage(message, "https://utteranc.es");
+        });
+    } else {
+        const message = {
+            type: "set-theme",
+            theme: "github-light",
+        };
+        waitForElm(".utterances-frame").then((iframe) => {
+            iframe.contentWindow.postMessage(message, "https://utteranc.es");
+        });
     }
 
     function sendMessage(message) {
-        const iframe = document.querySelector('iframe.giscus-frame');
+        const iframe = document.querySelector("iframe.giscus-frame");
         if (!iframe) return;
-        iframe.contentWindow.postMessage({ giscus: message }, 'https://giscus.app');
-      }
-      sendMessage({
+        iframe.contentWindow.postMessage(
+            { giscus: message },
+            "https://giscus.app"
+        );
+    }
+    sendMessage({
         setConfig: {
-          theme: theme,
+            theme: theme,
         },
-      });
-    
+    });
+
     // Create and send event
-    const event = new Event('themeChanged');
+    const event = new Event("themeChanged");
     document.dispatchEvent(event);
 }
 
 function rememberTheme(theme) {
-    localStorage.setItem('colorscheme', theme);
+    localStorage.setItem("colorscheme", theme);
 }
